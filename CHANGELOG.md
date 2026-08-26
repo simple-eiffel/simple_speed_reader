@@ -16,5 +16,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
   (running / paused-drawered / stopped-cockpit), foreign-script skip filter, media-transport
   keymap with in-flow micro-rewind.
 - 2026-08-26 — Repo scaffolded: README, docs/, USER_GUIDE, timeline tracking.
+- 2026-08-26 — D-015 fisheye ribbon (paused focus+context strip, clickable resume points);
+  D-016 analog BRAKING (hold: glide to 300 with live ribbon; drag left stop+scrub / right
+  re-engage; release: ease back to cruise) completing the intervention ladder.
+- 2026-08-26 — Program icon generated (scripts/make_icon.py): "r·e·ad"+ticks mark, 7-size
+  speed_reader.ico + docs logo.svg + icon-256.png.
+- 2026-08-26 — DESIGN_STORY.md: rolling interaction narrative beside the specifications.
 
 No code yet — implementation begins after /eiffel.intent.

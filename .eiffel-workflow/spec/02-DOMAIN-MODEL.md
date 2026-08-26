@@ -91,12 +91,16 @@ OLLAMA_CLIENT (curl-based, blocking — verified 2026-08-26); jobs go in, result
 opt-ins (preprocess, quiz), last text + position (autosave).
 **Will become:** `SR_SETTINGS` (simple_config)
 
-### Concept: Stage / Context Page / Flow Map / Cockpit (presentation)
+### Concept: Stage / Context Page / Fisheye Ribbon / Flow Map / Cockpit (presentation)
 **Definition:** Stage = the RSVP frame (word, red pivot pinned at fixed X, ticks, WPM readout).
-Context page = the readable regression surface with word hit-testing. Flow map = whole-text
-miniature with live cursor; scrubber when paused. Cockpit = every control, visible only outside RUNNING.
-**Will become:** `SR_STAGE_VIEW`, `SR_CONTEXT_VIEW`, `SR_FLOW_MAP_VIEW`, `SR_COCKPIT` (app target),
-composed over SW_CANVAS / stock simple_widgets; `SR_APP` owns the two-state switch; `SR_KEYS` the keymap.
+Context page = the readable regression surface with word hit-testing. Fisheye ribbon (PAUSED only)
+= one-line focus+context strip of the surrounding words, tapering from tiny edges to the biggest
+center current word — the "where am I in the flow" glance; every word clickable as a resume point.
+Flow map = whole-text miniature with live cursor; scrubber when paused. Cockpit = every control,
+visible only in STOPPED (drawered subset while PAUSED).
+**Will become:** `SR_STAGE_VIEW`, `SR_CONTEXT_VIEW`, `SR_RIBBON_VIEW`, `SR_FLOW_MAP_VIEW`,
+`SR_COCKPIT` (app target), composed over SW_CANVAS / stock simple_widgets; `SR_APP` owns the
+three-posture switch; `SR_KEYS` the keymap.
 
 ## Concept Relationships
 
@@ -152,3 +156,6 @@ SR_APP (GUI) ─── drives ───> SIMPLE_SPEED_READER  (GUI is a view; en
 | Drawer | Titled slide-in panel (SW_DRAWER) carrying controls in the paused posture |
 | Foreign skip | Opt-in stream filter: non-Latin-script tokens not streamed (transliterations kept); text itself untouched |
 | Linger class | Token property raising display time: length band, foreign script, diacritics, numeric, acronym (cap ×3) |
+| Fisheye ribbon | One-line strip: real words sized by distance from the current word (focus+context / Furnas fisheye); clickable resume points. Shown in PAUSED and live-flowing during BRAKING |
+| Braking | Held analog control: speed glides to 300 with the ribbon flowing live; drag left = stop + scrub back, drag right = re-engage; release = ease back to pre-brake cruise. The middle rung of the intervention ladder |
+| Intervention ladder | Left-tap micro-rewind (lapse) → Brake (wobble) → Pause (loss, marked recovery) → Stop (seal) |

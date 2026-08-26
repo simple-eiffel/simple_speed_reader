@@ -65,8 +65,11 @@ reader.load_file ("D:\books\chapter1.md")
 -- on_tick (armed via shell set_fast_timer (12)):
 reader.tick (now_ms)                    -- engine may advance / seal at text end
 inspect posture
-when Running then stage + flow_map + wpm + dim_pause_affordance
-when Paused  then context_view + flow_map (scrubber) + edge tabs → window.show_drawer
+when Running then stage + flow_map + wpm + dim pause/brake affordances
+                  -- braking overlay while brake held: fisheye ribbon flows live (D-016);
+                  -- stage quick-tap = pause, stage hold = brake, hold+drag = scrub gesture
+when Paused  then ribbon (fisheye strip, top) + context_view + flow_map (scrubber)
+                  + edge tabs → window.show_drawer
 when Stopped then cockpit (full)
 end
 ```
@@ -83,6 +86,7 @@ end
 | Ctrl+Left / Ctrl+Right | VLC long-seek | Same, by paragraph | Same, by paragraph |
 | Up / Down | speed dial (our "volume") | Target +25 / −25 WPM | Same |
 | , / . (< / >) | YouTube speed keys | Alias of Down / Up | Same |
+| B held (or stage press-and-hold) | (ours — the brake pedal, D-016) | Glide to 300, live fisheye overlay; drag left = stop + scrub back, drag right = re-engage toward 300; release = ease back to pre-brake cruise | — |
 | H | (ours — cruise control) | Hold at current / release | Toggle hold for resume |
 | 1 / 2 / 3 | (ours) | Back-off 100 / 50 / 25 | Same |
 | Home | player | — | Resume point → text start |

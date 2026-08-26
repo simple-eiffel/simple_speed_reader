@@ -49,11 +49,12 @@ tests run the whole reading loop without a window.)
 | SR_APP | GUI root | Two-state layout switch; tick fan-out; wiring |
 | SR_STAGE_VIEW | GUI painter | RSVP frame on SW_CANVAS (word, pivot, ticks, WPM) |
 | SR_CONTEXT_VIEW | GUI painter | Readable page + word hit-testing (recovery clicks) |
+| SR_RIBBON_VIEW | GUI painter | Paused fisheye strip: distance-tapered word sizes, click = resume point (D-015) |
 | SR_FLOW_MAP_VIEW | GUI painter | Whole-text miniature + cursor; scrub clicks |
 | SR_COCKPIT | GUI composite | Paused/stopped panels: intake, speed, quiz, history, settings |
 | SR_KEYS | GUI service | Running-state key map → facade commands |
 
-26 classes (20 library + 6 app). Tests per oracle standard: `testing/test_app.e` +
+27 classes (20 library + 7 app). Tests per oracle standard: `testing/test_app.e` +
 `speed_reader_test_set.e` (TEST_SET_BASE).
 
 ## Facade Design: SIMPLE_SPEED_READER

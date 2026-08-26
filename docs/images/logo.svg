@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- simple_speed_reader mark: the RSVP stage in miniature.
+       "read" pivots on its ORP letter 'e' (4 chars -> 2nd, the app's own law),
+       red pivot + red ticks on the near-black stage. -->
+  <rect x="1.5" y="1.5" width="253" height="253" rx="46" fill="#0d0d0f" stroke="#2a2a2e" stroke-width="3"/>
+  <g font-family="Consolas, 'Cascadia Mono', monospace" font-weight="bold" font-size="76">
+    <text x="128" y="154" text-anchor="middle"><tspan fill="#e8e8ea">r</tspan><tspan fill="#e5484d">e</tspan><tspan fill="#e8e8ea">ad</tspan></text>
+  </g>
+  <rect x="101.5" y="52"  width="11" height="36" fill="#e5484d"/>
+  <rect x="101.5" y="168" width="11" height="36" fill="#e5484d"/>
+</svg>

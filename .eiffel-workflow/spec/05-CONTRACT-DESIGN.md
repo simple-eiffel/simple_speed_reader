@@ -100,6 +100,24 @@ reset_for_recovery
     ensure at_recovery: current_wpm = recovery_wpm
            target_frame: target_wpm = old target_wpm
 
+apply_brake
+        -- D-016: begin the eased glide toward Brake_floor (300).
+    require not_braking: not is_braking
+    ensure braking: is_braking
+           cruise_remembered: pre_brake_wpm = old current_wpm
+           hold_remembered: was_held_before_brake = old is_held
+
+brake_glide_tick
+        -- Called per tick while braking (and while easing back after release).
+    ensure gliding_down: is_braking implies current_wpm <= old current_wpm
+           floored: current_wpm >= Brake_floor.min (pre_brake_wpm).max (Min_wpm)
+
+release_brake
+    require braking: is_braking
+    ensure released: not is_braking
+           easing_home: brake_recovery_target = pre_brake_wpm
+           hold_restored: is_held = was_held_before_brake
+
 set_comfy_max (a_wpm: INTEGER)
     require sane: a_wpm >= Min_wpm and a_wpm <= Max_wpm              -- Max_wpm = 1500
     ensure set: comfy_max_wpm = a_wpm
@@ -179,6 +197,15 @@ skip_sentence_forward
     ensure still_running: is_running
            moved_forward: position >= old position
            skips_logged: skipped_count >= old skipped_count
+
+scrub_back (a_words: INTEGER)
+        -- D-016 brake-drag: rewind while STILL RUNNING (braked to stop); no posture change.
+    require running: is_running
+            braking: governor.is_braking
+            positive: a_words >= 1
+    ensure still_running: is_running
+           moved_back: position = (old position - a_words).max (1)
+           brake_event_logged: brake_events.count >= old brake_events.count
 
 resume_at (a_index: INTEGER)
     require paused: is_paused

@@ -187,6 +187,57 @@ keeps flowing, speed unchanged) is the light-touch middle for momentary lapses.
 skipped words (honesty); full keymap table in spec/06-INTERFACE-DESIGN.md.
 **Reversible:** YES (bindings), semantics settled.
 
+### D-015: Fisheye ribbon in the PAUSED posture (2026-08-26, Larry)
+**Question:** Larry sketched a where-am-I strip: words (not letters) on one line, tiny at the
+left edge growing to the biggest center-current-word, then tapering smaller to the right —
+"a word-cloud thing except in a straight line of a sentence or sentence fragment."
+**Decision:** Add SR_RIBBON_VIEW to the paused posture, ABOVE the context page: a one-line
+focus+context (fisheye) strip of the real surrounding words, centered on the current word.
+- Sizing: geometric falloff by word distance d from center — scale(d) = max(0.24, 0.72^|d|)
+  of the center size (center ≈ 2× context-page body); span = as many whole words as fit the
+  width, drawn from the surrounding sentences.
+- Left of center = already-streamed words (normal brightness), right = upcoming (dimmer);
+  center word brightest with a small red tick echoing the stage pin (no ORP pivot — the ribbon
+  is about position, not recognition).
+- Interaction: click any ribbon word → sets the resume point (same command path as the context
+  page click). Hover-magnify (dock effect) deferred — SHOULD, not MVP.
+- PAUSED only. RUNNING stays chrome-free (D-012); the running-state position sense remains the
+  flow map.
+**Rationale:** The context page answers "what did it say?"; the ribbon answers "where am I in
+the flow?" in a single glance without reading. Classic Furnas fisheye / focus+context.
+**Implications:** New app class SR_RIBBON_VIEW (SW_CANVAS painter; reuses facade
+context_window (radius) — no engine change); app classes 6→7, total 27.
+**Reversible:** YES
+
+### D-016: Analog BRAKING control (2026-08-26, Larry)
+**Question:** Larry: a "braking" control — hold to ease the flow down from present speed to 300
+while the fisheye ribbon flows in sync; release → gentle ramp back to the speed you were reading
+at. While holding: mouse LEFT = full-brake to stop and rewind a little; mouse RIGHT = re-engage
+flow ramping to 300; release = resume ramp to full comfy speed.
+**Decision:** Braking is a transient overlay on RUNNING (not a posture change):
+- **Hold** (stage press-and-hold, dim brake affordance, or key B held): current_wpm eases
+  from pre_brake_wpm down toward Brake_floor (300, floored at Min_wpm) over ~1.5 s — a
+  deceleration glide, not a jump. The fisheye ribbon fades in over the running stage and flows
+  live, centered on the streaming word, at the same slowing rate — context without stopping.
+- **Drag while held:** left of press origin → decelerate to full stop, further leftward drag
+  scrubs position backward through the ribbon (rate ∝ drag distance); drag right → forward flow
+  re-engages, ramping to Brake_floor.
+- **Release:** speed eases back up to pre_brake_wpm, then the normal governance resumes
+  (prior hold state restored; ramp law continues toward the session target).
+- Stage QUICK-TAP (press-release, no drag, < ~250 ms) still = Pause (FR-034 refined);
+  hold = brake. Keyboard: Space pause, B-held brake.
+- Words re-streamed after a brake-scrub are simply re-streamed (timestamps make effective WPM
+  honest); a brake event (depth, scrub span) joins the run record.
+**Rationale:** Completes the graduated intervention ladder: Left-tap micro-rewind (lapse) →
+BRAKE (wobble — slow down, see context, maybe nudge back, never leave the stream) → Pause
+(comprehension loss — context page + marked recovery) → Stop (end sitting). Analog control over
+an analog problem.
+**Implications:** SR_GOVERNOR gains brake state (is_braking, pre_brake_wpm, eased glide;
+invariant: braking implies current_wpm >= Min_wpm and glide monotone toward floor);
+SR_SESSION gains scrub_back (running, position decreases, no posture change);
+SR_RIBBON_VIEW rides both PAUSED and the braking overlay; SR_APP press/drag/release routing.
+**Reversible:** YES (curve constants, gesture thresholds); the ladder concept is settled.
+
 ## Open Questions (for /eiffel.intent)
 - OQ-1: Flow map during RUNNING — confirmed in? (D-002 says yes; confirm with Larry)
 - OQ-2: Recovery WPM — fixed 250 or proportional to session max (e.g., max/3)?

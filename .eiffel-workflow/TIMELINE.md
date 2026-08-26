@@ -18,6 +18,7 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Spec complete (8/8, READY) | 2026-08-26 16:39 | 0:39 | 26 classes, 39 requirements traced |
 | Design refinements D-011…D-014 folded | 2026-08-26 16:55 | 0:55 | adaptive timing, 3 postures + drawers, foreign skip, transport keymap (42 FRs) |
 | Repo scaffolded (README/docs/user-guide/git) | 2026-08-26 16:55 | 0:55 | honest in-design status |
+| D-015/D-016 + icon + design story | 2026-08-26 17:35 | 1:35 | fisheye ribbon, analog braking (intervention ladder), 7-size .ico + logo.svg, rolling DESIGN_STORY.md (46 FRs) |
 | /eiffel.intent complete | — | — | |
 | Contracts (Phase 1) compile | — | — | first ec.sh gate |
 | Implementation (Phase 4) complete | — | — | |

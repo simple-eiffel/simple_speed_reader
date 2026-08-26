@@ -156,7 +156,15 @@ feature -- Commands
 
     hold ... release_hold ... back_off (a_amount: INTEGER) ...
     reset_for_recovery ... set_comfy_max (a_wpm: INTEGER) ...
+    apply_brake ... brake_glide_tick ... release_brake        -- D-016 analog braking
         -- contracts as specified in 05-CONTRACT-DESIGN.md verbatim
+
+feature -- Braking (D-016)
+
+    is_braking: BOOLEAN
+    pre_brake_wpm: INTEGER
+            -- The cruise to ease back to on release.
+    Brake_floor: INTEGER = 300
 
 invariant
     floor: Min_wpm <= current_wpm
@@ -327,6 +335,16 @@ end
   Foreign-script tokens: centered whole-word, no pivot (D-011).
 - `SR_CONTEXT_VIEW` — SW_CANVAS painter: flowed paragraphs from `context_window`, stopped word
   marked; per-word hit rectangles → `on_word_click (index)` → `resume_at`.
+- `SR_RIBBON_VIEW` — SW_CANVAS painter: one-line fisheye strip from `context_window`; per-word
+  font size = center × max(0.24, 0.72^|distance|), whole words packed to width;
+  left(streamed)=normal, right(upcoming)=dimmer, center brightest with a small red tick;
+  per-word hit rects → `on_word_click (index)` (same resume path). Two homes: PAUSED (above the
+  context page, D-015) and the BRAKING overlay on the running stage, flowing live in sync with
+  the slowing stream (D-016).
+- Braking input routing in `SR_APP`: stage press starts a hold-timer — release <~250 ms with no
+  drag = Pause; held = `apply_brake` (+ B key equivalent); drag left past threshold while held =
+  glide to stop then `scrub_back` at drag-proportional rate; drag right = re-engage forward;
+  release = `release_brake` (ease to pre-brake cruise). D-016.
 - `SR_FLOW_MAP_VIEW` — SW_CANVAS painter over `flow_blocks (pixel_budget)`; cursor band; read
   half brighter; paused clicks → scrub.
 - `SR_COCKPIT` — SW_COLUMN/tabs of stock widgets: intake (SW_TEXT_BOX, SW_FILE_DIALOG button,
@@ -364,8 +382,10 @@ simple_speed_reader/
 │   │             sr_clean_job.e sr_quiz_job.e sr_drill_job.e
 │   ├── quiz/     sr_quiz.e sr_quiz_question.e sr_quiz_validator.e
 │   └── store/    sr_log.e sr_settings.e
-├── app/          sr_app.e sr_stage_view.e sr_context_view.e
+├── app/          sr_app.e sr_stage_view.e sr_context_view.e sr_ribbon_view.e
 │                 sr_flow_map_view.e sr_cockpit.e sr_keys.e
+│   └── resources/ speed_reader.ico     (embedded in exe at build; installer SetupIconFile)
+├── scripts/      make_icon.py          (regenerates .ico + docs rasters)
 ├── testing/      test_app.e speed_reader_test_set.e
 └── docs/  README.md  CHANGELOG.md
 ```

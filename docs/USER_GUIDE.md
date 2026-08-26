@@ -15,7 +15,7 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
 | Posture | What you see | How you got here |
 |---------|--------------|------------------|
 | **Running** | Only the stream: the word stage, the flow map on the left, the dim `SPEED: N WPM` readout, and one dim pause mark. Nothing else. | Space/Enter from paused, or Start from the cockpit |
-| **Paused** | The **context page**: the surrounding paragraphs as normal readable text, your stopped word marked. Controls are tucked into edge drawers (Speed · Quiz · Settings) — pull one out if you need it. The flow map becomes a click-to-seek scrubber. | Space, clicking the stage, or the pause mark |
+| **Paused** | The **fisheye ribbon** on top — one line of the surrounding words, tiny at the edges swelling to your current word at center: where you are, at a glance. Below it, the **context page**: the surrounding paragraphs as normal readable text, your stopped word marked. Controls are tucked into edge drawers (Speed · Quiz · Settings) — pull one out if you need it. The flow map becomes a click-to-seek scrubber. Clicking a word — in the ribbon or the page — sets where reading resumes. | Space, clicking the stage, or the pause mark |
 | **Stopped** | The full cockpit: load text, settings, quiz, history, and **Continue at word N** if you were mid-book. Stopping *seals the sitting*: your run is logged and your place saved. | Esc (or S) from anywhere; or finishing the text |
 
 ## Keys (media-player muscle memory; the seek unit is the *sentence*)

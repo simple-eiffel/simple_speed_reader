@@ -79,6 +79,10 @@
 | FR-040 foreign-skip filter | SR_TOKEN.streams_under_filter; SR_SESSION.advance; skipped_count | ✓ |
 | FR-041 micro-rewind / skip-forward | SR_SESSION.replay_sentence / skip_sentence_forward | ✓ |
 | FR-042 transport keymap | SR_KEYS table (spec/06, D-014); media keys SHOULD | ✓ |
+| FR-043 fisheye ribbon | SR_RIBBON_VIEW (D-015); context_window reuse; click = resume | ✓ |
+| FR-044 program icon | app/resources/speed_reader.ico (generated, 7 sizes) + logo.svg; exe-embed + installer wiring at ship | ✓ (asset built) |
+| FR-045 braking glide + live ribbon | SR_GOVERNOR apply/glide/release_brake; SR_RIBBON_VIEW braking overlay; SR_APP tap-vs-hold routing | ✓ |
+| FR-046 brake-drag scrub gesture | SR_APP drag routing → SR_SESSION.scrub_back; brake events logged | ✓ |
 | NFR-001 cadence | SR_PACER deadline-anchored (04) | ✓ |
 | NFR-002 stop latency | state flip on command; next tick paints cockpit | ✓ |
 | NFR-003 AI non-blocking | gateway region + mailbox (DR-009) | ✓ |
@@ -115,13 +119,18 @@
   /SUPPRESSMSGBOXES silent-uninstall gotcha), CHANGELOG discipline
 - Timeline tracking: .eiffel-workflow/TIMELINE.md — stamp every phase milestone through
   installer build and Larry's approval (Larry's directive 2026-08-26)
+- Design story: .eiffel-workflow/DESIGN_STORY.md is the ROLLING interaction narrative (Larry's
+  directive 2026-08-26) — every accepted feature request gets an entry; ship phase publishes a
+  polished version into docs/ for the Eiffel community
 
 ## Ready for Implementation
 
-- [x] All requirements traced (42 FR + 6 NFR)
+- [x] All requirements traced (46 FR + 6 NFR)
 - [x] All risks mitigated in design
 - [x] All principles satisfied
-- [x] Design is complete (26 classes, contracts drafted, interfaces fixed)
-- [x] D-011…D-014 refinements folded in (adaptive timing, three postures, foreign skip, transport)
+- [x] Design is complete (27 classes, contracts drafted, interfaces fixed)
+- [x] D-011…D-016 refinements folded in (adaptive timing, three postures, foreign skip,
+      transport, fisheye ribbon, analog braking + intervention ladder)
+- [x] Icon asset generated (speed_reader.ico 7 sizes + logo.svg + icon-256.png)
 
 **VERDICT:** READY

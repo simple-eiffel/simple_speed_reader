@@ -1,9 +1,14 @@
+<p align="center">
+  <img src="docs/images/logo.svg" alt="simple_speed_reader logo" width="160">
+</p>
+
 <h1 align="center">simple_speed_reader</h1>
 
 <p align="center">
   <a href="https://simple-eiffel.github.io/simple_speed_reader/">Documentation</a> •
   <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a> •
-  <a href="docs/USER_GUIDE.md">User Guide</a>
+  <a href="docs/USER_GUIDE.md">User Guide</a> •
+  <a href=".eiffel-workflow/DESIGN_STORY.md">Design Story</a>
 </p>
 
 <p align="center">
