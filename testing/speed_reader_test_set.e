@@ -514,6 +514,84 @@ feature -- Test: session
 			assert_false ("no text", r.has_text)
 		end
 
+feature -- Test: braking (D-016)
+
+	test_governor_brake_cycle
+		local
+			g: SR_GOVERNOR
+			i: INTEGER
+		do
+			create g.make (250, 250, 900)
+			from i := 1 until i > 400 loop
+				g.note_word_advanced
+				i := i + 1
+			end
+			assert_integers_equal ("cruising", 900, g.current_wpm)
+			g.apply_brake
+			from i := 1 until i > 200 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			assert_integers_equal ("glided to the floor", 300, g.current_wpm)
+			g.release_brake
+			assert_true ("easing", g.is_easing_home)
+			from i := 1 until i > 200 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			assert_integers_equal ("eased home", 900, g.current_wpm)
+			assert_false ("brake fully idle", g.is_brake_active)
+		end
+
+	test_governor_brake_restores_hold
+		local
+			g: SR_GOVERNOR
+			i: INTEGER
+		do
+			create g.make (250, 250, 900)
+			from i := 1 until i > 120 loop
+				g.note_word_advanced
+				i := i + 1
+			end
+			g.hold
+			assert_integers_equal ("pinned", 500, g.target_wpm)
+			g.apply_brake
+			assert_false ("pin lifts for the glide", g.is_held)
+			from i := 1 until i > 100 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			g.release_brake
+			from i := 1 until i > 100 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			assert_true ("hold restored at arrival", g.is_held)
+			assert_integers_equal ("re-pinned at the old cruise", 500, g.target_wpm)
+		end
+
+	test_session_scrub_back
+		local
+			r: SIMPLE_SPEED_READER
+			l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (600, 300, 900)
+			r.load_text ({STRING_32} "t", {STRING_32} "One two three four five six seven eight.")
+			r.start_reading (0)
+			from l_now := 0 until r.position >= 5 or l_now > 10000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+			end
+			r.apply_brake
+			r.scrub_back_word (l_now)
+			r.scrub_back_word (l_now)
+			assert_integers_equal ("two words back, still running", 3, r.position)
+			assert_true ("still running", r.is_running)
+			r.release_brake
+			assert_false ("brake off", r.is_braking)
+		end
+
 feature {NONE} -- Fixture helpers
 
 	delete_file (a_path: READABLE_STRING_GENERAL)

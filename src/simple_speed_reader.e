@@ -371,6 +371,58 @@ feature -- The reading loop
 			sealed: is_sealed
 		end
 
+feature -- Braking (D-016)
+
+	is_braking: BOOLEAN
+		do
+			Result := attached session as al_s and then al_s.governor.is_braking
+		end
+
+	is_brake_active: BOOLEAN
+		do
+			Result := attached session as al_s and then al_s.governor.is_brake_active
+		end
+
+	apply_brake
+		require
+			running: is_running
+			idle: not is_brake_active
+		do
+			check attached session as al_s then
+				al_s.governor.apply_brake
+			end
+		ensure
+			braking: is_braking
+		end
+
+	release_brake
+		require
+			braking: is_braking
+		do
+			check attached session as al_s then
+				al_s.governor.release_brake
+			end
+		ensure
+			released: not is_braking
+		end
+
+	brake_tick
+			-- One clock tick of glide; call every tick while brake-active.
+		do
+			if attached session as al_s then
+				al_s.governor.brake_glide_tick
+			end
+		end
+
+	scrub_back_word (a_now_ms: INTEGER)
+		require
+			running: is_running
+		do
+			check attached session as al_s then
+				al_s.scrub_back_word (a_now_ms)
+			end
+		end
+
 feature -- Governance
 
 	hold

@@ -11,7 +11,7 @@ class
 inherit
 	SW_CANVAS
 		redefine
-			accepts_focus, handle_key, handle_char
+			accepts_focus, handle_key, handle_char, handle_release
 		end
 
 create
@@ -39,11 +39,20 @@ feature -- Input
 			end
 		end
 
+	handle_release (a_x, a_y: INTEGER)
+		do
+			if attached on_release as al_h then
+				al_h.call (a_x, a_y)
+			end
+		end
+
 feature -- Access
 
 	on_vk: detachable PROCEDURE [INTEGER, BOOLEAN]
 
 	on_char: detachable PROCEDURE [INTEGER]
+
+	on_release: detachable PROCEDURE [INTEGER, INTEGER]
 
 feature -- Element change
 
@@ -59,6 +68,13 @@ feature -- Element change
 			on_char := a_agent
 		ensure
 			set: on_char = a_agent
+		end
+
+	set_on_release (a_agent: PROCEDURE [INTEGER, INTEGER])
+		do
+			on_release := a_agent
+		ensure
+			set: on_release = a_agent
 		end
 
 end

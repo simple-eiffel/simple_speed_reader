@@ -72,6 +72,10 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_settings_roundtrip, "test_settings_roundtrip")
 			run_test (agent l_set.test_log_records_and_reads, "test_log_records_and_reads")
 			run_test (agent l_set.test_preset_position_continue, "test_preset_position_continue")
+			print ("=== BRAKING ===%N")
+			run_test (agent l_set.test_governor_brake_cycle, "test_governor_brake_cycle")
+			run_test (agent l_set.test_governor_brake_restores_hold, "test_governor_brake_restores_hold")
+			run_test (agent l_set.test_session_scrub_back, "test_session_scrub_back")
 		end
 
 	run_test (a_test: PROCEDURE; a_name: STRING)

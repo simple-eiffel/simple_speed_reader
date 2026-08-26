@@ -56,6 +56,24 @@ feature -- Access
 
 	is_held: BOOLEAN
 
+feature -- Braking (D-016)
+
+	is_braking: BOOLEAN
+
+	is_easing_home: BOOLEAN
+
+	is_brake_active: BOOLEAN
+		do
+			Result := is_braking or is_easing_home
+		end
+
+	pre_brake_wpm: INTEGER
+			-- The cruise the release eases back to.
+
+	was_held_before_brake: BOOLEAN
+
+	brake_floor_wpm: INTEGER
+
 feature -- Constants
 
 	Min_wpm: INTEGER = 100
@@ -63,6 +81,9 @@ feature -- Constants
 	Ramp_step: INTEGER = 25
 	Ramp_interval_words: INTEGER = 12
 	Nudge_step: INTEGER = 25
+	Brake_floor: INTEGER = 300
+	Brake_tick_step: INTEGER = 6
+			-- Per 12 ms tick: ~500 wpm/s - a 900->300 glide in ~1.2 s.
 
 feature -- Commands
 
@@ -155,6 +176,58 @@ feature -- Commands
 		ensure
 			at_recovery: current_wpm = recovery_wpm.min (target_wpm)
 			target_frame: target_wpm = old target_wpm
+		end
+
+	apply_brake
+			-- D-016: begin the eased glide toward the brake floor. A
+			-- pinned hold is remembered and restored when the ease home
+			-- completes.
+		require
+			idle: not is_brake_active
+		do
+			is_braking := True
+			pre_brake_wpm := current_wpm
+			was_held_before_brake := is_held
+			if is_held then
+				is_held := False
+				target_wpm := session_target_wpm.min (comfy_max_wpm)
+			end
+			brake_floor_wpm := Brake_floor.max (Min_wpm).min (pre_brake_wpm)
+		ensure
+			braking: is_braking
+			cruise_remembered: pre_brake_wpm = old current_wpm
+			hold_remembered: was_held_before_brake = old is_held
+		end
+
+	release_brake
+			-- Let go: ease back up toward the pre-brake cruise.
+		require
+			braking: is_braking
+		do
+			is_braking := False
+			is_easing_home := True
+		ensure
+			easing: is_easing_home and not is_braking
+		end
+
+	brake_glide_tick
+			-- One clock tick of glide (down while braking, up while
+			-- easing home); restores a remembered hold at arrival.
+		do
+			if is_braking then
+				current_wpm := (current_wpm - Brake_tick_step).max (brake_floor_wpm)
+			elseif is_easing_home then
+				current_wpm := (current_wpm + Brake_tick_step).min (pre_brake_wpm.min (target_wpm))
+				if current_wpm >= pre_brake_wpm.min (target_wpm) then
+					is_easing_home := False
+					if was_held_before_brake and not is_held then
+						hold
+					end
+				end
+			end
+		ensure
+			glide_down: (old is_braking) implies current_wpm <= old current_wpm
+			glide_up: (old is_easing_home) implies current_wpm >= old current_wpm
 		end
 
 	set_comfy_max (a_wpm: INTEGER)

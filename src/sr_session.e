@@ -224,6 +224,23 @@ feature -- Transport commands (D-014)
 			speed_untouched: governor.current_wpm = old governor.current_wpm
 		end
 
+	scrub_back_word (a_now_ms: INTEGER)
+			-- D-016 brake-drag: one word back while STILL RUNNING (the
+			-- brake has us stopped or crawling); no posture change.
+		require
+			running: is_running
+			placed: position >= 1
+		do
+			if position > 1 then
+				position := position - 1
+			end
+			pacer.arm (a_now_ms, timing.display_ms (text.token (position), governor.current_wpm),
+				timing.breather_ms (text.token (position), governor.current_wpm))
+		ensure
+			still_running: is_running
+			moved_back: position <= old position
+		end
+
 	skip_sentence_forward (a_now_ms: INTEGER)
 			-- Jump to the next sentence's first streamable word; the
 			-- jumped words are logged as skipped. Seals at text end.

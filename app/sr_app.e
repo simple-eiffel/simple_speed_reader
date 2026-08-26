@@ -59,6 +59,14 @@ feature {NONE} -- Initialization
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
 			running_root := l_row
+			create l_col.make
+			l_col.put (ribbon.surface)
+			create l_row.make
+			l_row.put (flow_map.surface)
+			l_row.put (stage.surface)
+			l_row.set_grow (1.0)
+			l_col.put (l_row)
+			braking_root := l_col
 			create paused_resume_button.make_primary ("Resume at sentence head  (Space)", Void)
 			create paused_here_button.make ("Resume exactly here  (Enter)", Void)
 			create paused_stop_button.make ("Stop and log the run  (Esc)", Void)
@@ -84,6 +92,8 @@ feature {NONE} -- Initialization
 			stage.surface.set_on_char (agent on_reading_char)
 			stage.surface.set_on_vk (agent on_reading_vk)
 			stage.surface.set_on_press (agent on_stage_press)
+			stage.surface.set_on_sweep (agent on_stage_sweep)
+			stage.surface.set_on_release (agent on_stage_release)
 			context_view.surface.set_on_char (agent on_paused_char)
 			context_view.set_on_word_click (agent on_word_marked)
 			flow_map.set_on_seek (agent on_map_seek)
@@ -136,7 +146,34 @@ feature {NONE} -- The clock
 		do
 			if a_type = 25 then
 				l_now := window.tick_ms
-				reader.tick (l_now)
+					-- The brake pedal (D-016): engage after a held press,
+					-- glide every tick, scrub while dragged left.
+				if is_press_live and then not brake_engaged and then reader.is_running
+					and then l_now - press_ms > Hold_engage_ms
+				then
+					brake_engaged := True
+					scrub_mode := False
+					scrub_accumulator := 0.0
+					reader.apply_brake
+					logger.info ("brake engaged at word " + reader.position.out)
+					window.set_root (braking_root)
+				end
+				if reader.is_brake_active then
+					reader.brake_tick
+				end
+				if brake_engaged and scrub_mode and reader.is_running then
+					scrub_accumulator := scrub_accumulator
+						+ ((scrub_dx.abs - Brake_drag_px) / 15.0).max (0.0).min (14.0) * 0.012
+					from
+					until
+						scrub_accumulator < 1.0 or not reader.is_running
+					loop
+						reader.scrub_back_word (l_now)
+						scrub_accumulator := scrub_accumulator - 1.0
+					end
+				elseif not (brake_engaged and scrub_mode) then
+					reader.tick (l_now)
+				end
 				if posture = Posture_running then
 					if reader.is_sealed then
 							-- The text finished under us.
@@ -166,7 +203,19 @@ feature {NONE} -- Postures (D-012)
 
 	posture: INTEGER
 
-	running_root, paused_root, cockpit_root: SW_WIDGET
+	running_root, paused_root, cockpit_root, braking_root: SW_WIDGET
+
+	is_press_live, brake_engaged, scrub_mode: BOOLEAN
+
+	press_ms, scrub_dx: INTEGER
+
+	press_x: REAL_64
+
+	scrub_accumulator: REAL_64
+
+	Hold_engage_ms: INTEGER = 220
+
+	Brake_drag_px: INTEGER = 40
 
 	to_running
 		do
@@ -180,14 +229,27 @@ feature {NONE} -- Postures (D-012)
 	to_paused
 		do
 			posture := Posture_paused
+			reset_brake_gesture
 			window.set_root (paused_root)
 			window.give_focus (context_view.surface)
 			window.request_render
 		end
 
+	reset_brake_gesture
+			-- Leaving the running stream mid-gesture: tidy the pedal.
+		do
+			is_press_live := False
+			brake_engaged := False
+			scrub_mode := False
+			if reader.is_braking then
+				reader.release_brake
+			end
+		end
+
 	to_cockpit
 		do
 			posture := Posture_cockpit
+			reset_brake_gesture
 			cockpit.refresh (reader)
 			cockpit.show_history (ledger.recent_lines (6))
 			window.set_root (cockpit_root)
@@ -269,9 +331,49 @@ feature {NONE} -- Transport (D-014)
 		end
 
 	on_stage_press (a_px, a_py: REAL_64)
-			-- The whole stage is a pause target (FR-034).
+			-- The stage is the pedal (D-016): a quick tap pauses, a
+			-- held press brakes (engaged from the tick handler).
 		do
-			do_pause
+			if reader.is_running then
+				is_press_live := True
+				press_ms := window.tick_ms
+				press_x := a_px
+				scrub_dx := 0
+			end
+		end
+
+	on_stage_sweep (a_px, a_py: REAL_64)
+			-- Drag while the pedal is down: left of the press point
+			-- scrubs backward, right re-engages forward flow.
+		do
+			if brake_engaged then
+				scrub_dx := (a_px - press_x).truncated_to_integer
+				scrub_mode := scrub_dx < -Brake_drag_px
+			end
+		end
+
+	on_stage_release (a_x, a_y: INTEGER)
+			-- Pedal up: a tap becomes the pause; a brake eases home.
+		do
+			if is_press_live then
+				is_press_live := False
+				if brake_engaged then
+					brake_engaged := False
+					scrub_mode := False
+					if reader.is_braking then
+						reader.release_brake
+						logger.info ("brake released at word " + reader.position.out
+							+ " (" + reader.current_wpm.out + " wpm, easing home)")
+					end
+					if posture = Posture_running then
+						window.set_root (running_root)
+						window.give_focus (stage.surface)
+						window.request_render
+					end
+				else
+					do_pause
+				end
+			end
 		end
 
 	open_speed_drawer

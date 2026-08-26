@@ -103,7 +103,9 @@ feature {NONE} -- Painting
 				l_s.append_string_general ("SPEED: ")
 				l_s.append_string_general (reader.current_wpm.out)
 				l_s.append_string_general (" WPM")
-				if reader.is_held then
+				if reader.is_braking then
+					l_s.append_string_general ("  [BRAKE]")
+				elseif reader.is_held then
 					l_s.append_string_general ("  [HELD]")
 				end
 				p.text (a_x + (a_w - p.advance (l_s)) / 2, a_y + a_h - 26.0, l_s)
