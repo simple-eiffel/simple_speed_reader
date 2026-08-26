@@ -443,6 +443,67 @@ feature -- Test: session
 			assert_attached ("record built", r.last_record)
 		end
 
+	test_settings_roundtrip
+		local
+			s, s2: SR_SETTINGS
+		do
+			create s.make ("test_sr_settings.cfg")
+			s.set_speeds (300, 275, 850)
+			s.set_skip_foreign (True)
+			s.set_font_size (72)
+			s.set_resume_point ({STRING_32} "D:\books\ch1.md", {STRING_32} "ch1.md", 412)
+			create s2.make ("test_sr_settings.cfg")
+			assert_integers_equal ("start persisted", 300, s2.start_wpm)
+			assert_integers_equal ("comfy persisted", 850, s2.comfy_max_wpm)
+			assert_true ("skip persisted", s2.skip_foreign)
+			assert_integers_equal ("font persisted", 72, s2.font_size)
+			assert_integers_equal ("position persisted", 412, s2.last_position)
+			assert_true ("path persisted", s2.last_file_path.same_string_general ("D:\books\ch1.md"))
+			delete_file ("test_sr_settings.cfg")
+		end
+
+	test_log_records_and_reads
+		local
+			lg: SR_LOG
+			rec: SR_RUN_RECORD
+			l_before: INTEGER
+		do
+			delete_file ("test_sr_log.db")
+			create lg.make ("test_sr_log.db")
+			l_before := lg.run_count
+			create rec.make ({STRING_32} "test text", 500, 3, 2, 1, 900, 640)
+			lg.record_run (rec, -1)
+			lg.record_run (rec, 80)
+			assert_integers_equal ("two rows", l_before + 2, lg.run_count)
+			assert_integers_equal ("recent capped", 1, lg.recent_lines (1).count)
+			assert_true ("line carries the words",
+				lg.recent_lines (1).first.has_substring ({STRING_32} "500 words"))
+			assert_true ("quiz percent shown",
+				lg.recent_lines (1).first.has_substring ({STRING_32} "quiz 80"))
+			lg.close
+			delete_file ("test_sr_log.db")
+		end
+
+	test_preset_position_continue
+		local
+			r: SIMPLE_SPEED_READER
+			l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (300, 300, 300)
+			r.load_text ({STRING_32} "t", {STRING_32} "One two three. Four five six.")
+			r.preset_position (4)
+			r.start_reading (0)
+			assert_integers_equal ("continued at four", 4, r.position)
+			from l_now := 0 until r.is_sealed or l_now > 10000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+			end
+			if attached r.last_record as al_rec then
+				assert_integers_equal ("only the tail streamed", 3, al_rec.streamed_count)
+			end
+		end
+
 	test_facade_blank_intake
 		local
 			r: SIMPLE_SPEED_READER
@@ -451,6 +512,18 @@ feature -- Test: session
 			r.load_text ({STRING_32} "t", {STRING_32} "   %N%N  ")
 			assert_false ("refused", r.last_intake_ok)
 			assert_false ("no text", r.has_text)
+		end
+
+feature {NONE} -- Fixture helpers
+
+	delete_file (a_path: READABLE_STRING_GENERAL)
+		local
+			l_f: RAW_FILE
+		do
+			create l_f.make_with_name (a_path)
+			if l_f.exists then
+				l_f.delete
+			end
 		end
 
 end

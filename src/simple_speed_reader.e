@@ -276,6 +276,19 @@ feature -- Status
 
 feature -- The reading loop
 
+	preset_position (a_index: INTEGER)
+			-- Continue-at-word-N: place a fresh session before starting.
+		require
+			startable: can_start
+			in_text: a_index >= 1 and a_index <= token_count
+		do
+			check attached session as al_s then
+				al_s.preset_position (a_index)
+			end
+		ensure
+			placed: position = a_index
+		end
+
 	tick (a_now_ms: INTEGER)
 		do
 			if attached session as al_s then

@@ -123,6 +123,19 @@ feature -- Element change
 
 feature -- Transport commands (D-014)
 
+	preset_position (a_index: INTEGER)
+			-- Place the session at `a_index' before it starts - the
+			-- "Continue at word N" doorway (FR-032).
+		require
+			stopped: is_stopped
+			unsealed: not is_sealed
+			in_text: a_index >= 1 and a_index <= text.token_count
+		do
+			position := a_index
+		ensure
+			placed: position = a_index
+		end
+
 	start_reading (a_now_ms: INTEGER)
 			-- Stopped -> running, at the first streamable word (or where
 			-- a previous pause left the position).

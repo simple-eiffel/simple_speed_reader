@@ -13,11 +13,15 @@ create
 
 feature {NONE} -- Initialization
 
-	make
-			-- Build the surface; `wire' hooks the host's agents after.
+	make (a_start_wpm, a_comfy_wpm: INTEGER; a_skip: BOOLEAN)
+			-- Build the surface seeded from the profile; `wire' hooks
+			-- the host's agents after.
+		require
+			lawful: a_start_wpm >= {SR_GOVERNOR}.Min_wpm and a_comfy_wpm <= {SR_GOVERNOR}.Max_wpm
 		local
 			l_row: SW_ROW
 			l_speeds: SW_ROW
+			i: INTEGER
 		do
 			create root.make
 			root := root.with_padding (20.0).with_gap (12.0)
@@ -42,27 +46,40 @@ feature {NONE} -- Initialization
 			l_row.put (load_button)
 			create start_button.make_primary ("Start reading  (Space pauses - Esc stops)", Void)
 			l_row.put (start_button)
+			create continue_button.make ("Continue where I left off", Void)
+			l_row.put (continue_button)
 			root.put (l_row)
 
 			create l_speeds.make
 			l_speeds := l_speeds.with_gap (10.0)
 			l_speeds.put (create {SW_LABEL}.make_mono ("start WPM"))
-			create start_box.make (250, {SR_GOVERNOR}.Min_wpm, 600, Void)
+			create start_box.make (a_start_wpm, {SR_GOVERNOR}.Min_wpm, 600, Void)
 			l_speeds.put (start_box)
 			l_speeds.put (create {SW_LABEL}.make_mono ("comfy max WPM"))
-			create comfy_box.make (900, 200, {SR_GOVERNOR}.Max_wpm, Void)
+			create comfy_box.make (a_comfy_wpm, 200, {SR_GOVERNOR}.Max_wpm, Void)
 			l_speeds.put (comfy_box)
-			create skip_check.make ("Skip Hebrew/Greek script words (transliterations stay)", False, Void)
+			create skip_check.make ("Skip Hebrew/Greek script words (transliterations stay)", a_skip, Void)
 			l_speeds.put (skip_check)
 			root.put (l_speeds)
 
 			create summary_label.make_mono ("")
 			root.put (summary_label)
+
+			create history_labels.make (History_rows)
+			from
+				i := 1
+			until
+				i > History_rows
+			loop
+				history_labels.extend (create {SW_LABEL}.make_mono (""))
+				root.put (history_labels.last)
+				i := i + 1
+			end
 		end
 
 feature -- Wiring
 
-	wire (a_on_load_file, a_on_start: PROCEDURE;
+	wire (a_on_load_file, a_on_start, a_on_continue: PROCEDURE;
 			a_on_start_wpm, a_on_comfy_wpm: PROCEDURE [INTEGER];
 			a_on_skip: PROCEDURE)
 			-- Hook the host's actions (two-phase: after the host's own
@@ -70,9 +87,29 @@ feature -- Wiring
 		do
 			load_button.set_on_click (a_on_load_file)
 			start_button.set_on_click (a_on_start)
+			continue_button.set_on_click (a_on_continue)
 			start_box.set_on_change (a_on_start_wpm)
 			comfy_box.set_on_change (a_on_comfy_wpm)
 			skip_check.set_on_change (a_on_skip)
+		end
+
+	show_history (a_lines: LIST [STRING_32])
+			-- The newest sealed runs, newest first.
+		local
+			i: INTEGER
+		do
+			from
+				i := 1
+			until
+				i > history_labels.count
+			loop
+				if i <= a_lines.count then
+					history_labels.i_th (i).set_text (a_lines.i_th (i))
+				else
+					history_labels.i_th (i).set_text ("")
+				end
+				i := i + 1
+			end
 		end
 
 feature -- Access
@@ -131,7 +168,11 @@ feature {NONE} -- Implementation
 
 	title_label, status_label, summary_label: SW_LABEL
 
-	load_button, start_button: SW_BUTTON
+	history_labels: ARRAYED_LIST [SW_LABEL]
+
+	History_rows: INTEGER = 6
+
+	load_button, start_button, continue_button: SW_BUTTON
 
 	skip_check: SW_CHECK_BOX
 

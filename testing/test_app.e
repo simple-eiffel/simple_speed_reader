@@ -68,6 +68,10 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_session_replay_and_skip, "test_session_replay_and_skip")
 			run_test (agent l_set.test_session_stop_keeps_position, "test_session_stop_keeps_position")
 			run_test (agent l_set.test_facade_blank_intake, "test_facade_blank_intake")
+			print ("=== STORE ===%N")
+			run_test (agent l_set.test_settings_roundtrip, "test_settings_roundtrip")
+			run_test (agent l_set.test_log_records_and_reads, "test_log_records_and_reads")
+			run_test (agent l_set.test_preset_position_continue, "test_preset_position_continue")
 		end
 
 	run_test (a_test: PROCEDURE; a_name: STRING)

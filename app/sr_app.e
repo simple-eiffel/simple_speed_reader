@@ -23,15 +23,21 @@ feature {NONE} -- Initialization
 				-- Phase 1: every attached attribute set - no agent may
 				-- capture Current until this block is complete (VEVI).
 			create logger.make_to_file ("speed_reader.log")
+			create settings.make ("speed_reader.cfg")
+			create ledger.make ("speed_reader.db")
 			create reader.make
+			reader := reader.with_speeds (settings.start_wpm, settings.recovery_wpm,
+				settings.comfy_max_wpm).with_foreign_skip (settings.skip_foreign)
 			create theme.make_dark
 			create window.make ("Simple Speed Reader", 90, 50, 1180, 820, theme)
 			create last_source.make_empty
 			create last_title.make_empty
+			create current_file_path.make_empty
 			create stage.make (reader)
+			stage.set_font_size (settings.font_size)
 			create context_view.make (reader)
 			create flow_map.make (reader)
-			create cockpit.make
+			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm, settings.skip_foreign)
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
@@ -63,12 +69,13 @@ feature {NONE} -- Initialization
 			context_view.set_on_word_click (agent on_word_marked)
 			flow_map.set_on_seek (agent on_map_seek)
 			cockpit.wire (
-				agent on_load_file_asked, agent on_start_asked,
+				agent on_load_file_asked, agent on_start_asked, agent on_continue_asked,
 				agent on_start_wpm_changed, agent on_comfy_changed,
 				agent on_skip_toggled)
 			paused_resume_button.set_on_click (agent on_paused_resume_clicked)
 			paused_here_button.set_on_click (agent on_paused_here_clicked)
 			paused_stop_button.set_on_click (agent do_stop)
+			cockpit.show_history (ledger.recent_lines (6))
 
 			window.set_root (cockpit_root)
 			window.set_on_shell_event (agent on_shell_event)
@@ -105,6 +112,7 @@ feature {NONE} -- The clock
 				if posture = Posture_running then
 					if reader.is_sealed then
 							-- The text finished under us.
+						record_seal
 						to_cockpit
 					else
 						stage.set_breather (reader.in_breather (l_now))
@@ -153,6 +161,7 @@ feature {NONE} -- Postures (D-012)
 		do
 			posture := Posture_cockpit
 			cockpit.refresh (reader)
+			cockpit.show_history (ledger.recent_lines (6))
 			window.set_root (cockpit_root)
 			window.request_render
 		end
@@ -279,6 +288,7 @@ feature {NONE} -- Transport (D-014)
 				reader.pause_reading
 				logger.info ("paused at word " + reader.position.out
 					+ " of " + reader.token_count.out + " (" + reader.current_wpm.out + " wpm)")
+				settings.set_resume_point (current_file_path, reader.title, reader.position)
 				to_paused
 			end
 		end
@@ -287,11 +297,19 @@ feature {NONE} -- Transport (D-014)
 		do
 			if reader.is_running or reader.is_paused then
 				reader.stop_and_seal
-				if attached reader.last_record as al_rec then
-					logger.info ({STRING_32} "sealed - " + al_rec.summary_line)
-				end
+				record_seal
 			end
 			to_cockpit
+		end
+
+	record_seal
+			-- The ledger row and the crash-safe bookmark, at every seal.
+		do
+			if attached reader.last_record as al_rec then
+				ledger.record_run (al_rec, -1)
+				logger.info ({STRING_32} "sealed - " + al_rec.summary_line)
+			end
+			settings.set_resume_point (current_file_path, reader.title, reader.position)
 		end
 
 	do_toggle_hold
@@ -330,6 +348,7 @@ feature {NONE} -- Cockpit actions
 			if not l_pasted.is_empty and then not l_pasted.same_string (last_source) then
 				last_source := l_pasted.twin
 				last_title := {STRING_32} "pasted text"
+				current_file_path := {STRING_32} "" -- pasted: no file to continue from
 				reader.load_text (last_title, last_source)
 			elseif not reader.can_start and then not last_source.is_empty then
 					-- Sealed sitting: a fresh session on the same text.
@@ -369,6 +388,7 @@ feature {NONE} -- Cockpit actions
 			if reader.last_intake_ok then
 				last_source := reader.loaded_source.twin -- already UTF-8-decoded
 				last_title := reader.title.twin
+				current_file_path := a_path.twin
 				logger.info ({STRING_32} "loaded file " + a_path
 					+ {STRING_32} " - " + reader.token_count.out + {STRING_32} " words")
 			else
@@ -376,6 +396,35 @@ feature {NONE} -- Cockpit actions
 			end
 			cockpit.refresh (reader)
 			window.request_render
+		end
+
+	on_continue_asked
+			-- FR-032: back into the last text at the saved word.
+		local
+			l_at: INTEGER
+		do
+			apply_speed_prefs
+			if not settings.last_file_path.is_empty and then settings.last_position > 0 then
+				reader.load_file (settings.last_file_path)
+				if reader.last_intake_ok and then reader.can_start then
+					current_file_path := settings.last_file_path.twin
+					last_source := reader.loaded_source.twin
+					last_title := reader.title.twin
+					l_at := settings.last_position.min (reader.token_count).max (1)
+					reader.preset_position (l_at)
+					reader.start_reading (window.tick_ms)
+					logger.info ({STRING_32} "continued " + reader.title
+						+ {STRING_32} " at word " + l_at.out)
+					to_running
+				else
+					logger.warn ({STRING_32} "continue failed: " + reader.last_intake_error)
+					cockpit.refresh (reader)
+					window.request_render
+				end
+			else
+				logger.info ("continue asked - no saved position")
+				window.request_render
+			end
 		end
 
 	on_start_wpm_changed (a_wpm: INTEGER)
@@ -391,6 +440,7 @@ feature {NONE} -- Cockpit actions
 	on_skip_toggled
 		do
 			reader := reader.with_foreign_skip (cockpit.skip_on)
+			settings.set_skip_foreign (cockpit.skip_on)
 		end
 
 	apply_speed_prefs
@@ -400,6 +450,7 @@ feature {NONE} -- Cockpit actions
 			l_start := cockpit.start_box.value
 			l_comfy := cockpit.comfy_box.value.max (l_start)
 			reader := reader.with_speeds (l_start, l_start.min (300), l_comfy)
+			settings.set_speeds (l_start, l_start.min (300), l_comfy)
 		end
 
 feature {NONE} -- Implementation
@@ -422,6 +473,10 @@ feature {NONE} -- Implementation
 
 	logger: SIMPLE_LOGGER
 
-	last_source, last_title: STRING_32
+	settings: SR_SETTINGS
+
+	ledger: SR_LOG
+
+	last_source, last_title, current_file_path: STRING_32
 
 end
