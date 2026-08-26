@@ -145,3 +145,13 @@ finalized and smoke-launched, simple_widgets extended with one additive feature 
 its own 193/193 suite re-run), and a demo text written to exercise every linger class — Hebrew,
 Greek, transliterations, Strong's numbers, the LXX. Deferred honestly: AI pipeline, persistent
 log, ribbon, braking, installer.
+
+### 16. "Allow me to change drives when opening a file" (first hand-test feedback)
+**The ask.** Minutes into using the build: the drawn file dialog could not leave drive D:.
+**What the design did.** Fixed it where it belonged — in simple_widgets itself, since every
+Windows app needs it. SW_FILE_DIALOG gained `available_drives` (probes A: through Z: with plain
+base DIRECTORY, keeping the toolkit's dependency-free doctrine; the row simply never appears on
+driveless platforms), a public `go_to_drive` with contracts (require the root exists, ensure the
+listing landed), and a chip row of live drives between the path and the listing. One new assault
+test (`drive_roots_and_hop`); suite 194/194; the reader rebuilt against it and hot-swapped on
+the desktop within minutes of the request. First feedback loop of the hand-test: closed.
