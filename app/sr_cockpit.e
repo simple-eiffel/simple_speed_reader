@@ -29,6 +29,10 @@ feature {NONE} -- Initialization
 			root.put (status_label)
 
 			create text_box.make ("")
+				-- Book-sized pastes land here: spell-checking them
+				-- would grind the pump for minutes. Off, like every
+				-- non-prose box in the ecosystem.
+			text_box.set_spellcheck (False)
 			text_box.set_grow (1.0)
 			root.put (text_box)
 

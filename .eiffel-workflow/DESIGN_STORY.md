@@ -167,3 +167,44 @@ descents, and typed absolute file paths all behave. The verbatim repro became a 
 test (plus three siblings); suite 198/198. And simple_logger now writes speed_reader.log beside
 the exe — app lifecycle, intake outcomes, starts, pauses, recovery marks, and each sealed run's
 honest summary — so the next report arrives with its own evidence attached.
+
+### 18. "The software froze" — then, minutes later, "finally came up"
+**The ask.** A freeze report, live: clicking near the text box locked the window. Larry left the
+frozen instance up for diagnosis — and then it unfroze on its own.
+**What the design did.** Live forensics first: sampling the hung process showed 0% CPU — a
+*blocked call*, not a loop — and "finally came up" turned the deadlock into a minutes-long block
+that returns. That signature convicted the newest code: the drives row was probing `A:\`–`Z:\`
+with `DIRECTORY.exists`, and a dead network letter or empty card slot waits out an SMB timeout
+per probe, right on dialog open. The cure went into the platform layer: simple_shell gained
+`logical_drives_mask` (Win32 `GetLogicalDrives` — answers without touching media), the dialog
+now builds its chips from the mask and never probes, and even `go_to_drive`'s precondition was
+softened to a shape check because a contract that probes is a contract that hangs. Along the way
+the build tripped, diagnosed, and recorded a second trap — editing a library class can leave a
+consumer's EIFGENs cache stale, while the old test exe happily prints ALL TESTS PASSED — and the
+cockpit's paste box had its spell-checker turned off before a pasted book could grind the pump.
+Suites: widgets 198/198 on a verified-fresh build.
+
+### 19. The paused-posture screenshot: "no control, no drawers, no fisheye — you tell me?"
+**The ask.** A screenshot mid-hand-test: the paused view worked (marked word, readable page,
+scrubber) but sat in a short band atop an empty window, the file's Greek rendered as mojibake,
+and none of the promised paused furniture was visible.
+**What the design did.** Three verdicts. The band was a one-line flex bug — the paused row never
+asked to grow inside its column (`set_grow (1.0)`; the running posture was unaffected because
+its row IS the root). The mojibake was an ecosystem find: `SIMPLE_FILE.content` claims UTF-8 but
+widens raw bytes char-per-byte; the facade now decodes properly itself (`binary_content` →
+`SIMPLE_ENCODING.utf_8_to_utf_32`, BOM stripped) and the bug is logged against simple_file. And
+the missing furniture was told straight: drawers and the fisheye ribbon are specified but not
+yet built — though the paused posture gained a visible control row (Resume at sentence head ·
+Resume exactly here · Stop) so the keyboard is no longer the only door. Engine 26/26 again.
+
+---
+
+## Intermission — 2026-08-26, evening
+
+Larry logs out for church, mid-hand-test, with the reader working "kinda okay" and three
+feedback rounds already closed the same day the idea arrived. The build stands green and
+committed across three repos (speed_reader, simple_widgets, simple_shell); the fixed build is
+staged and smoke-verified, waiting to be launched when he returns. Still queued from his list:
+the fisheye ribbon, the drawered pause furniture, braking, the AI quiz pipeline, the persistent
+log, the installer. The clock in TIMELINE.md keeps running — wall-clock honest — until the row
+that matters: LARRY APPROVES.

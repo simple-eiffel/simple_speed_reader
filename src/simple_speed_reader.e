@@ -86,12 +86,18 @@ feature -- Intake
 		end
 
 	load_file (a_path: READABLE_STRING_GENERAL)
-			-- Read a .txt/.md file and load it, titled by its file name.
+			-- Read a .txt/.md file as UTF-8 and load it, titled by its
+			-- file name. Bytes are decoded here with SIMPLE_ENCODING
+			-- (SIMPLE_FILE.content mojibakes UTF-8 - raw bytes widened
+			-- char-per-byte; verified on-screen 2026-08-26).
 		require
 			path_present: not a_path.is_empty
 		local
 			l_f: SIMPLE_FILE
-			l_title: STRING_32
+			l_title, l_decoded: STRING_32
+			l_bytes: ARRAY [NATURAL_8]
+			l_raw: STRING_8
+			l_enc: SIMPLE_ENCODING
 			i: INTEGER
 		do
 			create l_f.make (a_path)
@@ -105,11 +111,34 @@ feature -- Intake
 				if l_title.is_empty then
 					l_title := {STRING_32} "untitled"
 				end
-				load_text (l_title, l_f.content)
+				l_bytes := l_f.binary_content
+				create l_raw.make (l_bytes.count)
+				from
+					i := l_bytes.lower
+				until
+					i > l_bytes.upper
+				loop
+					l_raw.append_character (l_bytes.item (i).to_character_8)
+					i := i + 1
+				end
+				create l_enc.make
+				l_decoded := l_enc.utf_8_to_utf_32 (l_raw)
+				if not l_decoded.is_empty and then l_decoded.item (1).natural_32_code = 0xFEFF then
+					l_decoded.remove_head (1) -- byte-order mark
+				end
+				loaded_source := l_decoded
+				load_text (l_title, l_decoded)
 			else
 				last_intake_ok := False
 				last_intake_error := {STRING_32} "Cannot read file: " + a_path.to_string_32
 			end
+		end
+
+	loaded_source: STRING_32
+			-- The decoded text of the last successful file load
+			-- (for hosts that restart a sealed sitting).
+		attribute
+			create Result.make_empty
 		end
 
 	last_intake_ok: BOOLEAN

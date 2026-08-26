@@ -36,10 +36,20 @@ feature {NONE} -- Initialization
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
 			running_root := l_row
+			create paused_resume_button.make_primary ("Resume at sentence head  (Space)", Void)
+			create paused_here_button.make ("Resume exactly here  (Enter)", Void)
+			create paused_stop_button.make ("Stop and log the run  (Esc)", Void)
 			create l_col.make
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (context_view.surface)
+			l_row.set_grow (1.0)
+			l_col.put (l_row)
+			create l_row.make
+			l_row := l_row.with_gap (10.0)
+			l_row.put (paused_resume_button)
+			l_row.put (paused_here_button)
+			l_row.put (paused_stop_button)
 			l_col.put (l_row)
 			paused_root := l_col
 			cockpit_root := cockpit.root
@@ -56,6 +66,9 @@ feature {NONE} -- Initialization
 				agent on_load_file_asked, agent on_start_asked,
 				agent on_start_wpm_changed, agent on_comfy_changed,
 				agent on_skip_toggled)
+			paused_resume_button.set_on_click (agent on_paused_resume_clicked)
+			paused_here_button.set_on_click (agent on_paused_here_clicked)
+			paused_stop_button.set_on_click (agent do_stop)
 
 			window.set_root (cockpit_root)
 			window.set_on_shell_event (agent on_shell_event)
@@ -224,6 +237,22 @@ feature {NONE} -- Transport (D-014)
 			do_pause
 		end
 
+	on_paused_resume_clicked
+		do
+			if reader.is_paused then
+				reader.resume_at_sentence_start (window.tick_ms)
+				to_running
+			end
+		end
+
+	on_paused_here_clicked
+		do
+			if reader.is_paused and then reader.position >= 1 then
+				reader.resume_at (reader.position, window.tick_ms)
+				to_running
+			end
+		end
+
 	on_word_marked (a_index: INTEGER)
 			-- Context-page click: the reader-marked comprehension point.
 		do
@@ -325,21 +354,20 @@ feature {NONE} -- Cockpit actions
 		local
 			fd: SW_FILE_DIALOG
 		do
+			logger.info ("open-file dialog requested")
 			create fd.make_open ({STRING_32} "D:\")
 			fd.set_on_accept (agent on_file_picked)
 			window.show_sheet (fd, 680.0)
+			logger.info ("open-file dialog shown - " + fd.available_drives.count.out + " drives")
 		end
 
 	on_file_picked (a_path: STRING_32)
-		local
-			l_f: SIMPLE_FILE
 		do
 			window.close_sheet
 			apply_speed_prefs
 			reader.load_file (a_path)
 			if reader.last_intake_ok then
-				create l_f.make (a_path)
-				last_source := l_f.content
+				last_source := reader.loaded_source.twin -- already UTF-8-decoded
 				last_title := reader.title.twin
 				logger.info ({STRING_32} "loaded file " + a_path
 					+ {STRING_32} " - " + reader.token_count.out + {STRING_32} " words")
@@ -389,6 +417,8 @@ feature {NONE} -- Implementation
 	flow_map: SR_FLOW_MAP_VIEW
 
 	cockpit: SR_COCKPIT
+
+	paused_resume_button, paused_here_button, paused_stop_button: SW_BUTTON
 
 	logger: SIMPLE_LOGGER
 

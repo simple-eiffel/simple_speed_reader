@@ -26,6 +26,9 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | GUI smoke-launch verified | 2026-08-26 17:37 | 1:37 | fast-timer-needs-hwnd crash caught + fixed (arm on first heartbeat); window up and pumping |
 | Hand-test round 1: drive switching | 2026-08-26 17:53 | 1:53 | Larry's first feedback → SW_FILE_DIALOG drives row + go_to_drive (widgets 194/194); app rebuilt + hot-swapped |
 | Hand-test round 2: typed paths + logging | 2026-08-26 18:00 | 2:00 | typed C:\ repro → dialog honors typed absolute/directory paths (198/198); simple_logger wired, first log line live |
+| Hand-test round 3: freeze forensics | 2026-08-26 18:10 | 2:10 | 0%-CPU block → drive probes convicted → SHELL_DESKTOP.logical_drives_mask (GetLogicalDrives), dialog never probes; stale-EIFGENs trap caught + recorded |
+| Hand-test round 4: paused screenshot | 2026-08-26 18:14 | 2:14 | paused row flex fix (full height), UTF-8 decode at facade (SIMPLE_FILE.content mojibake found + logged), paused control row added; engine 26/26, GUI smoke-verified |
+| **INTERMISSION** — Larry to church | 2026-08-26 18:14 | 2:14 | build green across 3 repos, staged for his return; ribbon/drawers/braking/AI/log/installer queued |
 | Hardened (Phase 6) | — | — | |
 | Shipped (Phase 7): repo + docs + Release | — | — | |
 | **Installer built** (Inno Setup) | — | — | include build duration itself |
