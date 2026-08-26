@@ -25,6 +25,7 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | GUI implemented + finalized | 2026-08-26 17:35 | 1:35 | 6 app classes; VEVI two-phase creation lesson; SW_WINDOW.give_focus added (widgets 193/193 re-verified) (exe mtime) |
 | GUI smoke-launch verified | 2026-08-26 17:37 | 1:37 | fast-timer-needs-hwnd crash caught + fixed (arm on first heartbeat); window up and pumping |
 | Hand-test round 1: drive switching | 2026-08-26 17:53 | 1:53 | Larry's first feedback → SW_FILE_DIALOG drives row + go_to_drive (widgets 194/194); app rebuilt + hot-swapped |
+| Hand-test round 2: typed paths + logging | 2026-08-26 18:00 | 2:00 | typed C:\ repro → dialog honors typed absolute/directory paths (198/198); simple_logger wired, first log line live |
 | Hardened (Phase 6) | — | — | |
 | Shipped (Phase 7): repo + docs + Release | — | — | |
 | **Installer built** (Inno Setup) | — | — | include build duration itself |

@@ -155,3 +155,15 @@ driveless platforms), a public `go_to_drive` with contracts (require the root ex
 listing landed), and a chip row of live drives between the path and the listing. One new assault
 test (`drive_roots_and_hop`); suite 194/194; the reader rebuilt against it and hot-swapped on
 the desktop within minutes of the request. First feedback loop of the hand-test: closed.
+
+### 17. "Add simple_logging... and typing C:\ then Open didn't switch drives"
+**The ask.** Two-in-one hand-test report: wire in logging, and the natural gesture — typing a
+path into the name box and pressing Open — did nothing useful.
+**What the design did.** The typed path was being glued onto the current directory
+("D:\...\C:\"). SW_FILE_DIALOG now honors what the person typed: absolute text (drive-rooted or
+UNC) wins over the join, a bare "C:" normalizes to "C:\", and when the target is a *directory*
+the dialog navigates there instead of accepting it — so typed drive hops, typed child-folder
+descents, and typed absolute file paths all behave. The verbatim repro became a named assault
+test (plus three siblings); suite 198/198. And simple_logger now writes speed_reader.log beside
+the exe — app lifecycle, intake outcomes, starts, pauses, recovery marks, and each sealed run's
+honest summary — so the next report arrives with its own evidence attached.
