@@ -13,7 +13,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_start_wpm, a_comfy_wpm: INTEGER; a_skip: BOOLEAN)
+	make (a_start_wpm, a_comfy_wpm: INTEGER; a_skip, a_quiz_opt: BOOLEAN)
 			-- Build the surface seeded from the profile; `wire' hooks
 			-- the host's agents after.
 		require
@@ -62,6 +62,30 @@ feature {NONE} -- Initialization
 			l_speeds.put (skip_check)
 			root.put (l_speeds)
 
+			create l_row.make
+			l_row := l_row.with_gap (10.0)
+			create quiz_check.make ("Comprehension quiz (local AI, before reading - SQ3R)", a_quiz_opt, Void)
+			l_row.put (quiz_check)
+			create preview_button.make ("Preview questions", Void)
+			l_row.put (preview_button)
+			create quiz_status_label.make_mono ("")
+			l_row.put (quiz_status_label)
+			root.put (l_row)
+
+			create question_label.make_body ("")
+			root.put (question_label)
+			create answer_label.make_mono ("")
+			root.put (answer_label)
+			create l_row.make
+			l_row := l_row.with_gap (10.0)
+			create reveal_button.make ("Show the answer", Void)
+			l_row.put (reveal_button)
+			create got_button.make_primary ("I got it", Void)
+			l_row.put (got_button)
+			create missed_button.make ("I missed it", Void)
+			l_row.put (missed_button)
+			root.put (l_row)
+
 			create summary_label.make_mono ("")
 			root.put (summary_label)
 
@@ -81,7 +105,8 @@ feature -- Wiring
 
 	wire (a_on_load_file, a_on_start, a_on_continue: PROCEDURE;
 			a_on_start_wpm, a_on_comfy_wpm: PROCEDURE [INTEGER];
-			a_on_skip: PROCEDURE)
+			a_on_skip, a_on_quiz_toggle, a_on_preview,
+			a_on_reveal, a_on_got, a_on_missed: PROCEDURE)
 			-- Hook the host's actions (two-phase: after the host's own
 			-- attributes are all set, so its agents may capture it).
 		do
@@ -91,6 +116,23 @@ feature -- Wiring
 			start_box.set_on_change (a_on_start_wpm)
 			comfy_box.set_on_change (a_on_comfy_wpm)
 			skip_check.set_on_change (a_on_skip)
+			quiz_check.set_on_change (a_on_quiz_toggle)
+			preview_button.set_on_click (a_on_preview)
+			reveal_button.set_on_click (a_on_reveal)
+			got_button.set_on_click (a_on_got)
+			missed_button.set_on_click (a_on_missed)
+		end
+
+	set_quiz_status (a_text: READABLE_STRING_GENERAL)
+		do
+			quiz_status_label.set_text (a_text)
+		end
+
+	set_admin_texts (a_question, a_answer: READABLE_STRING_GENERAL)
+			-- The administration surface; both empty = quiz area idle.
+		do
+			question_label.set_text (a_question)
+			answer_label.set_text (a_answer)
 		end
 
 	show_history (a_lines: LIST [STRING_32])
@@ -128,6 +170,11 @@ feature -- Access
 	skip_on: BOOLEAN
 		do
 			Result := skip_check.is_checked
+		end
+
+	quiz_on: BOOLEAN
+		do
+			Result := quiz_check.is_checked
 		end
 
 feature -- Operations
@@ -172,8 +219,13 @@ feature {NONE} -- Implementation
 
 	History_rows: INTEGER = 6
 
-	load_button, start_button, continue_button: SW_BUTTON
+	load_button, start_button, continue_button,
+	preview_button, reveal_button, got_button, missed_button: SW_BUTTON
 
-	skip_check: SW_CHECK_BOX
+	quiz_status_label: SW_LABEL
+
+	question_label, answer_label: SW_LABEL
+
+	skip_check, quiz_check: SW_CHECK_BOX
 
 end

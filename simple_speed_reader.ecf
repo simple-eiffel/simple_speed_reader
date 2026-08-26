@@ -21,6 +21,7 @@
 		<library name="simple_encoding" location="$SIMPLE_EIFFEL/simple_encoding/simple_encoding.ecf"/>
 		<library name="simple_config" location="$SIMPLE_EIFFEL/simple_config/simple_config.ecf"/>
 		<library name="simple_sql" location="$SIMPLE_EIFFEL/simple_sql/simple_sql.ecf"/>
+		<library name="simple_json" location="$SIMPLE_EIFFEL/simple_json/simple_json.ecf"/>
 		<cluster name="src" location=".\src\" recursive="true"/>
 	</target>
 
@@ -32,7 +33,17 @@
 		<library name="simple_cairo" location="$SIMPLE_EIFFEL/simple_cairo/simple_cairo.ecf"/>
 		<library name="simple_shell" location="$SIMPLE_EIFFEL/simple_shell/simple_shell.ecf"/>
 		<library name="simple_logger" location="$SIMPLE_EIFFEL/simple_logger/simple_logger.ecf"/>
+		<library name="simple_process" location="$SIMPLE_EIFFEL/simple_process/simple_process.ecf"/>
 		<cluster name="app" location=".\app\"/>
+	</target>
+
+	<!-- The headless AI worker the GUI spawns (quiz generation).
+	     Console so its stdout is inspectable; talks to local Ollama. -->
+	<target name="speed_reader_worker" extends="simple_speed_reader">
+		<root class="SR_WORKER" feature="make"/>
+		<setting name="console_application" value="true"/>
+		<library name="simple_ai_client" location="$SIMPLE_EIFFEL/simple_ai_client/simple_ai_client.ecf"/>
+		<cluster name="worker" location=".\worker\"/>
 	</target>
 
 	<!-- Test runner. Console, so results land on stdout. Both testing

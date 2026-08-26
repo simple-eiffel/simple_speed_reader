@@ -514,6 +514,57 @@ feature -- Test: session
 			assert_false ("no text", r.has_text)
 		end
 
+feature -- Test: quiz (D-007)
+
+	test_validator_normalizes_whitespace
+		local
+			v: SR_QUIZ_VALIDATOR
+		do
+			create v
+			assert_true ("wrap does not defeat the quote",
+				v.is_quote_in_text ({STRING_32} "the plainest teaching",
+					{STRING_32} "fails the plainest%N   teaching Jesus gave"))
+			assert_false ("paraphrase dies",
+				v.is_quote_in_text ({STRING_32} "the clearest teaching",
+					{STRING_32} "fails the plainest teaching Jesus gave"))
+		end
+
+	test_quiz_parse_validate_score
+		local
+			r: SIMPLE_SPEED_READER
+			l_json: STRING_32
+		do
+			create r.make
+			r.load_text ({STRING_32} "t",
+				{STRING_32} "In the beginning God created the heavens and the earth. The earth was without form.")
+			l_json := {STRING_32} "[{%"q%":%"Who created?%",%"a%":%"God%",%"quote%":%"God created the heavens%"},{%"q%":%"Bogus?%",%"a%":%"x%",%"quote%":%"this quote is invented%"},{%"q%":%"Form?%",%"a%":%"without form%",%"quote%":%"The earth was without form.%"}]"
+			r.attach_quiz_json (l_json)
+			assert_true ("quiz armed", r.quiz_ready)
+			if attached r.quiz as al_q then
+				assert_integers_equal ("two survive the gate", 2, al_q.questions.count)
+				assert_integers_equal ("one hallucination dropped", 1, al_q.dropped_count)
+				al_q.judge_current (True)
+				al_q.judge_current (False)
+				assert_true ("administration done", al_q.is_administration_done)
+				assert_integers_equal ("half right", 50, al_q.score_percent)
+			end
+		end
+
+	test_quiz_error_payload_degrades
+		local
+			r: SIMPLE_SPEED_READER
+		do
+			create r.make
+			r.load_text ({STRING_32} "t", {STRING_32} "Some honest text here.")
+			r.attach_quiz_json ({STRING_32} "{%"error%": %"ollama unreachable%"}")
+			assert_false ("no usable quiz", r.quiz_ready)
+			if attached r.quiz as al_q then
+				assert_true ("reason kept", al_q.error_line.has_substring ({STRING_32} "unreachable"))
+			end
+			r.attach_quiz_json ({STRING_32} "utter garbage not json")
+			assert_false ("garbage degrades too", r.quiz_ready)
+		end
+
 feature -- Test: braking (D-016)
 
 	test_governor_brake_cycle

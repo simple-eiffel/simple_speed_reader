@@ -75,7 +75,7 @@ feature -- Access (defaults per D-004/D-011)
 			if attached config.string_value ("ollama_model") as al_s and then not al_s.is_empty then
 				Result := al_s.to_string_32
 			else
-				Result := {STRING_32} "qwen3:14b"
+				Result := {STRING_32} "huihui_ai/Qwen3.8-abliterated:latest"
 			end
 		end
 

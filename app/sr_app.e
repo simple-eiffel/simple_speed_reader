@@ -38,7 +38,8 @@ feature {NONE} -- Initialization
 			create context_view.make (reader)
 			create flow_map.make (reader)
 			create ribbon.make (reader)
-			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm, settings.skip_foreign)
+			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm,
+				settings.skip_foreign, settings.quiz_opt_in)
 			create speed_drawer.make_titled ("Speed")
 			create speed_label.make_mono ("")
 			speed_drawer.put (speed_label)
@@ -100,7 +101,8 @@ feature {NONE} -- Initialization
 			cockpit.wire (
 				agent on_load_file_asked, agent on_start_asked, agent on_continue_asked,
 				agent on_start_wpm_changed, agent on_comfy_changed,
-				agent on_skip_toggled)
+				agent on_skip_toggled, agent on_quiz_toggled, agent on_quiz_preview,
+				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False))
 			paused_resume_button.set_on_click (agent on_paused_resume_clicked)
 			paused_here_button.set_on_click (agent on_paused_here_clicked)
 			paused_stop_button.set_on_click (agent do_stop)
@@ -132,12 +134,13 @@ feature {NONE} -- The clock
 	on_heartbeat
 			-- The ambient heartbeat: arms the 12 ms fast tick once the
 			-- native window exists (set_fast_timer needs hwnd up), then
-			-- stays out of the way.
+			-- polls the quiz worker's mailbox file.
 		do
 			if not is_fast_timer_armed then
 				is_fast_timer_armed := True
 				window.set_fast_timer (Tick_ms)
 			end
+			poll_quiz_worker
 		end
 
 	on_shell_event (a_type, a_a, a_b: INTEGER)
@@ -206,6 +209,10 @@ feature {NONE} -- Postures (D-012)
 	running_root, paused_root, cockpit_root, braking_root: SW_WIDGET
 
 	is_press_live, brake_engaged, scrub_mode: BOOLEAN
+
+	quiz_generating, quiz_admin_active: BOOLEAN
+
+	pending_record: detachable SR_RUN_RECORD
 
 	press_ms, scrub_dx: INTEGER
 
@@ -492,11 +499,22 @@ feature {NONE} -- Transport (D-014)
 		end
 
 	record_seal
-			-- The ledger row and the crash-safe bookmark, at every seal.
+			-- The ledger row and the crash-safe bookmark, at every
+			-- seal. With an armed quiz, the row WAITS: administration
+			-- happens in the cockpit and the score joins the record.
 		do
 			if attached reader.last_record as al_rec then
-				ledger.record_run (al_rec, -1)
-				logger.info ({STRING_32} "sealed - " + al_rec.summary_line)
+				if settings.quiz_opt_in and then reader.quiz_ready
+					and then al_rec.streamed_count > 0
+				then
+					pending_record := al_rec
+					quiz_admin_active := True
+					show_current_quiz_question
+					logger.info ("seal held for quiz administration")
+				else
+					ledger.record_run (al_rec, -1)
+					logger.info ({STRING_32} "sealed - " + al_rec.summary_line)
+				end
 			end
 			settings.set_resume_point (current_file_path, reader.title, reader.position)
 		end
@@ -526,12 +544,236 @@ feature {NONE} -- Transport (D-014)
 			end
 		end
 
+feature {NONE} -- The quiz pipeline (D-007, worker-process pattern)
+
+	Quiz_in_name: STRING = "quiz_in.txt"
+
+	Quiz_out_name: STRING = "quiz_out.json"
+
+	start_quiz_generation
+			-- Spawn the worker on the loaded text; the heartbeat polls.
+		local
+			l_p: SIMPLE_PROCESS
+			l_cmd: STRING_32
+			l_n: INTEGER
+		do
+			if settings.quiz_opt_in and then reader.has_text
+				and then not worker_exe_path.is_empty
+			then
+				delete_quiet (Quiz_out_name)
+				write_utf8_file (Quiz_in_name, reader.source_text)
+				l_n := (reader.token_count * 3 // 800).max (3).min (10)
+				create l_cmd.make (256)
+				l_cmd.append_code (34)
+				l_cmd.append (worker_exe_path)
+				l_cmd.append_code (34)
+				l_cmd.append_string_general (" --quiz " + Quiz_in_name + " " + Quiz_out_name + " ")
+				l_cmd.append (settings.ollama_url)
+				l_cmd.append_string_general (" %"")
+				l_cmd.append (settings.ollama_model)
+				l_cmd.append_string_general ("%" ")
+				l_cmd.append_string_general (l_n.out)
+				create l_p.make
+				l_p.launch (l_cmd)
+				quiz_generating := True
+				cockpit.set_quiz_status ("quiz: generating on your GPU...")
+				logger.info ({STRING_32} "quiz worker spawned: " + l_cmd)
+			elseif settings.quiz_opt_in and then worker_exe_path.is_empty then
+				cockpit.set_quiz_status ("quiz: worker exe not found")
+				logger.warn ("quiz worker exe not found")
+			end
+		end
+
+	poll_quiz_worker
+			-- The 250 ms mailbox check (FR-022's streaming spirit).
+		local
+			l_json: STRING_32
+		do
+			if quiz_generating and then file_exists (Quiz_out_name) then
+				quiz_generating := False
+				l_json := read_utf8_file (Quiz_out_name)
+				if not l_json.is_empty and then reader.has_text then
+					reader.attach_quiz_json (l_json)
+					if attached reader.quiz as al_q then
+						if al_q.is_usable then
+							cockpit.set_quiz_status ("quiz ready: " + al_q.questions.count.out
+								+ " questions (" + al_q.dropped_count.out + " dropped by the quote gate)")
+							logger.info ("quiz ready: " + al_q.questions.count.out
+								+ " verified, " + al_q.dropped_count.out + " dropped")
+						else
+							cockpit.set_quiz_status ({STRING_32} "quiz unavailable: " + al_q.error_line)
+							logger.warn ({STRING_32} "quiz unavailable: " + al_q.error_line)
+						end
+					end
+				end
+				window.request_render
+			end
+		end
+
+	worker_exe_path: STRING_32
+			-- Installed sibling first; the dev-tree target second.
+		do
+			if file_exists ("speed_reader_worker.exe") then
+				Result := {STRING_32} "speed_reader_worker.exe"
+			elseif file_exists ("..\..\speed_reader_worker\F_code\simple_speed_reader.exe") then
+				Result := {STRING_32} "..\..\speed_reader_worker\F_code\simple_speed_reader.exe"
+			else
+				create Result.make_empty
+			end
+		end
+
+	on_quiz_toggled
+		do
+			settings.set_quiz_opt_in (cockpit.quiz_on)
+			if cockpit.quiz_on and then reader.has_text and then not reader.quiz_ready then
+				start_quiz_generation
+			end
+		end
+
+	on_quiz_preview
+			-- SQ3R: the questions, before the reading - in a drawer.
+		local
+			l_drawer: SW_DRAWER
+		do
+			if attached reader.quiz as al_q and then al_q.is_usable then
+				create l_drawer.make_titled ("Quiz preview (SQ3R)")
+				across
+					al_q.questions as q
+				loop
+					l_drawer.put (create {SW_LABEL}.make_body (q.prompt))
+				end
+				l_drawer.set_on_close (agent close_speed_drawer)
+				window.show_drawer (l_drawer, 460.0, False)
+				window.request_render
+			else
+				cockpit.set_quiz_status ("quiz: nothing to preview yet")
+				window.request_render
+			end
+		end
+
+	show_current_quiz_question
+		do
+			if attached reader.quiz as al_q and then al_q.is_usable
+				and then not al_q.is_administration_done
+			then
+				cockpit.set_admin_texts ({STRING_32} "Q" + al_q.administration_index.out
+					+ {STRING_32} "/" + al_q.questions.count.out + {STRING_32} ":  "
+					+ al_q.current_question.prompt, "")
+			end
+		end
+
+	on_quiz_reveal
+		do
+			if quiz_admin_active and then attached reader.quiz as al_q
+				and then al_q.is_usable and then not al_q.is_administration_done
+			then
+				cockpit.set_admin_texts ({STRING_32} "Q" + al_q.administration_index.out
+					+ {STRING_32} "/" + al_q.questions.count.out + {STRING_32} ":  "
+					+ al_q.current_question.prompt,
+					{STRING_32} "A: " + al_q.current_question.expected_answer
+					+ {STRING_32} "   -   proof: %"" + al_q.current_question.supporting_quote + {STRING_32} "%"")
+				window.request_render
+			end
+		end
+
+	on_quiz_judged (a_got_it: BOOLEAN)
+		do
+			if quiz_admin_active and then attached reader.quiz as al_q
+				and then al_q.is_usable and then not al_q.is_administration_done
+			then
+				al_q.judge_current (a_got_it)
+				if al_q.is_administration_done then
+					finish_quiz_administration (al_q.score_percent)
+				else
+					show_current_quiz_question
+				end
+				window.request_render
+			end
+		end
+
+	finish_quiz_administration (a_score: INTEGER)
+		do
+			quiz_admin_active := False
+			cockpit.set_admin_texts ("", "")
+			if attached pending_record as al_rec then
+				ledger.record_run (al_rec, a_score)
+				logger.info ({STRING_32} "sealed with quiz " + a_score.out
+					+ {STRING_32} "%% - " + al_rec.summary_line)
+				pending_record := Void
+			end
+			cockpit.set_quiz_status ("quiz score: " + a_score.out + "%%")
+			cockpit.show_history (ledger.recent_lines (6))
+		end
+
+	flush_pending_record
+			-- A new sitting begins while a quiz waited: record honestly
+			-- with whatever was judged, or untested.
+		do
+			if attached pending_record as al_rec then
+				if attached reader.quiz as al_q and then al_q.judged_count > 0 then
+					ledger.record_run (al_rec, al_q.score_percent)
+				else
+					ledger.record_run (al_rec, -1)
+				end
+				pending_record := Void
+			end
+			quiz_admin_active := False
+			cockpit.set_admin_texts ("", "")
+		end
+
+feature {NONE} -- Small file plumbing (worker mailbox)
+
+	file_exists (a_path: READABLE_STRING_GENERAL): BOOLEAN
+		do
+			Result := (create {RAW_FILE}.make_with_name (a_path)).exists
+		end
+
+	delete_quiet (a_path: READABLE_STRING_GENERAL)
+		local
+			l_f: RAW_FILE
+		do
+			create l_f.make_with_name (a_path)
+			if l_f.exists then
+				l_f.delete
+			end
+		end
+
+	write_utf8_file (a_path: READABLE_STRING_GENERAL; a_content: STRING_32)
+		local
+			l_f: RAW_FILE
+			l_enc: SIMPLE_ENCODING
+		do
+			create l_enc.make
+			create l_f.make_create_read_write (a_path)
+			l_f.put_string (l_enc.utf_32_to_utf_8 (a_content))
+			l_f.close
+		end
+
+	read_utf8_file (a_path: READABLE_STRING_GENERAL): STRING_32
+		local
+			l_f: RAW_FILE
+			l_raw: STRING_8
+			l_enc: SIMPLE_ENCODING
+		do
+			create Result.make_empty
+			create l_f.make_with_name (a_path)
+			if l_f.exists and then l_f.is_readable and then l_f.count > 0 then
+				l_f.open_read
+				l_f.read_stream (l_f.count)
+				l_raw := l_f.last_string.twin
+				l_f.close
+				create l_enc.make
+				Result := l_enc.utf_8_to_utf_32 (l_raw)
+			end
+		end
+
 feature {NONE} -- Cockpit actions
 
 	on_start_asked
 		local
 			l_pasted: STRING_32
 		do
+			flush_pending_record
 			apply_speed_prefs
 			l_pasted := cockpit.pasted_text
 			if not l_pasted.is_empty and then not l_pasted.same_string (last_source) then
@@ -539,6 +781,7 @@ feature {NONE} -- Cockpit actions
 				last_title := {STRING_32} "pasted text"
 				current_file_path := {STRING_32} "" -- pasted: no file to continue from
 				reader.load_text (last_title, last_source)
+				start_quiz_generation
 			elseif not reader.can_start and then not last_source.is_empty then
 					-- Sealed sitting: a fresh session on the same text.
 				reader.load_text (last_title, last_source)
@@ -580,6 +823,7 @@ feature {NONE} -- Cockpit actions
 				current_file_path := a_path.twin
 				logger.info ({STRING_32} "loaded file " + a_path
 					+ {STRING_32} " - " + reader.token_count.out + {STRING_32} " words")
+				start_quiz_generation
 			else
 				logger.error ({STRING_32} "file intake failed: " + reader.last_intake_error)
 			end
@@ -592,6 +836,7 @@ feature {NONE} -- Cockpit actions
 		local
 			l_at: INTEGER
 		do
+			flush_pending_record
 			apply_speed_prefs
 			if not settings.last_file_path.is_empty and then settings.last_position > 0 then
 				reader.load_file (settings.last_file_path)

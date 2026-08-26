@@ -70,6 +70,8 @@ feature -- Intake
 				last_intake_ok := False
 				last_intake_error := {STRING_32} "The text is empty."
 			else
+				create source_text.make_from_string_general (a_source)
+				quiz := Void
 				create text.make (a_title, tokenizer.tokenize (a_source))
 				create l_gov.make (pref_start_wpm, pref_recovery_wpm, pref_comfy_max_wpm)
 				check attached text as al_t then
@@ -369,6 +371,33 @@ feature -- The reading loop
 			end
 		ensure
 			sealed: is_sealed
+		end
+
+feature -- Quiz (D-007)
+
+	quiz: detachable SR_QUIZ
+
+	quiz_ready: BOOLEAN
+		do
+			Result := attached quiz as al_q and then al_q.is_usable
+		end
+
+	source_text: STRING_32
+			-- The loaded text itself - what quiz quotes verify against.
+		attribute
+			create Result.make_empty
+		end
+
+	attach_quiz_json (a_json: READABLE_STRING_32)
+			-- The worker's payload: parse, quote-verify, arm the quiz.
+		require
+			has_text: has_text
+			json_present: not a_json.is_empty
+			source_known: not source_text.is_empty
+		do
+			create quiz.make_from_json (a_json.to_string_32, source_text)
+		ensure
+			attached_quiz: quiz /= Void
 		end
 
 feature -- Braking (D-016)
