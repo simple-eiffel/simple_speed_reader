@@ -28,10 +28,22 @@ your text *before* you read it. Part of the
 
 ## Status
 
-🚧 **In design — no code yet.** Spec Kit pre-phase is complete (research +
-specification, 2026-08-26); implementation has not started. Nothing below is
-shipped; this README describes the *designed* product. See
-`.eiffel-workflow/` for the full research and specification record.
+🔨 **v0.1 hand-test build — engine tested, GUI first light (2026-08-26).**
+The headless engine (tokenizer, ORP law, speed governor, deadline pacer,
+session state machine, foreign-script classification and skip filter) is
+built and green: **26/26 F_code tests**. The GUI (three postures, stage with
+red pivot + ticks, flow map, context-page recovery, transport keys) compiles
+finalized and smoke-launches. Not yet shipped: no installer, no AI pipeline
+(preprocessor/quiz), no persistent log, no fisheye ribbon or braking —
+those are specified in `.eiffel-workflow/` and queued. Build it yourself:
+
+```
+/d/prod/ec.sh test -config simple_speed_reader.ecf -target simple_speed_reader_tests
+./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe   # 26/26
+/d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader
+# copy cairo.dll beside EIFGENs/speed_reader/F_code/simple_speed_reader.exe, run it,
+# and feed it demo/sample_text.md
+```
 
 ## The idea
 

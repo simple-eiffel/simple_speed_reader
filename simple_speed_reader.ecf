@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system xmlns="http://www.eiffel.com/developers/xml/configuration-1-23-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-23-0 http://www.eiffel.com/developers/xml/configuration-1-23-0.xsd" name="simple_speed_reader" uuid="38A8D392-426E-415A-9817-54EF3F148C7C" library_target="simple_speed_reader">
+	<description>RSVP speed reader with comprehension-recovery loop - engine library, GUI app, tests</description>
+
+	<target name="simple_speed_reader">
+		<root all_classes="true"/>
+		<file_rule>
+			<exclude>/EIFGENs$</exclude>
+			<exclude>/\..*$</exclude>
+		</file_rule>
+		<option warning="warning">
+			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
+		</option>
+		<setting name="dead_code_removal" value="feature"/>
+		<capability>
+			<concurrency support="scoop" use="thread"/>
+			<void_safety support="all"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="simple_file" location="$SIMPLE_EIFFEL/simple_file/simple_file.ecf"/>
+		<cluster name="src" location=".\src\" recursive="true"/>
+	</target>
+
+	<!-- The shipped GUI. Not a console app. -->
+	<target name="speed_reader" extends="simple_speed_reader">
+		<root class="SR_APP" feature="make"/>
+		<setting name="console_application" value="false"/>
+		<library name="simple_widgets" location="$SIMPLE_EIFFEL/simple_widgets/simple_widgets.ecf"/>
+		<library name="simple_cairo" location="$SIMPLE_EIFFEL/simple_cairo/simple_cairo.ecf"/>
+		<library name="simple_shell" location="$SIMPLE_EIFFEL/simple_shell/simple_shell.ecf"/>
+		<cluster name="app" location=".\app\"/>
+	</target>
+
+	<!-- Test runner. Console, so results land on stdout. Both testing
+	     libraries per ecosystem standard. -->
+	<target name="simple_speed_reader_tests" extends="simple_speed_reader">
+		<root class="TEST_APP" feature="make"/>
+		<setting name="console_application" value="true"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing.ecf"/>
+		<library name="simple_testing" location="$SIMPLE_EIFFEL\simple_testing\simple_testing.ecf"/>
+		<cluster name="test" location=".\testing\" recursive="true"/>
+	</target>
+</system>

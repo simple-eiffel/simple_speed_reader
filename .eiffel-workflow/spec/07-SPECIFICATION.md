@@ -83,14 +83,16 @@ feature -- Classification (D-011/D-013; computed at creation, AI-enrichable)
 feature -- The ORP law (Single Choice: the only place this rule exists)
 
     pivot_for_length (a_count: INTEGER): INTEGER
-            -- Spritz-convention pivot: 1→1, 2-4→2, 5-9→3, 10+→4.
+            -- Spritz-convention pivot, frame-verified against the video:
+            -- 1→1, 2-5→2, 6-9→3, 10-13→4, 14+→5.
         require
             positive: a_count >= 1
         do
             if a_count = 1 then Result := 1
-            elseif a_count <= 4 then Result := 2
+            elseif a_count <= 5 then Result := 2
             elseif a_count <= 9 then Result := 3
-            else Result := 4
+            elseif a_count <= 13 then Result := 4
+            else Result := 5
             end
         ensure
             inside: Result >= 1 and Result <= a_count

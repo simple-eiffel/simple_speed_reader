@@ -128,3 +128,20 @@ release. Stage quick-tap pauses; stage press-and-hold brakes. (D-016)
 
 ### 14. "Keep a rolling log of this process"
 **What the design did.** This document — and the rule at the top that keeps it rolling.
+
+### 15. "Do we have testing like the other simple_* libs? Then give me an F_code binary and a sample text."
+**The ask.** Testing to the ecosystem standard (simple_ocr_capture and simple_json named as the
+models), then a runnable build to try.
+**What the design did.** Became the build day. Nine engine classes written contracts-first from
+the specification — and the contracts immediately earned their keep: the compiler caught an
+assertion cursor shadowing a local (VEEN), void-safety forced the two-phase creation idiom
+(every attached attribute set before any agent may capture Current — VEVI), and the smoke launch
+caught set_fast_timer's needs-a-window precondition, fixed with the arm-on-first-heartbeat
+pattern from ocr_capture. One genuine spec correction fell out of implementation: frame f10
+("words" pivoting its 2nd letter) refuted the drafted ORP table; the law is 1 / 2–5 / 6–9 /
+10–13 / 14+ → pivot 1/2/3/4/5, now frame-verified in test_pivot_law. Result, same afternoon as
+the idea: **26/26 engine tests green in F_code on the first finalize**, the three-posture GUI
+finalized and smoke-launched, simple_widgets extended with one additive feature (give_focus,
+its own 193/193 suite re-run), and a demo text written to exercise every linger class — Hebrew,
+Greek, transliterations, Strong's numbers, the LXX. Deferred honestly: AI pipeline, persistent
+log, ribbon, braking, installer.

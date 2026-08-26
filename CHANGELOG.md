@@ -23,4 +23,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
   speed_reader.ico + docs logo.svg + icon-256.png.
 - 2026-08-26 — DESIGN_STORY.md: rolling interaction narrative beside the specifications.
 
-No code yet — implementation begins after /eiffel.intent.
+### Added — v0.1 hand-test build (2026-08-26, same day)
+- Engine (src/): SR_TOKEN (ORP law frame-corrected to 1/2-5/6-9/10-13/14+ bands, combining-mark
+  avoidance, script/diacritic/numeric/acronym classification), SR_TOKENIZER (paragraph/sentence/
+  clause structure, closing-quote-aware), SR_GOVERNOR (ramp/hold/back-off/recovery, hold-aware
+  back-off), SR_TIMING_MODEL (linger classes, foreign 350-WPM floor, breathers), SR_PACER
+  (deadline-anchored, drift-free, sleep-tolerant), SR_SESSION (three states, seal-on-stop,
+  micro-rewind/skip, foreign-skip accounting), SR_RUN_RECORD, SR_TEXT, SIMPLE_SPEED_READER facade.
+- Tests (testing/): 26 contract-assault tests — **26/26 passing, F_code**.
+- GUI (app/): SR_APP three postures over the 12 ms shell fast tick; SR_STAGE_VIEW (pinned red
+  pivot + ticks, blank breathers, WPM readout, foreign centered/no-pivot); SR_CONTEXT_VIEW
+  (readable recovery page, click-to-mark); SR_FLOW_MAP_VIEW (whole-text texture, cursor,
+  paused backward scrubbing); SR_COCKPIT (paste/file intake, speed anchors, foreign-skip,
+  honest run summary); SR_SURFACE key-hearing canvas. demo/sample_text.md exercises every
+  linger class (Hebrew, Greek, translits, Strong's refs, LXX).
+- simple_widgets gained SW_WINDOW.give_focus (additive; its suite re-run: 193/193).
+
+Deferred to next iteration (specified, not built): AI preprocessor + quiz, persistent log,
+fisheye ribbon, braking gesture, drawers, position autosave, installer.

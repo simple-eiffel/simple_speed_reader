@@ -69,7 +69,10 @@ shows blank sentence gaps. Displayed WPM remains the nominal rate; log records e
 
 ### D-006: ORP (pivot) heuristic
 **Decision:** Pivot index by word length, Spritz-convention (~35%, left of center): 1 char→1st;
-2–4→2nd; 5–9→3rd; 10+→4th. Pivot glyph drawn accent-red at fixed stage X; prefix measured via
+2–5→2nd; 6–9→3rd; 10–13→4th; 14+→5th. (Corrected 2026-08-26 at implementation: frame f10 shows
+"words" (5 chars) pivoting on its 2nd letter 'o' — the original 2–4/5–9 split predicted the 3rd.
+All sampled frames verify the corrected table; encoded in SR_TOKEN.pivot_for_length and
+test_pivot_law.) Pivot glyph drawn accent-red at fixed stage X; prefix measured via
 cairo x_advance so the pivot lands exactly on the pin; tick marks above/below the pin.
 **Rationale:** Matches the video frames (reading→'a' 3rd char; But→'u' 2nd; narrowing→'r' 3rd;
 inner→'n' 2nd... wait, video shows inner→2nd 'n' = 3rd char — heuristic table reproduces observed frames).
