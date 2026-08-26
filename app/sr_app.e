@@ -22,6 +22,7 @@ feature {NONE} -- Initialization
 		do
 				-- Phase 1: every attached attribute set - no agent may
 				-- capture Current until this block is complete (VEVI).
+			create logger.make_to_file ("speed_reader.log")
 			create reader.make
 			create theme.make_dark
 			create window.make ("Simple Speed Reader", 90, 50, 1180, 820, theme)
@@ -59,7 +60,9 @@ feature {NONE} -- Initialization
 			window.set_root (cockpit_root)
 			window.set_on_shell_event (agent on_shell_event)
 			window.set_on_tick (agent on_heartbeat)
+			logger.info ("app up - window created, cockpit posture")
 			window.run
+			logger.info ("app down - pump exited")
 		end
 
 feature {NONE} -- The clock
@@ -225,6 +228,8 @@ feature {NONE} -- Transport (D-014)
 			-- Context-page click: the reader-marked comprehension point.
 		do
 			if reader.is_paused and then a_index >= 1 and then a_index <= reader.position then
+				logger.info ("recovery - marked word " + a_index.out
+					+ " (was at " + reader.position.out + ")")
 				reader.resume_at (a_index, window.tick_ms)
 				to_running
 			end
@@ -243,6 +248,8 @@ feature {NONE} -- Transport (D-014)
 		do
 			if reader.is_running then
 				reader.pause_reading
+				logger.info ("paused at word " + reader.position.out
+					+ " of " + reader.token_count.out + " (" + reader.current_wpm.out + " wpm)")
 				to_paused
 			end
 		end
@@ -251,6 +258,9 @@ feature {NONE} -- Transport (D-014)
 		do
 			if reader.is_running or reader.is_paused then
 				reader.stop_and_seal
+				if attached reader.last_record as al_rec then
+					logger.info ({STRING_32} "sealed - " + al_rec.summary_line)
+				end
 			end
 			to_cockpit
 		end
@@ -298,8 +308,14 @@ feature {NONE} -- Cockpit actions
 			end
 			if reader.can_start then
 				reader.start_reading (window.tick_ms)
+				logger.info ({STRING_32} "reading started - " + reader.title
+					+ {STRING_32} " (" + reader.token_count.out + {STRING_32} " words, target "
+					+ reader.target_wpm.out + {STRING_32} " wpm)")
 				to_running
 			else
+				logger.warn ({STRING_32} "start refused - " +
+					(if reader.last_intake_ok then {STRING_32} "no startable session"
+					 else reader.last_intake_error end))
 				cockpit.refresh (reader)
 				window.request_render
 			end
@@ -325,6 +341,10 @@ feature {NONE} -- Cockpit actions
 				create l_f.make (a_path)
 				last_source := l_f.content
 				last_title := reader.title.twin
+				logger.info ({STRING_32} "loaded file " + a_path
+					+ {STRING_32} " - " + reader.token_count.out + {STRING_32} " words")
+			else
+				logger.error ({STRING_32} "file intake failed: " + reader.last_intake_error)
 			end
 			cockpit.refresh (reader)
 			window.request_render
@@ -369,6 +389,8 @@ feature {NONE} -- Implementation
 	flow_map: SR_FLOW_MAP_VIEW
 
 	cockpit: SR_COCKPIT
+
+	logger: SIMPLE_LOGGER
 
 	last_source, last_title: STRING_32
 
