@@ -208,3 +208,27 @@ staged and smoke-verified, waiting to be launched when he returns. Still queued 
 the fisheye ribbon, the drawered pause furniture, braking, the AI quiz pipeline, the persistent
 log, the installer. The clock in TIMELINE.md keeps running — wall-clock honest — until the row
 that matters: LARRY APPROVES.
+
+## The night build — 2026-08-26, evening
+
+### 20. "Okay ... I am back and we're back on the clock. Let's get this thing done ... tonight!"
+**The ask.** Everything. Tonight.
+**What the design did.** Five slices, each compiled, tested, and committed before the next.
+*Persistence*: the profile (simple_config, UTF-8-safe even for Hebrew filenames) and the SQLite
+ledger — every sealed sitting a row; position bookmarked crash-safe on every pause; Continue-
+where-I-left-off through a new contracted `preset_position`. *The fisheye ribbon*, landed above
+the paused context page exactly as sketched. *The Speed drawer* — the paused furniture D-012
+promised. *Braking* — which first required teaching simple_widgets that a pointer can let go
+(`handle_release`, the toolkit's third new feature this project demanded): hold the stage and
+speed glides to 300 at ~500 wpm/s while the ribbon flows with the live word; drag left and the
+stream halts and scrubs backward proportionally; release and it eases home, politely restoring
+any HOLD pin it had to lift. And *the AI quiz pipeline*: a second headless exe the GUI spawns
+(the pump never meets curl), Qwen3 think-blocks stripped, the JSON slab extracted, written
+atomically, polled by heartbeat — and every question's supporting quote verified VERBATIM
+against the text, hallucinations dropped and counted. First live run against the machine's own
+Ollama: five real questions about the demo essay, quotes anchored, on the first try. Then the
+installer — Inno, both exes, the icon, the guide, a per-user install whose uninstaller asks
+before touching the reading ledger and never asks silently (the ocr lesson, honored). Compile
+time for the installer itself: under eight seconds. Engine 35/35; widgets 198/198; idea to
+feature-complete-with-installer: **3 hours 40 minutes of wall clock, one afternoon and one
+evening.** The clock now waits on one row.

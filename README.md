@@ -28,21 +28,24 @@ your text *before* you read it. Part of the
 
 ## Status
 
-🔨 **v0.1 hand-test build — engine tested, GUI first light (2026-08-26).**
-The headless engine (tokenizer, ORP law, speed governor, deadline pacer,
-session state machine, foreign-script classification and skip filter) is
-built and green: **26/26 F_code tests**. The GUI (three postures, stage with
-red pivot + ticks, flow map, context-page recovery, transport keys) compiles
-finalized and smoke-launches. Not yet shipped: no installer, no AI pipeline
-(preprocessor/quiz), no persistent log, no fisheye ribbon or braking —
-those are specified in `.eiffel-workflow/` and queued. Build it yourself:
+🚀 **v0.9.0 — feature-complete, installer built, in final hand-test (2026-08-26,
+the same day the idea arrived).** Engine **35/35 F_code tests**; simple_widgets
+suite 198/198 (this project grew the toolkit: give_focus, handle_release,
+drive chips, typed paths). Built and working: three postures + the analog
+**braking pedal** (hold the stage: glide to 300 with the live fisheye ribbon;
+drag to scrub; release to ease home), recovery loop, fisheye ribbon, Speed
+drawer, scholarly timing with foreign-script skip, **local-AI comprehension
+quiz** (worker process, quote-verified against your text — live-tested on a
+local Qwen3), SQLite reading ledger + Continue-where-you-left-off, UTF-8-clean
+intake, `SimpleSpeedReader-0.9.0-Setup.exe` (7 MB, per-user, ledger-preserving
+uninstall). Awaiting Larry's approval to tag 1.0.
 
 ```
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target simple_speed_reader_tests
-./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe   # 26/26
+./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 35/35
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader
-# copy cairo.dll beside EIFGENs/speed_reader/F_code/simple_speed_reader.exe, run it,
-# and feed it demo/sample_text.md
+/d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader_worker
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\simple_speed_reader.iss
 ```
 
 ## The idea

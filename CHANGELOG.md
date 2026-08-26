@@ -3,6 +3,27 @@
 All notable changes to simple_speed_reader are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/).
 
+## [0.9.0] - 2026-08-26 (the night build)
+
+Feature-complete in one evening, on top of the same day's design + v0.1:
+- **Persistence**: SR_SETTINGS profile (simple_config, UTF-8-safe paths) +
+  SR_LOG SQLite ledger (every sealed run: speeds, rewinds, quiz score);
+  crash-safe bookmark on every pause/seal; Continue-where-I-left-off.
+- **Fisheye ribbon** (D-015) above the paused context page - clickable resume points.
+- **Speed drawer** (D-012): live dial, hold/release, back-offs, nudges.
+- **BRAKING** (D-016): hold the stage to glide to 300 with the ribbon flowing live;
+  drag left = halt + proportional scrub-back, drag right = re-engage; release eases
+  back to cruise and restores a held pin. simple_widgets gained handle_release.
+- **AI quiz pipeline** (D-007): speed_reader_worker exe (spawned, never blocks the
+  pump) asks local Ollama for questions as strict JSON; think-blocks stripped;
+  every quote verified verbatim against the text (hallucinations dropped and
+  counted); SQ3R preview drawer; post-seal self-judged administration; score into
+  the ledger. Live-verified on Ollama 11435 / Qwen3-8B: 5/5 real questions.
+- **Installer**: SimpleSpeedReader-0.9.0-Setup.exe (Inno, 7 MB, 7.8 s build) -
+  per-user, both exes + cairo.dll + icon + demo + guide, ledger-preserving
+  uninstall prompt (UninstallSilent-guarded per the ocr lesson).
+- Engine tests 35/35 F_code; widgets 198/198.
+
 ## [Unreleased]
 
 ### Added

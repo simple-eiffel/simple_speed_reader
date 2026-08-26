@@ -1,8 +1,6 @@
 # simple_speed_reader — User Guide
 
-> **Design preview.** This guide describes the designed product (spec of 2026-08-26).
-> The app is not yet built; keys and behaviors here are the binding design and will be
-> kept current through implementation.
+> v0.9.0 — everything below is built and shipping in the installer.
 
 ## What it is
 
@@ -15,7 +13,8 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
 | Posture | What you see | How you got here |
 |---------|--------------|------------------|
 | **Running** | Only the stream: the word stage, the flow map on the left, the dim `SPEED: N WPM` readout, and one dim pause mark. Nothing else. | Space/Enter from paused, or Start from the cockpit |
-| **Paused** | The **fisheye ribbon** on top — one line of the surrounding words, tiny at the edges swelling to your current word at center: where you are, at a glance. Below it, the **context page**: the surrounding paragraphs as normal readable text, your stopped word marked. Controls are tucked into edge drawers (Speed · Quiz · Settings) — pull one out if you need it. The flow map becomes a click-to-seek scrubber. Clicking a word — in the ribbon or the page — sets where reading resumes. | Space, clicking the stage, or the pause mark |
+| **Paused** | The **fisheye ribbon** on top — one line of the surrounding words, tiny at the edges swelling to your current word at center: where you are, at a glance. Below it, the **context page**: the surrounding paragraphs as normal readable text, your stopped word marked. A control row (Resume at sentence head · Resume exactly here · Stop · **Speed >**) sits at the bottom; Speed opens a drawer with the live dial, hold, back-offs, and nudges. The flow map becomes a click-to-seek scrubber. Clicking a word — in the ribbon or the page — sets where reading resumes. | Space, a quick tap on the stage |
+| **Braking** | Press and **hold** the stage (~¼ s) and the pedal engages: speed glides down to 300 while the fisheye ribbon appears above the stage and flows with the live word (`[BRAKE]` in the readout). **Drag left** past 40 px: the stream halts and scrubs backward, faster the further you drag. **Drag right**: forward flow re-engages. **Release**: speed eases back up to the cruise you were at — and a held pin comes back by itself. | Hold the stage mid-read |
 | **Stopped** | The full cockpit: load text, settings, quiz, history, and **Continue at word N** if you were mid-book. Stopping *seals the sitting*: your run is logged and your place saved. | Esc (or S) from anywhere; or finishing the text |
 
 ## Keys (media-player muscle memory; the seek unit is the *sentence*)
@@ -69,18 +68,30 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
 
 ## The quiz (opt-in)
 
-When you load a text, the local model starts writing a short quiz from it — before you read.
-- **Preview** the questions first if you like (the SQ3R study move: it primes what to look for).
-- After reading, take the quiz in the cockpit. Every question carries a supporting quote that
-  verifiably occurs in your text — a question that can't prove itself is discarded.
-- Scores land in your history next to your speeds. Speed without retention is a party trick;
-  this is the honesty meter.
+Tick **Comprehension quiz** in the cockpit. From then on, the moment a text loads, a background
+worker asks your local model to write a short quiz from it — before you read a word. The stream
+never waits: generation runs in its own process and the status line reports when it's ready.
+- **Preview questions** (the SQ3R study move) opens a drawer with just the questions — read them
+  first to prime what to look for.
+- Every question carries a supporting quote verified **verbatim** against your text. A question
+  that can't prove itself is dropped, and the status line tells you how many were.
+- After you stop or finish, the cockpit administers the quiz: read the question, **Show the
+  answer**, then judge yourself — *I got it* / *I missed it*. Honest self-scoring beats a machine
+  guessing at your phrasing.
+- The score lands in that run's ledger row. Speed without retention is a party trick; this is
+  the honesty meter.
 
-Requires a local [Ollama](https://ollama.com) server (configurable URL/model in Settings).
-Without one, everything except the AI features works normally.
+Requires a local [Ollama](https://ollama.com) server (URL and model live in `speed_reader.cfg`;
+defaults to `http://localhost:11435`). Without one, everything else works normally and the
+status line says exactly why the quiz didn't arrive.
 
-## Your log
+## Continue where you left off
 
-Every sealed sitting records: date, text, words streamed/skipped, dialed and achieved WPM,
-pauses and rewinds, quiz score. The history panel charts your trend. It's stored locally
-(SQLite) and never leaves your machine.
+Your position is bookmarked on every pause and stop (crash-safe). **Continue where I left off**
+in the cockpit reloads the last file and resumes at the saved word, at recovery speed.
+
+## Your ledger
+
+Every sealed sitting records: date, text, words streamed/skipped, dialed peak and achieved WPM,
+pauses and rewinds, quiz score. The cockpit lists your newest six runs; the full ledger is
+`speed_reader.db` (SQLite) beside the exe — local only, never leaves your machine.

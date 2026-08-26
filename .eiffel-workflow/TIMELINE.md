@@ -29,10 +29,17 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Hand-test round 3: freeze forensics | 2026-08-26 18:10 | 2:10 | 0%-CPU block → drive probes convicted → SHELL_DESKTOP.logical_drives_mask (GetLogicalDrives), dialog never probes; stale-EIFGENs trap caught + recorded |
 | Hand-test round 4: paused screenshot | 2026-08-26 18:14 | 2:14 | paused row flex fix (full height), UTF-8 decode at facade (SIMPLE_FILE.content mojibake found + logged), paused control row added; engine 26/26, GUI smoke-verified |
 | **INTERMISSION** — Larry to church | 2026-08-26 18:14 | 2:14 | build green across 3 repos, staged for his return; ribbon/drawers/braking/AI/log/installer queued |
-| Hardened (Phase 6) | — | — | |
-| Shipped (Phase 7): repo + docs + Release | — | — | |
-| **Installer built** (Inno Setup) | — | — | include build duration itself |
+| Back on the clock — the night build begins | 2026-08-26 ~18:55 | 2:55 | "let's get this thing done tonight" |
+| Persistence slice green | 2026-08-26 ~19:05 | 3:05 | SR_SETTINGS + SR_LOG (SQLite) + Continue-at-word-N; 29/29 |
+| Ribbon + Speed drawer | 2026-08-26 ~19:12 | 3:12 | fisheye above the context page; drawer with dial/hold/back-offs |
+| BRAKING live | 2026-08-26 ~19:20 | 3:20 | handle_release added to widgets (198/198); glide/scrub/ease + hold-restore; 32/32 |
+| AI quiz pipeline LIVE-verified | 2026-08-26 ~19:33 | 3:33 | worker exe → Ollama 11435 Qwen3-8B → 5 real quote-anchored questions from the sample; quote gate + SQ3R preview + self-judged admin; 35/35 |
+| **Installer built** | 2026-08-26 19:38 | 3:38 | SimpleSpeedReader-0.9.0-Setup.exe, 7 MB — ISCC compile 7.8 s (rebuild 5.8 s with final guide) |
+| v0.9.0 feature-complete, docs refreshed | 2026-08-26 19:40 | 3:40 | README/CHANGELOG/USER_GUIDE tell tonight's truth; awaiting the row below |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
+
+Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release
+(ship phase) — after the approval row fills.
 
 ## Rules for future sessions
 
