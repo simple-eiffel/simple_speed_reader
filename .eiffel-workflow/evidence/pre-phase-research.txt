@@ -1,0 +1,25 @@
+# Pre-Phase Research Evidence
+# Project: d:\prod\simple_speed_reader
+# Date: 2026-08-26
+
+Research completed: yes
+Steps completed: 7/7
+Recommendation: BUILD
+Confidence: HIGH
+
+References cited: 17 (4 papers, 4 method sources, 5 repositories, 4 local ecosystem evidence points + source video)
+Alternatives researched: 5 (Spritz, chislerr/rsvp-reader, speeedy, Stutter, Limitless-One/RSVP-Reader)
+Risks identified: 9 (8 registered + 1 resource)
+
+Method notes:
+- 4 live WebSearch queries (RSVP/ORP mechanics, Schotter regression research, OSS comparables, SQ3R)
+- Source video analyzed via ffmpeg frame extraction (14 frames)
+- Ecosystem capabilities verified by reading sw_canvas.e, sw_painter.e, shell_window.e,
+  ollama_client.e (paths + line numbers in REFERENCES.md)
+- Name simple_speed_reader chosen by Larry from 4 candidates
+- Larry's design inputs captured verbatim in 01-SCOPE / 03-REQUIREMENTS / 04-DECISIONS:
+  reader-not-drill identity, recovery loop w/ re-ramp, hold + back-off (100/50/25),
+  speed+comprehension log, quiz BEFORE reading, quiz preview (SQ3R), drill mode secondary,
+  running state shows ONLY the word-stream
+
+# Status: COMPLETE

@@ -1,0 +1,32 @@
+# Pre-Phase Specification Evidence
+# Project: d:\prod\simple_speed_reader
+# Date: 2026-08-26
+
+Specification completed: yes
+Steps completed: 8/8
+Classes designed: 26 (20 library + 6 app target)
+Contracts defined: 11 classes with full invariant/pre/post drafts (05-CONTRACT-DESIGN.md);
+  frame conditions via MML |=| on tokens/questions/stops models
+Requirements traced: 39 (33 FR + 6 NFR) - all mapped in 08-VALIDATION.md
+
+OOSC2 compliance: PASS
+Eiffel excellence: PASS
+Ready for implementation: yes (VERDICT: READY)
+
+Phase inputs consumed: all 8 research documents (same-session, content in context)
+Oracle consulted: yes (check run 2026-08-26; rules/gotchas folded into 03/06/08:
+  testing standard, across-element binding, PROCEDURE[TUPLE] flattening, preferred_width,
+  rrect radius, genericity/semantic-range, ecosystem-enumeration-before-design)
+New facts verified this phase:
+  - OLLAMA_CLIENT.execute_chat is SYNCHRONOUS curl (ollama_client.e:2,137) ->
+    SR_AI_GATEWAY separate region + SR_MAILBOX mailbox pattern (DR-009)
+  - shell set_fast_timer (a_ms) at shell_window.e:93 -> cadence source; tick-rate
+    validation is first Phase-1 gate test (A-1 NEEDS_VALIDATION)
+  - simple_mml types: MML_SEQUENCE/SET/MAP/BAG/INTERVAL available
+  - ECF multi-target precedent: simple_ocr_capture (base + gui + tests extends)
+Requirements added by challenge step: FR-030 font fallback, FR-031 resize-safe pivot,
+  FR-032 position autosave, FR-033 hash text identity
+Requirement reworded: FR-022 (quiz generation launches at load, streams per chunk,
+  complete before administration - "before reading" intent preserved)
+
+# Status: COMPLETE

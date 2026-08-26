@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>simple_speed_reader — Simple Eiffel</title>
+<style>
+  body { margin:0; font-family: Segoe UI, system-ui, sans-serif; background:#0d0d0f; color:#e8e8ea; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  .tag { color:#e5484d; font-family: Consolas, monospace; }
+  .status { display:inline-block; background:#3a2a00; color:#ffb224; border-radius:6px;
+            padding:2px 10px; font-size:.85rem; margin: 12px 0 24px; }
+  a { color:#7cb8ff; text-decoration:none; } a:hover { text-decoration:underline; }
+  .word { font-family: Consolas, monospace; font-size:3rem; text-align:center; margin:40px 0;
+          letter-spacing:.02em; }
+  .word .pivot { color:#e5484d; }
+  .dim { color:#8a8a90; font-family: Consolas, monospace; text-align:center; font-size:.9rem; }
+  ul { line-height:1.7; }
+  footer { margin-top:48px; color:#8a8a90; font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>simple_<span class="tag">speed_reader</span></h1>
+  <div>RSVP reading with the science objections engineered out — for the
+     <a href="https://github.com/simple-eiffel">Simple Eiffel</a> ecosystem.</div>
+  <div class="status">🚧 In design — no code yet (spec complete 2026-08-26)</div>
+
+  <div class="word">rea<span class="pivot">d</span>ing</div>
+  <div class="dim">SPEED: 595 WPM</div>
+
+  <ul>
+    <li><b>Recovery loop</b> — one key out of the stream, click your last-comprehended word,
+        re-ramp from 250 WPM. Regression restored (Schotter et&nbsp;al. 2014).</li>
+    <li><b>Quiz before reading</b> — a local model writes a quote-verified quiz from your text
+        at load time; preview it (SQ3R), take it after, log the score.</li>
+    <li><b>Three postures</b> — running is only the stream; paused drawers the controls over a
+        readable context page; stopped opens the full cockpit.</li>
+    <li><b>Scholar timing</b> — Hebrew/Greek linger with no fake pivot, transliteration and
+        acronym classes, optional foreign-script skip.</li>
+    <li><b>Honest log</b> — dialed WPM vs achieved WPM vs retention, in SQLite, local only.</li>
+  </ul>
+
+  <p>
+    <a href="USER_GUIDE.md">User guide</a> ·
+    <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a>
+  </p>
+
+  <footer>MIT · Eiffel 25.02 · Windows x64 · Design by Contract · SCOOP</footer>
+</main>
+</body>
+</html>
