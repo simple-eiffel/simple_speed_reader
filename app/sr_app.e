@@ -37,7 +37,24 @@ feature {NONE} -- Initialization
 			stage.set_font_size (settings.font_size)
 			create context_view.make (reader)
 			create flow_map.make (reader)
+			create ribbon.make (reader)
 			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm, settings.skip_foreign)
+			create speed_drawer.make_titled ("Speed")
+			create speed_label.make_mono ("")
+			speed_drawer.put (speed_label)
+			create hold_button.make ("Hold at current", Void)
+			speed_drawer.put (hold_button)
+			create backoff_100_button.make ("Back off 100  (1)", Void)
+			speed_drawer.put (backoff_100_button)
+			create backoff_50_button.make ("Back off 50  (2)", Void)
+			speed_drawer.put (backoff_50_button)
+			create backoff_25_button.make ("Back off 25  (3)", Void)
+			speed_drawer.put (backoff_25_button)
+			create nudge_up_button.make ("Target +25  (Up)", Void)
+			speed_drawer.put (nudge_up_button)
+			create nudge_down_button.make ("Target -25  (Down)", Void)
+			speed_drawer.put (nudge_down_button)
+			create speed_chip_button.make ("Speed >", Void)
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
@@ -46,6 +63,7 @@ feature {NONE} -- Initialization
 			create paused_here_button.make ("Resume exactly here  (Enter)", Void)
 			create paused_stop_button.make ("Stop and log the run  (Esc)", Void)
 			create l_col.make
+			l_col.put (ribbon.surface)
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (context_view.surface)
@@ -56,6 +74,7 @@ feature {NONE} -- Initialization
 			l_row.put (paused_resume_button)
 			l_row.put (paused_here_button)
 			l_row.put (paused_stop_button)
+			l_row.put (speed_chip_button)
 			l_col.put (l_row)
 			paused_root := l_col
 			cockpit_root := cockpit.root
@@ -75,6 +94,15 @@ feature {NONE} -- Initialization
 			paused_resume_button.set_on_click (agent on_paused_resume_clicked)
 			paused_here_button.set_on_click (agent on_paused_here_clicked)
 			paused_stop_button.set_on_click (agent do_stop)
+			ribbon.set_on_word_click (agent on_word_marked)
+			speed_chip_button.set_on_click (agent open_speed_drawer)
+			speed_drawer.set_on_close (agent close_speed_drawer)
+			hold_button.set_on_click (agent on_hold_clicked)
+			backoff_100_button.set_on_click (agent on_backoff_clicked (100))
+			backoff_50_button.set_on_click (agent on_backoff_clicked (50))
+			backoff_25_button.set_on_click (agent on_backoff_clicked (25))
+			nudge_up_button.set_on_click (agent on_drawer_nudge (True))
+			nudge_down_button.set_on_click (agent on_drawer_nudge (False))
 			cockpit.show_history (ledger.recent_lines (6))
 
 			window.set_root (cockpit_root)
@@ -244,6 +272,65 @@ feature {NONE} -- Transport (D-014)
 			-- The whole stage is a pause target (FR-034).
 		do
 			do_pause
+		end
+
+	open_speed_drawer
+		do
+			refresh_speed_labels
+			window.show_drawer (speed_drawer, 320.0, True)
+			window.request_render
+		end
+
+	close_speed_drawer
+		do
+			window.close_sheet
+			window.request_render
+		end
+
+	on_hold_clicked
+		do
+			do_toggle_hold
+			refresh_speed_labels
+			window.request_render
+		end
+
+	on_backoff_clicked (a_amount: INTEGER)
+		do
+			if reader.has_text then
+				reader.back_off (a_amount)
+				refresh_speed_labels
+				window.request_render
+			end
+		end
+
+	on_drawer_nudge (a_up: BOOLEAN)
+		do
+			if a_up then
+				do_nudge_up
+			else
+				do_nudge_down
+			end
+			refresh_speed_labels
+			window.request_render
+		end
+
+	refresh_speed_labels
+		local
+			l_s: STRING_32
+		do
+			create l_s.make (48)
+			l_s.append_string_general ("current ")
+			l_s.append_string_general (reader.current_wpm.out)
+			l_s.append_string_general (" -> target ")
+			l_s.append_string_general (reader.target_wpm.out)
+			l_s.append_string_general (" wpm")
+			if reader.is_held then
+				l_s.append_string_general ("  [HELD]")
+				hold_button.set_label ("Release hold")
+			else
+				hold_button.set_label ("Hold at current")
+			end
+			speed_label.set_text (l_s)
 		end
 
 	on_paused_resume_clicked
@@ -469,7 +556,15 @@ feature {NONE} -- Implementation
 
 	cockpit: SR_COCKPIT
 
-	paused_resume_button, paused_here_button, paused_stop_button: SW_BUTTON
+	ribbon: SR_RIBBON_VIEW
+
+	speed_drawer: SW_DRAWER
+
+	speed_label: SW_LABEL
+
+	paused_resume_button, paused_here_button, paused_stop_button,
+	speed_chip_button, hold_button, backoff_100_button, backoff_50_button,
+	backoff_25_button, nudge_up_button, nudge_down_button: SW_BUTTON
 
 	logger: SIMPLE_LOGGER
 
