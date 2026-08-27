@@ -622,6 +622,35 @@ feature -- Test: word cloud
 			assert_true ("ribbon tier hot for glory", r.cloud_tier (3) >= 4)
 		end
 
+	test_wordcloud_survives_greek
+			-- The crash repro: a text carrying Greek must build its
+			-- cloud (to_string_8 must never see a non-ASCII key).
+		local
+			r: SIMPLE_SPEED_READER
+			l_src: STRING_32
+			l_top: ARRAYED_LIST [TUPLE [word: STRING_32; tally: INTEGER]]
+		do
+			create r.make
+			create l_src.make (64)
+			l_src.append_string_general ("The glory word ")
+			l_src.append_code (0x03B4) -- delta
+			l_src.append_code (0x03CC)
+			l_src.append_code (0x03BE)
+			l_src.append_code (0x03B1)
+			l_src.append_string_general (" appears twice: ")
+			l_src.append_code (0x03B4)
+			l_src.append_code (0x03CC)
+			l_src.append_code (0x03BE)
+			l_src.append_code (0x03B1)
+			l_src.append_string_general (" indeed, glory glory.")
+			r.load_text ({STRING_32} "t", l_src)
+			assert_true ("loaded without dying", r.last_intake_ok)
+			r.preset_position (1)
+			l_top := r.top_words_scoped ({SIMPLE_SPEED_READER}.Scope_document, 10)
+			assert_true ("greek term ranked", across l_top as w some
+				w.word.has_code (0x03B4) end)
+		end
+
 feature -- Test: quiz (D-007)
 
 	test_validator_normalizes_whitespace

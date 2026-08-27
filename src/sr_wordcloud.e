@@ -155,7 +155,9 @@ feature -- Access
 			end
 			if Result.count < 3 then
 				Result.wipe_out
-			elseif stopwords.has (Result.to_string_8) then
+			elseif Result.is_valid_as_string_8 and then stopwords.has (Result.to_string_8) then
+					-- Non-ASCII words (Greek, Hebrew, diacritics) are never
+					-- English stopwords - and to_string_8 would die on them.
 				Result.wipe_out
 			else
 				l_code := Result.item (1).natural_32_code.to_integer_32
