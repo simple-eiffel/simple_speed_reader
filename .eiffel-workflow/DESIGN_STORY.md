@@ -279,3 +279,20 @@ sentence again, at pace), HERE when paused; the pedal engages the brake live exa
 stage hold does; the speed drawer opens over the moving stream for live tuning. And thanks to
 focus-follows-interest — donated to SW_CANVAS an hour earlier — deck clicks never steal the
 keyboard from the stage.
+
+### 26. "+/- for speed tiers, Alt for font, a bigger readout, remember it all, a brake key, tooltips everywhere"
+**The ask.** A volley: ±25/50/100 wpm on +/- with Shift and Ctrl+Shift; Alt± for font points; a
+larger speed indicator; settings that survive restart; a key-combo for the brake ("perhaps
+'='?"); hover tooltips on every control for discovery.
+**What the design did.** The keys hit bedrock first: the shell pump forwards a WHITELIST of
+virtual keys, and +/- were not on it - nor was WM_SYSKEYDOWN handled at all, so Alt-anything
+died in the platform. simple_shell grew (donation #7): the stepping keys joined the whitelist,
+Alt-modified steps forward with the menu loop suppressed, the beep swallowed - and its suite
+held 13/13. The governor generalized to sanctioned raise_target/lower_target steps {25,50,100};
+Alt± steps the stage type 4 points and persists it; the readout doubled in size and grew honest
+- "SPEED: 425 -> 900 WPM" whenever the ramp still has somewhere to go. On '=' as the brake: it
+had just become the speed-up key, so the counter-proposal stood - B, for Brake, a TOGGLE (the
+shell forwards no key-up; a key cannot hear its own release), working from running and paused
+both. And discovery: donation #8, SW_CANVAS.on_hover, lets the one-canvas deck retarget its
+tooltip per button - so every control in the reader now names its own key-combo when the mouse
+rests on it. Everything persists; everything reloads at boot. Engine 36/36.

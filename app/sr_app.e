@@ -92,6 +92,7 @@ feature {NONE} -- Initialization
 			stage.surface.set_on_sweep (agent on_stage_sweep)
 			stage.surface.set_on_release (agent on_stage_release)
 			context_view.surface.set_on_char (agent on_paused_char)
+			context_view.surface.set_on_key (agent on_reading_vk)
 			context_view.set_on_word_click (agent on_word_marked)
 			flow_map.set_on_seek (agent on_map_seek)
 			cockpit.wire (
@@ -108,6 +109,16 @@ feature {NONE} -- Initialization
 			ribbon.surface.set_on_files (agent on_files_dropped)
 			flow_map.surface.set_on_files (agent on_files_dropped)
 			cockpit.drop_zone.set_on_drop (agent on_files_dropped)
+			stage.surface.set_tooltip ("Click = pause - hold = brake (B toggles) - Left = replay - +/- speed - Alt +/- font")
+			context_view.surface.set_tooltip ("Click the word you last truly read - Space resumes at the sentence head")
+			ribbon.surface.set_tooltip ("Where you are in the flow - click a word to resume there")
+			flow_map.surface.set_tooltip ("The whole text - click while paused to jump back")
+			hold_button.set_tooltip ("H while reading")
+			backoff_100_button.set_tooltip ("key 1 - or Ctrl+Shift+minus")
+			backoff_50_button.set_tooltip ("key 2 - or Shift+minus")
+			backoff_25_button.set_tooltip ("key 3 - or minus")
+			nudge_up_button.set_tooltip ("Up arrow, '.', or '+'")
+			nudge_down_button.set_tooltip ("Down arrow, ',', or '-'")
 			speed_drawer.set_on_close (agent close_speed_drawer)
 			hold_button.set_on_click (agent on_hold_clicked)
 			backoff_100_button.set_on_click (agent on_backoff_clicked (100))
@@ -185,7 +196,7 @@ feature {NONE} -- The clock
 					else
 						stage.set_breather (reader.in_breather (l_now))
 						l_sig := reader.position * 16
-							+ reader.current_wpm
+							+ reader.current_wpm + reader.target_wpm * 3
 							+ (if stage.is_in_breather then 8 else 0 end)
 						if l_sig /= last_render_sig then
 							last_render_sig := l_sig
@@ -274,6 +285,14 @@ feature {NONE} -- Transport (D-014)
 				do_stop
 			when 104, 72 then -- h, H
 				do_toggle_hold
+			when 98, 66 then -- b, B: the keyboard brake TOGGLE (the
+					-- shell forwards no key-up, so a hold-key cannot
+					-- exist; press engages, press again releases)
+				if brake_engaged then
+					do_brake_release
+				else
+					on_deck_brake_press
+				end
 			when 49 then -- 1
 				if reader.has_text then
 					reader.back_off (100)
@@ -313,9 +332,57 @@ feature {NONE} -- Transport (D-014)
 				do_nudge_up
 			when 40 then -- Down
 				do_nudge_down
+			when 187, 107 then -- '+'/'=' row key, numpad +
+				speed_or_font_step (True)
+			when 189, 109 then -- '-', numpad -
+				speed_or_font_step (False)
 			else
 			end
 			window.request_render
+		end
+
+	speed_or_font_step (a_up: BOOLEAN)
+			-- The stepping keys: +/- 25 wpm; Shift 50; Ctrl+Shift 100;
+			-- Alt steps the stage font 4 points instead.
+		local
+			l_keys: SW_KEYS
+			l_amount: INTEGER
+		do
+			create l_keys
+			if l_keys.alt_down then
+				font_step (a_up)
+			elseif reader.has_text then
+				if l_keys.control_down and l_keys.shift_down then
+					l_amount := 100
+				elseif l_keys.shift_down then
+					l_amount := 50
+				else
+					l_amount := 25
+				end
+				if a_up then
+					if not reader.is_held then
+						reader.raise_target (l_amount)
+					end
+				else
+					reader.lower_target (l_amount)
+				end
+			end
+		end
+
+	font_step (a_up: BOOLEAN)
+			-- Alt+ +/-: the stage type grows or shrinks 4 points,
+			-- clamped to the profile's lawful range, and persists.
+		local
+			l_size: REAL_64
+		do
+			if a_up then
+				l_size := (stage.font_size + 4.0).min (160.0)
+			else
+				l_size := (stage.font_size - 4.0).max (16.0)
+			end
+			stage.set_font_size (l_size)
+			settings.set_font_size (l_size.truncated_to_integer)
+			logger.info ("font size " + l_size.truncated_to_integer.out + "pt")
 		end
 
 	on_paused_char (a_code: INTEGER)
@@ -333,6 +400,12 @@ feature {NONE} -- Transport (D-014)
 				end
 			when 27, 115, 83 then -- Esc
 				do_stop
+			when 98, 66 then -- b, B: brake toggle from paused = resume braked
+				if brake_engaged then
+					do_brake_release
+				else
+					on_deck_brake_press
+				end
 			else
 			end
 		end

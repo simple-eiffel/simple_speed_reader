@@ -146,24 +146,48 @@ feature -- Commands
 			comfy_frame: comfy_max_wpm = old comfy_max_wpm
 		end
 
+	raise_target (a_amount: INTEGER)
+			-- Raise the target by a sanctioned step (+/=, with Shift 50,
+			-- with Ctrl+Shift 100).
+		require
+			sanctioned_step: a_amount = 25 or a_amount = 50 or a_amount = 100
+			not_held: not is_held
+		do
+			target_wpm := (target_wpm + a_amount).min (comfy_max_wpm)
+			session_target_wpm := session_target_wpm.max (target_wpm)
+		ensure
+			raised_capped: target_wpm = (old target_wpm + a_amount).min (comfy_max_wpm)
+			current_frame: current_wpm = old current_wpm
+		end
+
+	lower_target (a_amount: INTEGER)
+			-- Lower the target by a sanctioned step; ambition and the
+			-- current pace follow down.
+		require
+			sanctioned_step: a_amount = 25 or a_amount = 50 or a_amount = 100
+		do
+			target_wpm := (target_wpm - a_amount).max (Min_wpm)
+			session_target_wpm := session_target_wpm.min (target_wpm)
+			current_wpm := current_wpm.min (target_wpm)
+		ensure
+			lowered_floored: target_wpm = (old target_wpm - a_amount).max (Min_wpm)
+			current_clamped: current_wpm <= target_wpm
+		end
+
 	nudge_up
 			-- Raise the target one step (Up / '.').
 		require
 			not_held: not is_held
 		do
-			target_wpm := (target_wpm + Nudge_step).min (comfy_max_wpm)
-			session_target_wpm := session_target_wpm.max (target_wpm)
+			raise_target (Nudge_step)
 		ensure
 			raised_capped: target_wpm = (old target_wpm + Nudge_step).min (comfy_max_wpm)
-			current_frame: current_wpm = old current_wpm
 		end
 
 	nudge_down
 			-- Lower the target one step (Down / ',').
 		do
-			target_wpm := (target_wpm - Nudge_step).max (Min_wpm)
-			session_target_wpm := session_target_wpm.min (target_wpm)
-			current_wpm := current_wpm.min (target_wpm)
+			lower_target (Nudge_step)
 		ensure
 			lowered_floored: target_wpm = (old target_wpm - Nudge_step).max (Min_wpm)
 		end

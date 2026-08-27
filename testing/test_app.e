@@ -52,6 +52,7 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_governor_hold_and_release, "test_governor_hold_and_release")
 			run_test (agent l_set.test_governor_back_off_keeps_comfy, "test_governor_back_off_keeps_comfy")
 			run_test (agent l_set.test_governor_back_off_after_hold_stays_low, "test_governor_back_off_after_hold_stays_low")
+			run_test (agent l_set.test_governor_step_tiers, "test_governor_step_tiers")
 			run_test (agent l_set.test_governor_recovery, "test_governor_recovery")
 			print ("=== TIMING ===%N")
 			run_test (agent l_set.test_timing_base_and_length, "test_timing_base_and_length")

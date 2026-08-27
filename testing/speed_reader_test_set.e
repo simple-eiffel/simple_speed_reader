@@ -216,6 +216,22 @@ feature -- Test: governor
 			assert_integers_equal ("release honors the back-off", 150, g.target_wpm)
 		end
 
+	test_governor_step_tiers
+			-- +/- 25, Shift 50, Ctrl+Shift 100 - the keyboard tiers.
+		local
+			g: SR_GOVERNOR
+		do
+			create g.make (250, 250, 900)
+			g.lower_target (100)
+			g.lower_target (50)
+			g.lower_target (25)
+			assert_integers_equal ("stacked down", 725, g.target_wpm)
+			g.raise_target (100)
+			assert_integers_equal ("stepped up", 825, g.target_wpm)
+			g.raise_target (100)
+			assert_integers_equal ("capped at comfy", 900, g.target_wpm)
+		end
+
 	test_governor_recovery
 		local
 			g: SR_GOVERNOR

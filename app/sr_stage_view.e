@@ -97,18 +97,22 @@ feature {NONE} -- Painting
 					p.fill_rect (l_pin - 1.5, l_base - font_size - 20.0, 3.0, 16.0)
 					p.fill_rect (l_pin - 1.5, l_base + 14.0, 3.0, 16.0)
 				end
-				p.font (p.Role_mono, 13.0, True)
+				p.font (p.Role_mono, 21.0, True)
 				p.set_color (Dim)
-				create l_s.make (24)
+				create l_s.make (32)
 				l_s.append_string_general ("SPEED: ")
 				l_s.append_string_general (reader.current_wpm.out)
+				if reader.target_wpm > reader.current_wpm then
+					l_s.append_string_general (" -> ")
+					l_s.append_string_general (reader.target_wpm.out)
+				end
 				l_s.append_string_general (" WPM")
 				if reader.is_braking then
 					l_s.append_string_general ("  [BRAKE]")
 				elseif reader.is_held then
 					l_s.append_string_general ("  [HELD]")
 				end
-				p.text (a_x + (a_w - p.advance (l_s)) / 2, a_y + a_h - 26.0, l_s)
+				p.text (a_x + (a_w - p.advance (l_s)) / 2, a_y + a_h - 30.0, l_s)
 			else
 				p.font (p.Role_mono, 18.0, False)
 				p.set_color (Dim)

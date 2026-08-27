@@ -92,6 +92,21 @@ feature {NONE} -- Initialization
 			create summary_label.make_mono ("")
 			root.put (summary_label)
 
+				-- Key-combo discovery: every control tells its shortcut.
+			text_box.set_tooltip ("Paste any text - Start streams it")
+			load_button.set_tooltip ("Open a .txt, .md or .pdf - drive chips and typed paths both work")
+			start_button.set_tooltip ("While reading: Space pauses - Esc stops - B brakes - +/- speed - Alt +/- font")
+			continue_button.set_tooltip ("Reload the last file at your bookmarked word")
+			start_box.set_tooltip ("Where the ramp starts each run")
+			comfy_box.set_tooltip ("The ceiling the ramp climbs toward")
+			skip_check.set_tooltip ("Stream past Hebrew/Greek glyphs - transliterations stay - text views show everything")
+			quiz_check.set_tooltip ("A local model writes questions from your text BEFORE you read (SQ3R)")
+			preview_button.set_tooltip ("Read the questions first - it primes comprehension")
+			reveal_button.set_tooltip ("See the expected answer and its verbatim proof quote")
+			got_button.set_tooltip ("Honest self-scoring - the score joins this run's ledger row")
+			missed_button.set_tooltip ("No shame - the gap is information")
+			drop_zone.set_tooltip ("Drag from Explorer - works on any part of the reader, any time")
+
 			create history_labels.make (History_rows)
 			from
 				i := 1

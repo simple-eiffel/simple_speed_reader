@@ -23,6 +23,7 @@ feature {NONE} -- Initialization
 			surface.set_on_paint (agent paint)
 			surface.set_on_press (agent press)
 			surface.set_on_release (agent release)
+			surface.set_on_hover (agent hover)
 		ensure
 			reader_kept: reader = a_reader
 		end
@@ -210,6 +211,34 @@ feature {NONE} -- Input
 				if attached on_brake_release as al_h then
 					al_h.call
 				end
+			end
+		end
+
+	hover (a_px, a_py: REAL_64)
+			-- Retarget the tooltip to the button under the pointer -
+			-- key-combo discovery lives here.
+		do
+			inspect button_at (a_px, surface.width)
+			when 1 then
+				if reader.is_running then
+					surface.set_tooltip ("PAUSE - Space, or click the stage")
+				else
+					surface.set_tooltip ("PLAY - resume at the sentence head - Space")
+				end
+			when 2 then
+				if reader.is_running then
+					surface.set_tooltip ("REPLAY this sentence at pace - Left arrow")
+				else
+					surface.set_tooltip ("Resume exactly HERE - Enter, or click a word above")
+				end
+			when 3 then
+				surface.set_tooltip ("STOP and log the run - Esc")
+			when 4 then
+				surface.set_tooltip ("BRAKE - hold with the mouse - key B toggles - drag left to scrub back")
+			when 5 then
+				surface.set_tooltip ("SPEED drawer - keys: +/- 25 wpm, Shift 50, Ctrl+Shift 100 - Alt +/- font size")
+			else
+				surface.set_tooltip ("")
 			end
 		end
 

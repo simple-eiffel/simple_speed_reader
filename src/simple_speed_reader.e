@@ -487,6 +487,27 @@ feature -- Governance
 			end
 		end
 
+	raise_target (a_amount: INTEGER)
+		require
+			has_text: has_text
+			not_held: not is_held
+			sanctioned: a_amount = 25 or a_amount = 50 or a_amount = 100
+		do
+			check attached session as al_s then
+				al_s.governor.raise_target (a_amount)
+			end
+		end
+
+	lower_target (a_amount: INTEGER)
+		require
+			has_text: has_text
+			sanctioned: a_amount = 25 or a_amount = 50 or a_amount = 100
+		do
+			check attached session as al_s then
+				al_s.governor.lower_target (a_amount)
+			end
+		end
+
 	nudge_up
 		require
 			has_text: has_text

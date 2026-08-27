@@ -29,6 +29,9 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
 | **Ctrl+Left / Ctrl+Right** | Same, by paragraph | Same |
 | **Up / Down** (or . / ,) | Speed target +25 / −25 WPM | Same |
 | **H** | Hold speed at current (ramp freezes); press again to release | Same, for the resume |
+| **B** | Brake **toggle**: press to glide down to 300 with the ribbon flowing, press again to ease back to cruise (the mouse pedal is hold-to-brake; a key can't hear its own release) | Resume *braked* into the stream; B again to ease up |
+| **+ / -** (or =) | Speed target ±25 · **Shift** ±50 · **Ctrl+Shift** ±100 (numpad too) | Same |
+| **Alt + / -** | Stage font size ±4 pt (persists to your profile) | Same |
 | **1 / 2 / 3** | Back off by 100 / 50 / 25 WPM | Same |
 | **Home** | — | Resume point to the start of the text |
 | Hardware media keys | Play/Pause = Space · Stop = Esc | Same |
@@ -39,6 +42,10 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
    recovers. For a mere blink-length lapse, use **Left** (micro-rewind) instead: one sentence
    replays without breaking stride.
 2. **Stop keeps your place** (like an audiobook app), it never resets to the beginning.
+
+**Discovery:** rest the mouse on anything — every control (each deck button included) carries a
+tooltip naming its key-combo. All of it persists: font size, speeds, filters, and opt-ins reload
+from `speed_reader.cfg` on every start.
 
 ## The recovery loop (why this reader exists)
 
