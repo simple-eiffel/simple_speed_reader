@@ -309,3 +309,12 @@ unstructured prose and their tooltip says why; on a real book they light up. STA
 what a tape deck means by it: word one, and the RAMP starts over too - back to your start
 speed, climbing fresh. The deck is ten zones now, VCR-ordered, every button still naming its
 behavior on hover. Engine 38/38.
+
+### 28. The screenshot with the floating band: "we need a progress bar under the black window"
+**The ask.** A position indicator right under the stage.
+**What the design did.** The screenshot earned double: it asked for a progress bar and it
+convicted a layout bug in the same frame - the stage sat in a floating 400-pixel band because
+SW_ROW's default cross-axis CENTERS children at their preferred height. All three content rows
+went to Cross_stretch (the toolkit had the cure on the shelf), so stage, context page and flow
+map now fill their posture top to bottom - and right beneath the stage, one shared SW_PROGRESS
+strip rides every reading posture above the deck, fed position-over-token-count every tick.
