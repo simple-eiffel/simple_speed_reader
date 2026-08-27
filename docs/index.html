@@ -3,51 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>simple_speed_reader — Simple Eiffel</title>
+<title>simple_speed_reader</title>
+<link rel="icon" href="images/icon-256.png">
 <style>
-  body { margin:0; font-family: Segoe UI, system-ui, sans-serif; background:#0d0d0f; color:#e8e8ea; }
-  main { max-width: 760px; margin: 0 auto; padding: 48px 24px; }
-  h1 { font-size: 2rem; margin: 0 0 4px; }
-  .tag { color:#e5484d; font-family: Consolas, monospace; }
-  .status { display:inline-block; background:#3a2a00; color:#ffb224; border-radius:6px;
-            padding:2px 10px; font-size:.85rem; margin: 12px 0 24px; }
-  a { color:#7cb8ff; text-decoration:none; } a:hover { text-decoration:underline; }
-  .word { font-family: Consolas, monospace; font-size:3rem; text-align:center; margin:40px 0;
-          letter-spacing:.02em; }
-  .word .pivot { color:#e5484d; }
-  .dim { color:#8a8a90; font-family: Consolas, monospace; text-align:center; font-size:.9rem; }
-  ul { line-height:1.7; }
-  footer { margin-top:48px; color:#8a8a90; font-size:.85rem; }
+  :root {
+    --stage: #0d0d0f; --panel: #131318; --line: #26262c;
+    --ink: #e8e8ea; --dim: #8a8a90; --faint: #55555c;
+    --red: #e5484d; --amber: #e8a33d;
+  }
+  * { margin: 0; box-sizing: border-box; }
+  body { background: var(--stage); color: var(--ink);
+    font: 16px/1.65 "Segoe UI", system-ui, sans-serif; }
+  code, .mono { font-family: Consolas, "IBM Plex Mono", monospace; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+  a { color: var(--amber); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header { text-align: center; padding: 26px 0 10px; }
+  header img { width: 130px; }
+  h1 { font-family: Consolas, monospace; font-size: 2.1rem; margin-top: 10px; }
+  h1 .p { color: var(--red); }
+  .tag { color: var(--dim); margin-top: 4px; }
+  nav { margin: 18px 0 8px; color: var(--faint); }
+  nav a { margin: 0 10px; }
+
+  .stage-demo { background: #000; border: 1px solid var(--line); border-radius: 10px;
+    margin: 30px 0; padding: 56px 20px 40px; text-align: center; position: relative; }
+  .stage-demo .word { font-family: Consolas, monospace; font-weight: 700;
+    font-size: clamp(2.2rem, 7vw, 3.6rem); letter-spacing: .01em; }
+  .stage-demo .word b { color: var(--red); font-weight: 700; }
+  .stage-demo .tick { position: absolute; left: 50%; width: 3px; height: 16px;
+    background: var(--red); transform: translateX(-50%); }
+  .stage-demo .t1 { top: 22px; } .stage-demo .t2 { bottom: 58px; }
+  .stage-demo .speed { color: var(--dim); font-family: Consolas, monospace;
+    font-size: .95rem; margin-top: 26px; letter-spacing: .06em; }
+
+  h2 { font-family: Consolas, monospace; font-size: 1.15rem; margin: 44px 0 12px;
+    color: var(--ink); letter-spacing: .04em; }
+  h2::before { content: "// "; color: var(--red); }
+  p { margin: 10px 0; max-width: 68ch; }
+  .muted { color: var(--dim); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px; margin: 16px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; }
+  .card h3 { font-family: Consolas, monospace; font-size: .95rem; margin-bottom: 6px;
+    color: var(--amber); }
+  .card p { font-size: .92rem; color: var(--dim); margin: 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: .92rem; }
+  .twrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 7px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--faint); font-family: Consolas, monospace; font-weight: 400;
+    text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
+  td:first-child { font-family: Consolas, monospace; color: var(--amber); white-space: nowrap; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 18px; }
+  .stat b { display: block; font-family: Consolas, monospace; font-size: 1.4rem;
+    color: var(--red); font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--dim); font-size: .8rem; }
+
+  pre { background: #000; border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-size: .85rem; color: var(--dim); }
+  footer { margin-top: 60px; color: var(--faint); font-size: .85rem; text-align: center; }
 </style>
 </head>
 <body>
 <main>
-  <h1>simple_<span class="tag">speed_reader</span></h1>
-  <div>RSVP reading with the science objections engineered out — for the
-     <a href="https://github.com/simple-eiffel">Simple Eiffel</a> ecosystem.</div>
-  <div class="status">🚧 In design — no code yet (spec complete 2026-08-26)</div>
+  <header>
+    <img src="images/logo.svg" alt="simple_speed_reader">
+    <h1>simple_<span class="p">speed_reader</span></h1>
+    <div class="tag">Read fast without lying to yourself.</div>
+    <nav>
+      <a href="USER_GUIDE.md">User guide</a>
+      <a href="THE_NIGHT_BUILD.md">The Night Build</a>
+      <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a>
+      <a href="https://github.com/simple-eiffel">Simple Eiffel</a>
+    </nav>
+  </header>
 
-  <div class="word">rea<span class="pivot">d</span>ing</div>
-  <div class="dim">SPEED: 595 WPM</div>
+  <div class="stage-demo">
+    <div class="tick t1"></div>
+    <div class="word">rea<b>d</b>ing</div>
+    <div class="tick t2"></div>
+    <div class="speed">SPEED: 425 -&gt; 900 WPM</div>
+  </div>
 
-  <ul>
-    <li><b>Recovery loop</b> — one key out of the stream, click your last-comprehended word,
-        re-ramp from 250 WPM. Regression restored (Schotter et&nbsp;al. 2014).</li>
-    <li><b>Quiz before reading</b> — a local model writes a quote-verified quiz from your text
-        at load time; preview it (SQ3R), take it after, log the score.</li>
-    <li><b>Three postures</b> — running is only the stream; paused drawers the controls over a
-        readable context page; stopped opens the full cockpit.</li>
-    <li><b>Scholar timing</b> — Hebrew/Greek linger with no fake pivot, transliteration and
-        acronym classes, optional foreign-script skip.</li>
-    <li><b>Honest log</b> — dialed WPM vs achieved WPM vs retention, in SQLite, local only.</li>
-  </ul>
+  <p>An RSVP speed reader for Windows — one word at a time, the red pivot letter
+  pinned where your eye already is — built around the two things reading science
+  holds against every other word-streamer: it restores <em>regression</em>
+  (Schotter, Tran &amp; Rayner 2014) with a one-key recovery loop, and it
+  verifies comprehension with a local-AI quiz whose every question must prove
+  itself with a verbatim quote from your text. Dark-only, contract-first,
+  every pixel its own.</p>
 
-  <p>
-    <a href="USER_GUIDE.md">User guide</a> ·
-    <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a>
-  </p>
+  <h2>the intervention ladder</h2>
+  <div class="grid">
+    <div class="card"><h3>Left &mdash; replay</h3><p>A lapse. This sentence again, at pace. No ceremony.</p></div>
+    <div class="card"><h3>hold &mdash; BRAKE</h3><p>A wobble. Speed glides to a crawl, the fisheye ribbon flows along; drag left to scrub back; release to ease home.</p></div>
+    <div class="card"><h3>Space &mdash; recover</h3><p>Comprehension lost. A readable page; click the word you last truly read; resume there, slow, climbing.</p></div>
+    <div class="card"><h3>Esc &mdash; seal</h3><p>The sitting ends honestly: speeds, rewinds, skips and quiz score into the ledger.</p></div>
+  </div>
 
-  <footer>MIT · Eiffel 25.02 · Windows x64 · Design by Contract · SCOOP</footer>
+  <h2>what ships</h2>
+  <div class="grid">
+    <div class="card"><h3>The deck</h3><p>Eleven drawn VCR buttons: start-over with a fresh ramp, paragraph and section jumps, play, replay, stop, the brake pedal, speed, cloud.</p></div>
+    <div class="card"><h3>Scholarly timing</h3><p>Hebrew and Greek linger and never wear a fake pivot; transliterations, refs and acronyms carry their own beats; optional foreign-script skip.</p></div>
+    <div class="card"><h3>The word cloud</h3><p>Ribbon words warm by significance; W (or the edge tab) opens the Document / Section / Paragraph cloud.</p></div>
+    <div class="card"><h3>Quiz before reading</h3><p>A local model writes questions at load time, in a worker process. Verbatim-quote gate; SQ3R preview; self-judged score into the ledger.</p></div>
+    <div class="card"><h3>Any text in</h3><p>Paste, a drive-hopping dialog, Explorer drag-and-drop anywhere, PDFs through bundled Poppler. UTF-8 clean.</p></div>
+    <div class="card"><h3>The honest ledger</h3><p>Dialed peak vs achieved WPM vs retention, every sitting. Crash-safe bookmarks; continue where you left off.</p></div>
+  </div>
+
+  <h2>keys</h2>
+  <div class="twrap"><table>
+    <tr><th>key</th><th>while reading</th></tr>
+    <tr><td>Space</td><td>pause to the context page (paused: resume at the sentence head)</td></tr>
+    <tr><td>Left / Right</td><td>replay this sentence / skip a sentence (Ctrl: paragraphs)</td></tr>
+    <tr><td>B</td><td>brake toggle &mdash; glide to the crawl and back</td></tr>
+    <tr><td>+ / -</td><td>speed &plusmn;25 &middot; Shift &plusmn;50 &middot; Ctrl+Shift &plusmn;100</td></tr>
+    <tr><td>Alt + / -</td><td>stage font &plusmn;4pt, persisted</td></tr>
+    <tr><td>H &middot; 1 2 3</td><td>hold the ramp &middot; back off 100 / 50 / 25</td></tr>
+    <tr><td>F &middot; W</td><td>fade mode &middot; the word cloud</td></tr>
+    <tr><td>Esc</td><td>stop and log the run</td></tr>
+  </table></div>
+  <p class="muted">Rest the mouse on anything — every control names its key-combo.</p>
+
+  <h2>the numbers</h2>
+  <div class="stats">
+    <div class="stat"><b>6h 27m</b><span>video to feature-complete</span></div>
+    <div class="stat"><b>50/50</b><span>engine tests, F_code, adversarial pass included</span></div>
+    <div class="stat"><b>13</b><span>features factored back to the toolkit</span></div>
+    <div class="stat"><b>41</b><span>commits, three repositories, one day</span></div>
+    <div class="stat"><b>12 MB</b><span>installer, 8-second compile</span></div>
+  </div>
+  <p>The whole story — the science, the contracts that caught real bugs, the
+  thirteen donations — is in <a href="THE_NIGHT_BUILD.md">The Night Build</a>.</p>
+
+  <h2>install</h2>
+  <pre>SimpleSpeedReader-0.9.0-Setup.exe     per-user, no UAC, ~12 MB
+&#8226; the reader + its AI worker + cairo.dll + DLL-isolated pdftotext
+&#8226; uninstall asks before touching your reading history - never silently</pre>
+  <p class="muted">The quiz needs a local <a href="https://ollama.com">Ollama</a>;
+  everything else runs without one.</p>
+
+  <footer>MIT &middot; Eiffel 25.02 &middot; Windows x64 &middot; Design by Contract &middot; SCOOP-compatible<br>
+  Part of the Simple Eiffel ecosystem &mdash; no Vision2, no GTK: every pixel the toolkit's own.</footer>
 </main>
 </body>
 </html>

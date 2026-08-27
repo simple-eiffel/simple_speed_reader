@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/logo.svg" alt="simple_speed_reader logo" width="160">
+  <img src="docs/images/logo.svg" alt="simple_speed_reader logo" width="180">
 </p>
 
 <h1 align="center">simple_speed_reader</h1>
@@ -8,6 +8,7 @@
   <a href="https://simple-eiffel.github.io/simple_speed_reader/">Documentation</a> •
   <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a> •
   <a href="docs/USER_GUIDE.md">User Guide</a> •
+  <a href="docs/THE_NIGHT_BUILD.md">The Night Build</a> •
   <a href=".eiffel-workflow/DESIGN_STORY.md">Design Story</a>
 </p>
 
@@ -16,75 +17,131 @@
   <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
   <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
   <img src="https://img.shields.io/badge/Platform-Windows%20x64-lightgrey.svg" alt="Windows x64">
-  <img src="https://img.shields.io/badge/Status-In%20Design-orange.svg" alt="Status: In Design">
+  <img src="https://img.shields.io/badge/tests-50%2F50-brightgreen.svg" alt="Tests 50/50">
 </p>
 
-**Read fast without lying to yourself.** An RSVP speed reader (one word at a
-time, red pivot letter, dark screen, ramping to 900 WPM) built around the two
-things every other word-streamer lacks: a one-key **recovery loop** for the
-moment your mind wanders, and a local-AI **comprehension quiz** written from
-your text *before* you read it. Part of the
+**Read fast without lying to yourself.** An RSVP speed reader — one word at a
+time, the red pivot letter pinned at center, dark screen, ramping toward 900
+WPM — built around the two things every other word-streamer lacks: a one-key
+**recovery loop** for the moment your mind wanders (the regression that
+reading science says comprehension needs), and a **local-AI comprehension
+quiz** written from your text *before* you read it, every question verified
+verbatim against the source. Part of the
 [Simple Eiffel](https://github.com/simple-eiffel) ecosystem.
 
 ## Status
 
-🚀 **v0.9.0 — feature-complete, installer built, in final hand-test (2026-08-26,
-the same day the idea arrived).** Engine **35/35 F_code tests**; simple_widgets
-suite 198/198 (this project grew the toolkit: give_focus, handle_release,
-drive chips, typed paths). Built and working: three postures + the analog
-**braking pedal** (hold the stage: glide to 300 with the live fisheye ribbon;
-drag to scrub; release to ease home), recovery loop, fisheye ribbon, Speed
-drawer, scholarly timing with foreign-script skip, **local-AI comprehension
-quiz** (worker process, quote-verified against your text — live-tested on a
-local Qwen3), SQLite reading ledger + Continue-where-you-left-off, UTF-8-clean
-intake, `SimpleSpeedReader-0.9.0-Setup.exe` (7 MB, per-user, ledger-preserving
-uninstall). Awaiting Larry's approval to tag 1.0.
+✅ **v0.9.0 — feature-complete, hardened, installer built.** Specified,
+implemented, hand-tested and hardened in one day (2026-08-26 — the whole
+story is in [The Night Build](docs/THE_NIGHT_BUILD.md)). Engine **50/50**
+F_code contract-assault tests including a nine-test adversarial pass;
+simple_widgets 198/198 and simple_shell 13/13 with the thirteen features this
+application factored back into them. Awaiting the 1.0 tag.
+
+- Ships as two finalized Eiffel executables (the reader and its AI worker),
+  cairo.dll, and a DLL-isolated Poppler `pdftotext` — no runtime, no Python,
+  **no Vision2**: the GUI is [simple_widgets](https://github.com/simple-eiffel/simple_widgets)
+  over [simple_shell](https://github.com/simple-eiffel/simple_shell)
+- Local-only by design: the quiz talks to your own Ollama; nothing leaves the machine
+- The reading ledger (SQLite), profile, and bookmarks live beside the exe
+
+## The idea
+
+Reading science has two standing objections to RSVP speed reading: it
+eliminates *regressions* — the backward glances that repair comprehension
+(Schotter, Tran & Rayner 2014) — and it never verifies that anything was
+understood. simple_speed_reader is RSVP with both objections engineered out:
+
+- **The intervention ladder.** Tap Left: this sentence replays at pace.
+  **Hold the stage (or the pedal): the BRAKE** — speed glides to a crawl
+  while a fisheye ribbon of the surrounding words flows along; drag left to
+  scrub back; release to ease home. Press Space: the readable context page,
+  click the word you last truly read, resume there at recovery speed.
+  Esc: the sitting seals into the ledger.
+- **Quiz before reading (SQ3R).** A local model writes questions from your
+  text at load time — in a worker process, never blocking the stream. Every
+  question carries a supporting quote verified **verbatim** or it is dropped
+  and counted. Preview the questions first; self-judge after; the score joins
+  that run's ledger row beside dialed WPM and *achieved* WPM.
+
+## What ships today
+
+**The stage** — video-faithful ORP pivot with tick marks, settable font
+(Alt +/− live), WPM readout that shows the ramp's intent (`425 -> 900`),
+optional crossfade pacing that scales with the word's own display slot.
+
+**Governance** — ramp to a persisted comfy-max, hold (H), back-offs (1/2/3),
+speed tiers on +/− (Shift ×2, Ctrl+Shift ×4), the analog brake (mouse-hold or
+B toggle).
+
+**Navigation** — an eleven-button drawn VCR deck: start-over with a fresh
+ramp, paragraph and section jumps (sections detected from markdown headings
+and standalone title lines; the buttons ghost when a text has none),
+play/pause, replay/here, stop, brake, speed, cloud.
+
+**Orientation** — full-text flow map (click-to-seek when paused), progress
+bar, the colorized fisheye ribbon (word-cloud significance tiers), and a
+scoped **word cloud** drawer — Document / Section / Paragraph — on the W key,
+the deck, or the right-edge peek-and-pin tab.
+
+**Scholarly timing** — Hebrew and Greek linger (never faster than an
+effective 350 WPM) and render centered without a fake pivot; transliterations,
+numerics, and acronyms carry their own linger classes; an optional
+foreign-script skip streams past glyphs while every text view shows them.
+
+**Intake** — paste, a drive-hopping file dialog, Explorer drag-and-drop onto
+any surface, and PDFs through bundled Poppler with honest refusals for
+text-free scans. UTF-8 clean end to end.
+
+**Honesty** — every sealed sitting logged: dialed peak, achieved WPM,
+pauses, rewinds, skips, quiz score. Crash-safe bookmarks;
+continue-where-you-left-off.
+
+## Install
+
+Run `SimpleSpeedReader-0.9.0-Setup.exe` (per-user, no UAC; ~12 MB). The
+uninstaller asks before touching your reading history — and never asks
+silently.
+
+## Build from source
 
 ```
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target simple_speed_reader_tests
-./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 35/35
+./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 50/50
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader_worker
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\simple_speed_reader.iss
 ```
 
-## The idea
+Copy `cairo.dll`, `speed_reader.ico`, and the `pdf\` extractor folder beside
+the finalized exe (every finalize wipes F_code; the installer stages all of
+it for shipped installs).
 
-Reading science has two objections to RSVP speed reading: it eliminates
-regressions (re-reading repairs comprehension — Schotter, Tran & Rayner 2014),
-and it never verifies that anything was understood. simple_speed_reader is
-RSVP with both objections engineered out:
+## Architecture
 
-- **Recovery loop** — Space stops the stream instantly and shows the
-  surrounding paragraphs as readable text. Click the word where you were last
-  solid; the stream resumes *there*, at ~250 WPM, re-ramping toward your
-  comfy-max. Getting lost costs seconds, not the chapter.
-- **Quiz before reading** — a local model (Ollama, on your GPU, nothing
-  leaves the machine) writes a quote-anchored quiz from your text at load
-  time. Preview the questions first (the SQ3R move), take it after, and the
-  score joins your log next to *dialed* WPM and *actually achieved* WPM.
+A headless, contract-first engine (`SIMPLE_SPEED_READER` facade over
+tokenizer, ORP law, timing model, deadline pacer, speed governor, session
+state machine, word-significance ranks, quiz gate) that a scripted clock can
+drive without a window — the GUI is a view. The speed governor's invariant
+*is* the product rule (`Min <= current <= target <= comfy_max`); the recovery
+command's postcondition *is* the science (resume re-ramps from recovery
+speed). AI runs in a spawned worker process polled by mailbox file: the pump
+never meets a blocking call, by construction.
 
-## Designed features (planned — not yet built)
+## Dependencies
 
-- Video-parity dark stage: fixed ORP pivot, tick marks, live WPM readout; settable font
-- Three postures: **running** (stream only + one dim pause affordance),
-  **paused** (context page + drawered controls), **stopped** (full cockpit)
-- Speed governance: ramp to comfy-max (default 900), hold-at-current, back-off −100/−50/−25
-- Media-player transport keys: Space/K, Esc/S, Left/Right sentence seeks,
-  in-flow micro-rewind, Up/Down speed
-- Whole-text flow map with live word cursor; scrubber when paused
-- Scholar-grade timing: Hebrew/Greek script detection (linger + no fake pivot),
-  transliteration and acronym linger, numerals, optional foreign-script skip
-- Local-AI text preprocessor for OCR-grade sources; honest speed + comprehension log (SQLite)
-- Drill mode with AI-generated graded practice texts
-
-## Planned stack
-
-[simple_widgets](https://github.com/simple-eiffel/simple_widgets) (drawn GUI) ·
-simple_shell · simple_cairo · simple_ai_client (Ollama) · simple_sql ·
-simple_config · simple_file · simple_hash · simple_diff — SCOOP-compatible,
-void-safe, contracts everywhere.
+| Library | Purpose |
+|---------|---------|
+| simple_widgets / simple_shell / simple_cairo | the drawn Win32 face |
+| simple_ai_client | Ollama (worker process only) |
+| simple_sql | the reading ledger |
+| simple_config | the profile |
+| simple_file / simple_encoding | UTF-8 intake |
+| simple_pdf | bundled Poppler pdftotext |
+| simple_logger / simple_process / simple_json | log, worker spawn, quiz payloads |
+| base + testing (ISE), simple_testing | kernel and the assault harness |
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). Bundled `pdftotext` and companions are
+Poppler (GPL); they ship as separate executables in `pdf\`.

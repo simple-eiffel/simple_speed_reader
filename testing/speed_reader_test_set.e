@@ -780,6 +780,222 @@ feature -- Test: braking (D-016)
 			assert_false ("brake off", r.is_braking)
 		end
 
+feature -- Test: hardening (Phase 6 adversarial)
+
+	test_adversarial_single_word
+		local
+			r: SIMPLE_SPEED_READER
+			l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (300, 300, 300)
+			r.load_text ({STRING_32} "t", {STRING_32} "alone")
+			assert_true ("one word loads", r.last_intake_ok)
+			r.start_reading (0)
+			from l_now := 0 until r.is_sealed or l_now > 5000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+			end
+			assert_true ("one word seals", r.is_sealed)
+			if attached r.last_record as al_rec then
+				assert_integers_equal ("one streamed", 1, al_rec.streamed_count)
+			end
+		end
+
+	test_adversarial_all_foreign_with_skip
+			-- Every word filtered: the facade must refuse to start,
+			-- never crash or spin.
+		local
+			r: SIMPLE_SPEED_READER
+			l_src: STRING_32
+		do
+			r := (create {SIMPLE_SPEED_READER}.make).with_foreign_skip (True)
+			create l_src.make (12)
+			l_src.append_code (0x05D1)
+			l_src.append_code (0x05E8)
+			l_src.append_character (' ')
+			l_src.append_code (0x03B1)
+			l_src.append_code (0x03B2)
+			r.load_text ({STRING_32} "t", l_src)
+			assert_true ("loads", r.last_intake_ok)
+			assert_false ("nothing streamable - cannot start", r.can_start)
+		end
+
+	test_adversarial_monster_word
+		local
+			r: SIMPLE_SPEED_READER
+			l_src: STRING_32
+			i, l_now: INTEGER
+		do
+			create l_src.make (600)
+			from i := 1 until i > 500 loop
+				l_src.append_character ('x')
+				i := i + 1
+			end
+			l_src.append_string_general (" done.")
+			create r.make
+			r := r.with_speeds (300, 300, 300)
+			r.load_text ({STRING_32} "t", l_src)
+			assert_integers_equal ("two tokens", 2, r.token_count)
+			assert_true ("pivot inside the monster",
+				r.token (1).pivot_index >= 1 and r.token (1).pivot_index <= 500)
+			r.start_reading (0)
+			from l_now := 0 until r.is_sealed or l_now > 10000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+			end
+			assert_true ("monster streams and seals", r.is_sealed)
+		end
+
+	test_adversarial_punctuation_noise
+			-- Markdown droppings: rules, fences, lone dashes.
+		local
+			r: SIMPLE_SPEED_READER
+		do
+			create r.make
+			r.load_text ({STRING_32} "t",
+				{STRING_32} "--- ### %"...%" word --- *** !!!")
+			assert_true ("noise loads", r.last_intake_ok)
+			assert_true ("tokens exist", r.token_count >= 5)
+			assert_true ("startable", r.can_start)
+		end
+
+	test_adversarial_rapid_pause_resume
+		local
+			r: SIMPLE_SPEED_READER
+			i, l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (600, 300, 900)
+			r.load_text ({STRING_32} "t",
+				{STRING_32} "One two three four five six seven eight nine ten eleven twelve.")
+			r.start_reading (0)
+			from i := 1 until i > 25 loop
+				l_now := l_now + 40
+				r.tick (l_now)
+				if r.is_running then
+					r.pause_reading
+					r.resume_at_sentence_start (l_now)
+				end
+				i := i + 1
+			end
+			assert_true ("still coherent", r.is_running or r.is_sealed)
+			assert_true ("position lawful", r.position >= 1 and r.position <= r.token_count)
+		end
+
+	test_adversarial_governor_floor_everything
+		local
+			g: SR_GOVERNOR
+			i: INTEGER
+		do
+			create g.make (100, 100, 100)
+			from i := 1 until i > 50 loop
+				g.note_word_advanced
+				i := i + 1
+			end
+			assert_integers_equal ("pinned at the floor", 100, g.current_wpm)
+			g.back_off (100)
+			assert_integers_equal ("cannot go below Min", 100, g.target_wpm)
+			g.apply_brake
+			from i := 1 until i > 60 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			assert_integers_equal ("brake floor clamps to pre-brake", 100, g.current_wpm)
+			g.release_brake
+			from i := 1 until i > 60 loop
+				g.brake_glide_tick
+				i := i + 1
+			end
+			assert_false ("brake settles idle", g.is_brake_active)
+		end
+
+	test_adversarial_boundary_jumps
+		local
+			r: SIMPLE_SPEED_READER
+			l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (600, 300, 900)
+			r.load_text ({STRING_32} "t", {STRING_32} "Aa bb. Cc dd.")
+			r.start_reading (0)
+			r.replay_sentence (0)
+			assert_integers_equal ("replay at word one stays put", 1, r.position)
+			r.restart_from_beginning (0)
+			assert_integers_equal ("restart at start is word one", 1, r.position)
+			r.jump_paragraph (True, 0)
+			assert_integers_equal ("paragraph back at start stays", 1, r.position)
+			from l_now := 0 until r.is_sealed or l_now > 8000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+				if r.is_running and then r.position = r.token_count then
+					r.skip_sentence_forward (l_now)
+				end
+			end
+			assert_true ("forward past the end seals", r.is_sealed)
+		end
+
+	test_adversarial_quiz_garbage_payloads
+		local
+			r: SIMPLE_SPEED_READER
+			l_big: STRING_32
+			i: INTEGER
+		do
+			create r.make
+			r.load_text ({STRING_32} "t", {STRING_32} "Honest text for the gate.")
+			r.attach_quiz_json ({STRING_32} "[]")
+			assert_false ("empty array unusable, no crash", r.quiz_ready)
+			r.attach_quiz_json ({STRING_32} "[{%"q%":42,%"a%":true,%"quote%":[]}]")
+			assert_false ("wrong types dropped, no crash", r.quiz_ready)
+			r.attach_quiz_json ({STRING_32} "[{%"q%":%"only a question%"}]")
+			assert_false ("missing fields dropped", r.quiz_ready)
+			create l_big.make (6000)
+			l_big.append_character ('[')
+			from i := 1 until i > 200 loop
+				l_big.append_string_general ("{%"q%":%"q%",%"a%":%"a%",%"quote%":%"nowhere at all%"},")
+				i := i + 1
+			end
+			l_big.append_string_general ("{%"q%":%"q%",%"a%":%"a%",%"quote%":%"Honest text%"}]")
+			r.attach_quiz_json (l_big)
+			assert_true ("one survivor of 201", r.quiz_ready)
+			if attached r.quiz as al_q then
+				assert_integers_equal ("200 dropped and counted", 200, al_q.dropped_count)
+			end
+		end
+
+	test_adversarial_large_text_stress
+			-- 20k words: tokenize, cloud, and a burst of ticks - bounded
+			-- time, lawful state.
+		local
+			r: SIMPLE_SPEED_READER
+			l_src: STRING_32
+			i, l_now: INTEGER
+		do
+			create l_src.make (200000)
+			from i := 1 until i > 4000 loop
+				l_src.append_string_general ("alpha beta gamma delta glory. ")
+				if i \\ 40 = 0 then
+					l_src.append_string_general ("%N%N")
+				end
+				i := i + 1
+			end
+			create r.make
+			r := r.with_speeds (600, 600, 900)
+			r.load_text ({STRING_32} "stress", l_src)
+			assert_integers_equal ("20k tokens", 20000, r.token_count)
+			r.preset_position (1)
+			assert_true ("cloud built and ranked",
+				not r.top_words_scoped ({SIMPLE_SPEED_READER}.Scope_document, 10).is_empty)
+			r.start_reading (0)
+			from l_now := 0 until l_now > 3000 loop
+				l_now := l_now + 12
+				r.tick (l_now)
+			end
+			assert_true ("far into the stream", r.position > 20)
+			r.stop_and_seal
+			assert_true ("sealed clean", r.is_sealed)
+		end
+
 feature {NONE} -- Fixture helpers
 
 	delete_file (a_path: READABLE_STRING_GENERAL)
