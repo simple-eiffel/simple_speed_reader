@@ -330,3 +330,19 @@ pacer learned when each word took the stage; and the stage fakes alpha honestly 
 inks toward the stage black, since on a solid ground that IS alpha. Frames flow only during
 transitions (the render signature quantizes brightness to 24 steps). Opt-in, persisted,
 tooltipped. Engine 39/39.
+
+### 30. "I don't see how to turn fade on/off?"
+**The ask.** A screenshot of the paused posture, toggle nowhere in sight.
+**What the design did.** Owned the miss: the only door was a cockpit checkbox, and the reader
+lives in the other two postures. Three doors now, always in sync - the F key from anywhere
+(the one that will actually get used), a labeled toggle in the Speed drawer, and the cockpit
+box following along. The same screenshot was also the ribbon's first portrait on real text:
+"the room is the argument" swelling at center, the progress bar seated beneath the stage.
+
+### 31. "Put our ICON as the window icon in the upper-left corner!"
+**The ask.** The mark, in the title bar.
+**What the design did.** Donation #9: finalized Eiffel binaries carry no custom resources, so
+simple_shell gained `shell_set_window_icon` - the r-e-ad mark loads from the .ico shipped
+beside the exe (the multi-size file the icon script built hours ago; Windows picks 16px for
+the title bar, larger for the taskbar) and lands via WM_SETICON on the first heartbeat. Shell
+suite 13/13. The reader now wears its own face.

@@ -40,6 +40,9 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Poppler family fix + full-time deck | 2026-08-26 20:15 | 4:15 | DLL-isolated pdf\ (24 DLLs, bisected); deck rides every posture, state-aware PAUSE/REPLAY, live pedal |
 | Keys volley: tiers, Alt-font, B, tooltips | 2026-08-26 20:29 | 4:29 | shell keymap donation (13/13); +/- 25/50/100; Alt±4pt persisted; 21px honest readout; B brake toggle; hover combos everywhere (SW_CANVAS.on_hover donation); engine 36/36 |
 | Structure navigation: START/PARA/SECT | 2026-08-26 20:43 | 4:43 | 10-zone VCR deck; section detection (md # + standalone headings), SECT ghosts without structure; fresh-ramp start-over; engine 38/38 |
+| Progress bar + Cross_stretch layout fix | 2026-08-26 20:58 | 4:58 | SW_PROGRESS under the stage, all postures; the floating-band bug (row cross-axis centered) cured |
+| Fade mode (WPM-scaled crossfade) | 2026-08-26 21:49 | 5:49 | fade_alpha curve in the timing model (39/39); fade-in 30%, melt into breathers only, self-attenuates at speed |
+| Fade toggle everywhere + window icon | 2026-08-26 ~22:00 | 6:00 | F key + drawer toggle + synced checkbox; shell_set_window_icon donation (13/13) - the r-e-ad mark in the title bar |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release

@@ -167,6 +167,7 @@ feature {NONE} -- The clock
 			if not is_fast_timer_armed then
 				is_fast_timer_armed := True
 				window.set_fast_timer (Tick_ms)
+				window.set_window_icon ("speed_reader.ico")
 			end
 			poll_quiz_worker
 		end
