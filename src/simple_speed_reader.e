@@ -344,6 +344,38 @@ feature -- Status
 			Result := attached text as al_t and then al_t.has_sections
 		end
 
+feature -- Reading window law (the 1-9 keys; Single Choice: the split lives here)
+
+	window_left_span (a_level: INTEGER): INTEGER
+			-- Words trailing behind the primary at window level `a_level':
+			-- level 1 is the primary alone; level N >= 2 trails N // 2.
+		require
+			lawful: a_level >= 1 and a_level <= 9
+		do
+			if a_level >= 2 then
+				Result := a_level // 2
+			end
+		ensure
+			solo_alone: a_level = 1 implies Result = 0
+			bounded: Result >= 0 and Result <= 4
+		end
+
+	window_right_span (a_level: INTEGER): INTEGER
+			-- Words leading ahead of the primary: the level's remainder -
+			-- odd levels lean ahead (level 3 = 1 behind, 2 ahead).
+		require
+			lawful: a_level >= 1 and a_level <= 9
+		do
+			if a_level >= 2 then
+				Result := a_level - a_level // 2
+			end
+		ensure
+			solo_alone: a_level = 1 implies Result = 0
+			leads_or_ties: Result >= window_left_span (a_level)
+			near_even: Result - window_left_span (a_level) <= 1
+			level_total: a_level >= 2 implies window_left_span (a_level) + Result = a_level
+		end
+
 	restart_from_beginning (a_now_ms: INTEGER)
 		require
 			live: is_running or is_paused

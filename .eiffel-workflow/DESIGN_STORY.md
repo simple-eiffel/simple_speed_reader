@@ -388,3 +388,47 @@ sharing with the Eiffel community, its hero a working ORP stage reading its own 
 the proof: /VERYSILENT install, exit 0, both exes and the 25-file Poppler family landed in the
 user's programs folder, and the INSTALLED binary - not the build tree's - launched clean for
 the owner's screenshots. Seven hours thirty-eight minutes on the honest clock. One row open.
+
+### 35. "Watch what I actually do" — the film review
+**The ask.** Larry recorded a one-take, silent 3:46 screen capture of the INSTALLED app reading
+THE_NIGHT_BUILD.md — the program reading its own build story — and asked for two things: a
+YouTube description grounded in what he actually does on screen, and a descriptive SRT caption
+track generated from what is shown.
+**What the design did.** The film was watched the only way a text model can watch: ffmpeg cut
+it into nineteen contact sheets, one frame every two seconds with the timestamp burned into the
+corner, and the sheets were read like a flip-book. What they showed is the remarkable part:
+without a script, every rung of the intervention ladder fired on camera. The ramp climbs 250
+to 725 and cruises; the back-off keys ease it to 650; Space folds the stage into the readable
+page under the colorized fisheye; the recovery click resumes SENTENCES back at 250 — the
+Schotter-regression loop, live; the brake glides 650-548-392-300 with the ribbon flowing over
+the live stream (through the "what the contracts caught" passage, of all places), then eases
+home without a jolt; an em-dash takes its own beat as a red bar; and at the last word the
+sitting seals itself into the cockpit's honest line — 2,385 words streamed, peak 725,
+EFFECTIVE 255, three pauses, three rewinds. The gap between those two numbers, the product's
+whole argument, closes the film unprompted. The deliverables: a 24-cue descriptive SRT beside
+the mp4 (same basename — players and YouTube auto-pair it) and a chapter description whose
+timestamps are observations, not marketing. One blemish caught in the final frames: the ledger
+row stamps UTC (03:50:07 for a 23:50 EDT seal) — logged for a post-approval fix.
+
+## The reading window — 2026-08-27, 00:43
+
+### 36. "The number keys 1-9 invoke a change in how many words are presented"
+**The ask.** A reading window on the stage: key 1 keeps the classic single word; higher keys
+flank the primary with its real neighbors — 2 = one each side, 3 = one behind and two ahead,
+onward to 9 — fisheye-styled, the primary largest and brightest with its red character still
+aligned, the neighbors colorized the way the word cloud would ink them and dimmer with distance.
+**What the design did.** The split became a law before it became pixels: level N >= 2 trails
+N // 2 behind and leads the rest ahead, so odd levels lean into what is coming — and that law
+lives exactly once, as two contract-carrying pure functions on the facade (`window_left_span`
+per `window_right_span`, ensure-linked to each other), where the test target can assault it;
+the stage view, like every view, only asks. On the stage the primary pipeline did not move —
+same ORP pin, same red letter, same tick marks — the walks outward reuse the ribbon's layout
+law (advance-and-gap, drop what misses the edge) with two decay curves the ribbon never needed:
+0.66^d on type size and 0.72^d on brightness, both floored so the far words stay legible and
+present, both riding the word-cloud tier inks (hot = red, warm = amber) and melting with fade
+mode through one generalized toward-stage lerp. The 1/2/3 keys had been the speed back-offs;
+the directive claims the digits, so back-off keeps its drawer buttons and honest tooltips while
+the whole digit row now belongs to the window. The choice persists beside the font. Engine
+51/51 first build; GUI melted, finalized, and smoke-launched clean. The installer was NOT
+rebuilt: the 0.9.0 setup exe is the artifact under Larry's open approval, and its version
+stamp is his call.

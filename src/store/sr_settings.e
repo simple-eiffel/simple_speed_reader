@@ -61,6 +61,14 @@ feature -- Access (defaults per D-004/D-011)
 			Result := config.boolean_value ("quiz_opt_in")
 		end
 
+	word_window: INTEGER
+			-- The stage's 1-9 reading window: 1 = the primary word
+			-- alone (default); N >= 2 adds fisheye neighbors per
+			-- {SIMPLE_SPEED_READER}.window_left_span / window_right_span.
+		do
+			Result := bounded (config.integer_value ("word_window"), 1, 1, 9)
+		end
+
 	cloud_scope: INTEGER
 			-- 1 document (default), 2 section, 3 paragraph.
 		do
@@ -167,6 +175,16 @@ feature -- Element change (each saves immediately - crash-honest)
 		do
 			config.set_boolean ("quiz_opt_in", a_on)
 			config.save
+		end
+
+	set_word_window (a_level: INTEGER)
+		require
+			lawful: a_level >= 1 and a_level <= 9
+		do
+			config.set_integer ("word_window", a_level)
+			config.save
+		ensure
+			kept: word_window = a_level
 		end
 
 	set_fade_words (a_on: BOOLEAN)

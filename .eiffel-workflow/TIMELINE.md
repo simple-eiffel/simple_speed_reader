@@ -48,6 +48,8 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Hardening pass (Phase 6) GREEN | 2026-08-26 ~23:10 | 7:10 | 9 adversarial tests first-build green - 50/50 total (monster words, all-foreign refusal, garbage quizzes, 20k stress) |
 | Ship materials complete | 2026-08-26 ~23:30 | 7:30 | ecosystem-standard README; docs/index.html product page; THE_NIGHT_BUILD.md narrative + published artifact page; installer rebuilt (8.5 s) |
 | **Silent install + installed exe verified** | 2026-08-26 23:38 | 7:38 | /VERYSILENT exit 0 to %LOCALAPPDATA%\Programs; both exes + cairo + icon + pdf family (25 files) + demo + guide; INSTALLED app launched clean for screenshots |
+| The film review (YouTube kit) | 2026-08-27 00:05 | 8:05 | watched Larry's one-take 3:46 recording via 19 ffmpeg contact sheets; every ladder rung fired on camera (ramp 250→725, back-off, pause+ribbon, recovery click, brake to the 300 crawl, ease home, seal — peak 725 / effective 255); descriptive SRT + chaptered description rebuilt from observed fact |
+| Reading window (keys 1–9) | 2026-08-27 00:43 | 8:43 | 1 = the classic solo word … 9 = 10 words (4 behind / 5 ahead — odd levels lean ahead); fisheye 0.66^d size taper + 0.72^d distance dim over word-cloud tier inks, red pivot stays pinned; persisted like the font; span law lives once on the facade, contract-tested — engine 51/51; digit back-offs retire to the Speed drawer's buttons |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release

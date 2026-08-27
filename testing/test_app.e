@@ -38,6 +38,8 @@ feature {NONE} -- Test Runners
 			print ("=== ORP LAW ===%N")
 			run_test (agent l_set.test_pivot_law, "test_pivot_law")
 			run_test (agent l_set.test_pivot_avoids_combining_marks, "test_pivot_avoids_combining_marks")
+			print ("=== READING WINDOW ===%N")
+			run_test (agent l_set.test_window_span_law, "test_window_span_law")
 			print ("=== CLASSIFICATION ===%N")
 			run_test (agent l_set.test_classification_hebrew, "test_classification_hebrew")
 			run_test (agent l_set.test_classification_greek, "test_classification_greek")

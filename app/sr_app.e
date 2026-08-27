@@ -35,6 +35,7 @@ feature {NONE} -- Initialization
 			create current_file_path.make_empty
 			create stage.make (reader)
 			stage.set_font_size (settings.font_size)
+			stage.set_word_window (settings.word_window)
 			create context_view.make (reader)
 			create flow_map.make (reader)
 			create ribbon.make (reader)
@@ -48,11 +49,11 @@ feature {NONE} -- Initialization
 			speed_drawer.put (speed_label)
 			create hold_button.make ("Hold at current", Void)
 			speed_drawer.put (hold_button)
-			create backoff_100_button.make ("Back off 100  (1)", Void)
+			create backoff_100_button.make ("Back off 100", Void)
 			speed_drawer.put (backoff_100_button)
-			create backoff_50_button.make ("Back off 50  (2)", Void)
+			create backoff_50_button.make ("Back off 50", Void)
 			speed_drawer.put (backoff_50_button)
-			create backoff_25_button.make ("Back off 25  (3)", Void)
+			create backoff_25_button.make ("Back off 25", Void)
 			speed_drawer.put (backoff_25_button)
 			create nudge_up_button.make ("Target +25  (Up)", Void)
 			speed_drawer.put (nudge_up_button)
@@ -136,14 +137,14 @@ feature {NONE} -- Initialization
 			ribbon.surface.set_on_files (agent on_files_dropped)
 			flow_map.surface.set_on_files (agent on_files_dropped)
 			cockpit.drop_zone.set_on_drop (agent on_files_dropped)
-			stage.surface.set_tooltip ("Click = pause - hold = brake (B) - Left = replay - +/- speed - Alt +/- font - F fades")
+			stage.surface.set_tooltip ("Click = pause - hold = brake (B) - Left = replay - +/- speed - 1-9 words on stage - Alt +/- font - F fades")
 			context_view.surface.set_tooltip ("Click the word you last truly read - Space resumes at the sentence head")
 			ribbon.surface.set_tooltip ("Where you are - click a word to resume there - colors = word significance - W opens the cloud")
 			flow_map.surface.set_tooltip ("The whole text - click while paused to jump back")
 			hold_button.set_tooltip ("H while reading")
-			backoff_100_button.set_tooltip ("key 1 - or Ctrl+Shift+minus")
-			backoff_50_button.set_tooltip ("key 2 - or Shift+minus")
-			backoff_25_button.set_tooltip ("key 3 - or minus")
+			backoff_100_button.set_tooltip ("Drops your speed 100 wpm right now")
+			backoff_50_button.set_tooltip ("Drops your speed 50 wpm right now")
+			backoff_25_button.set_tooltip ("Drops your speed 25 wpm right now")
 			nudge_up_button.set_tooltip ("Up arrow, '.', or '+'")
 			nudge_down_button.set_tooltip ("Down arrow, ',', or '-'")
 			speed_drawer.set_on_close (agent close_speed_drawer)
@@ -354,18 +355,8 @@ feature {NONE} -- Transport (D-014)
 				else
 					on_deck_brake_press
 				end
-			when 49 then -- 1
-				if reader.has_text then
-					reader.back_off (100)
-				end
-			when 50 then -- 2
-				if reader.has_text then
-					reader.back_off (50)
-				end
-			when 51 then -- 3
-				if reader.has_text then
-					reader.back_off (25)
-				end
+			when 49 .. 57 then -- 1-9: the reading window (words on stage)
+				apply_word_window (a_code - 48)
 			when 46 then -- .
 				do_nudge_up
 			when 44 then -- ,
@@ -428,6 +419,21 @@ feature {NONE} -- Transport (D-014)
 					reader.lower_target (l_amount)
 				end
 			end
+		end
+
+	apply_word_window (a_level: INTEGER)
+			-- The 1-9 keys: how many words share the stage. 1 is the
+			-- primary alone (the default); level N >= 2 trails N // 2
+			-- behind and leads the rest ahead, fisheye-styled.
+			-- Persisted like the font.
+		require
+			lawful: a_level >= 1 and a_level <= 9
+		do
+			stage.set_word_window (a_level)
+			settings.set_word_window (a_level)
+			logger.info ("word window " + a_level.out
+				+ " (" + reader.window_left_span (a_level).out + " behind, primary, "
+				+ reader.window_right_span (a_level).out + " ahead)")
 		end
 
 	font_step (a_up: BOOLEAN)

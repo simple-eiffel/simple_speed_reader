@@ -28,10 +28,18 @@
   nav a { margin: 0 10px; }
 
   .stage-demo { background: #000; border: 1px solid var(--line); border-radius: 10px;
-    margin: 30px 0; padding: 56px 20px 40px; text-align: center; position: relative; }
+    margin: 30px 0; padding: 56px 20px 40px; text-align: center; position: relative;
+    overflow: hidden; }
   .stage-demo .word { font-family: Consolas, monospace; font-weight: 700;
     font-size: clamp(2.2rem, 7vw, 3.6rem); letter-spacing: .01em; }
   .stage-demo .word b { color: var(--red); font-weight: 700; }
+  .stage-demo .word .pw { position: relative; display: inline-block; }
+  /* The reading window's fisheye neighbors: hung off the primary so the
+     pivot stays mathematically centered under its ticks. */
+  .stage-demo .word .nb { font-size: .55em; font-weight: 400; color: #9a9aa0;
+    position: absolute; top: 54%; transform: translateY(-50%); white-space: nowrap; }
+  .stage-demo .word .nbl { right: 100%; margin-right: .6em; }
+  .stage-demo .word .nbr { left: 100%; margin-left: .6em; }
   .stage-demo .tick { position: absolute; left: 50%; width: 3px; height: 16px;
     background: var(--red); transform: translateX(-50%); }
   .stage-demo .t1 { top: 22px; } .stage-demo .t2 { bottom: 58px; }
@@ -87,7 +95,7 @@
 
   <div class="stage-demo">
     <div class="tick t1"></div>
-    <div class="word">rea<b>d</b>ing</div>
+    <div class="word"><span class="pw"><span class="nb nbl">fast</span>rea<b>d</b>ing<span class="nb nbr">without</span></span></div>
     <div class="tick t2"></div>
     <div class="speed">SPEED: 425 -&gt; 900 WPM</div>
   </div>
@@ -113,6 +121,7 @@
     <div class="card"><h3>The deck</h3><p>Eleven drawn VCR buttons: start-over with a fresh ramp, paragraph and section jumps, play, replay, stop, the brake pedal, speed, cloud.</p></div>
     <div class="card"><h3>Scholarly timing</h3><p>Hebrew and Greek linger and never wear a fake pivot; transliterations, refs and acronyms carry their own beats; optional foreign-script skip.</p></div>
     <div class="card"><h3>The word cloud</h3><p>Ribbon words warm by significance; W (or the edge tab) opens the Document / Section / Paragraph cloud.</p></div>
+    <div class="card"><h3>The reading window</h3><p>Keys 1&ndash;9: the classic lone word, or up to ten &mdash; real neighbors flank the primary, fisheye-small, word-cloud-inked, dimmer with distance. The red pivot never moves.</p></div>
     <div class="card"><h3>Quiz before reading</h3><p>A local model writes questions at load time, in a worker process. Verbatim-quote gate; SQ3R preview; self-judged score into the ledger.</p></div>
     <div class="card"><h3>Any text in</h3><p>Paste, a drive-hopping dialog, Explorer drag-and-drop anywhere, PDFs through bundled Poppler. UTF-8 clean.</p></div>
     <div class="card"><h3>The honest ledger</h3><p>Dialed peak vs achieved WPM vs retention, every sitting. Crash-safe bookmarks; continue where you left off.</p></div>
@@ -126,7 +135,8 @@
     <tr><td>B</td><td>brake toggle &mdash; glide to the crawl and back</td></tr>
     <tr><td>+ / -</td><td>speed &plusmn;25 &middot; Shift &plusmn;50 &middot; Ctrl+Shift &plusmn;100</td></tr>
     <tr><td>Alt + / -</td><td>stage font &plusmn;4pt, persisted</td></tr>
-    <tr><td>H &middot; 1 2 3</td><td>hold the ramp &middot; back off 100 / 50 / 25</td></tr>
+    <tr><td>H</td><td>hold the ramp (back-offs live on the Speed drawer's buttons)</td></tr>
+    <tr><td>1 &ndash; 9</td><td>the reading window: 1 = the classic solo word &middot; 9 = ten &mdash; fisheye neighbors, dimming outward, pivot pinned</td></tr>
     <tr><td>F &middot; W</td><td>fade mode &middot; the word cloud</td></tr>
     <tr><td>Esc</td><td>stop and log the run</td></tr>
   </table></div>
@@ -135,7 +145,7 @@
   <h2>the numbers</h2>
   <div class="stats">
     <div class="stat"><b>6h 27m</b><span>video to feature-complete</span></div>
-    <div class="stat"><b>50/50</b><span>engine tests, F_code, adversarial pass included</span></div>
+    <div class="stat"><b>51/51</b><span>engine tests, F_code, adversarial pass included</span></div>
     <div class="stat"><b>13</b><span>features factored back to the toolkit</span></div>
     <div class="stat"><b>41</b><span>commits, three repositories, one day</span></div>
     <div class="stat"><b>12 MB</b><span>installer, 8-second compile</span></div>
@@ -144,6 +154,8 @@
   thirteen donations — is in <a href="THE_NIGHT_BUILD.md">The Night Build</a>.</p>
 
   <h2>install</h2>
+  <p><a href="https://github.com/simple-eiffel/simple_speed_reader/releases/latest">Download
+  the latest Release</a> &mdash; then:</p>
   <pre>SimpleSpeedReader-0.9.0-Setup.exe     per-user, no UAC, ~12 MB
 &#8226; the reader + its AI worker + cairo.dll + DLL-isolated pdftotext
 &#8226; uninstall asks before touching your reading history - never silently</pre>

@@ -32,7 +32,7 @@ default 900 WPM). When your mind wanders — and it will — recovery is one key
 | **B** | Brake **toggle**: press to glide down to 300 with the ribbon flowing, press again to ease back to cruise (the mouse pedal is hold-to-brake; a key can't hear its own release) | Resume *braked* into the stream; B again to ease up |
 | **+ / -** (or =) | Speed target ±25 · **Shift** ±50 · **Ctrl+Shift** ±100 (numpad too) | Same |
 | **Alt + / -** | Stage font size ±4 pt (persists to your profile) | Same |
-| **1 / 2 / 3** | Back off by 100 / 50 / 25 WPM | Same |
+| **1 – 9** | Reading window: **1** = the classic single word (default) · **2** = 3 words (1 behind, 1 ahead) · **3** = 4 words (1 behind, 2 ahead) · … · **9** = 10 words (4 behind, 5 ahead). The primary keeps its size and red pivot letter; neighbors trail off fisheye-style, dimmer with distance, colored by word-cloud significance. Persists to your profile. (Back-offs moved to the Speed drawer's buttons.) | — |
 | **Home** | — | Resume point to the start of the text |
 | Hardware media keys | Play/Pause = Space · Stop = Esc | Same |
 
@@ -58,7 +58,7 @@ from `speed_reader.cfg` on every start.
 ## Speed governance
 
 - Session starts at your start speed (200–300) and ramps toward your comfy-max.
-- **H** pins the ramp when the current pace feels right; **1/2/3** back it off when it doesn't.
+- **H** pins the ramp when the current pace feels right; the Speed drawer's back-off buttons (100/50/25) ease it off when it doesn't.
 - Back-offs change this session's target, never your saved comfy-max.
 - The readout shows the dialed speed; your log records the *achieved* speed too (breathers,
   rewinds and skips included). The difference is information, not shame.

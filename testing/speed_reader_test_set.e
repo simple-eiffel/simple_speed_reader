@@ -47,6 +47,41 @@ feature -- Test: ORP law
 			assert_integers_equal ("stepped to base letter", 1, t.pivot_index)
 		end
 
+feature -- Test: reading window law
+
+	test_window_span_law
+			-- The 1-9 keys: 1 = the primary alone; level N >= 2 trails
+			-- N // 2 behind and leads the rest ahead - odd levels lean
+			-- ahead. Totals: 1 word, then N + 1 words.
+		local
+			l_reader: SIMPLE_SPEED_READER
+			n: INTEGER
+		do
+			create l_reader.make
+			assert_integers_equal ("solo behind", 0, l_reader.window_left_span (1))
+			assert_integers_equal ("solo ahead", 0, l_reader.window_right_span (1))
+			assert_integers_equal ("2 behind", 1, l_reader.window_left_span (2))
+			assert_integers_equal ("2 ahead", 1, l_reader.window_right_span (2))
+			assert_integers_equal ("3 behind", 1, l_reader.window_left_span (3))
+			assert_integers_equal ("3 ahead", 2, l_reader.window_right_span (3))
+			assert_integers_equal ("4 behind", 2, l_reader.window_left_span (4))
+			assert_integers_equal ("4 ahead", 2, l_reader.window_right_span (4))
+			assert_integers_equal ("9 behind", 4, l_reader.window_left_span (9))
+			assert_integers_equal ("9 ahead", 5, l_reader.window_right_span (9))
+			from
+				n := 2
+			until
+				n > 9
+			loop
+				assert_integers_equal ("level total " + n.out, n,
+					l_reader.window_left_span (n) + l_reader.window_right_span (n))
+				assert_true ("ahead lean " + n.out,
+					l_reader.window_right_span (n) >= l_reader.window_left_span (n)
+					and l_reader.window_right_span (n) - l_reader.window_left_span (n) <= 1)
+				n := n + 1
+			end
+		end
+
 feature -- Test: classification
 
 	test_classification_hebrew

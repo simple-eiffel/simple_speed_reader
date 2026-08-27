@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
   <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
   <img src="https://img.shields.io/badge/Platform-Windows%20x64-lightgrey.svg" alt="Windows x64">
-  <img src="https://img.shields.io/badge/tests-50%2F50-brightgreen.svg" alt="Tests 50/50">
+  <img src="https://img.shields.io/badge/tests-51%2F51-brightgreen.svg" alt="Tests 51/51">
 </p>
 
 **Read fast without lying to yourself.** An RSVP speed reader — one word at a
@@ -33,10 +33,11 @@ verbatim against the source. Part of the
 
 ✅ **v0.9.0 — feature-complete, hardened, installer built.** Specified,
 implemented, hand-tested and hardened in one day (2026-08-26 — the whole
-story is in [The Night Build](docs/THE_NIGHT_BUILD.md)). Engine **50/50**
-F_code contract-assault tests including a nine-test adversarial pass;
-simple_widgets 198/198 and simple_shell 13/13 with the thirteen features this
-application factored back into them. Awaiting the 1.0 tag.
+story is in [The Night Build](docs/THE_NIGHT_BUILD.md)); the **1–9 reading
+window** joined the stage the next morning, before first publish. Engine
+**51/51** F_code contract-assault tests including a nine-test adversarial
+pass; simple_widgets 198/198 and simple_shell 13/13 with the thirteen
+features this application factored back into them. Awaiting the 1.0 tag.
 
 - Ships as two finalized Eiffel executables (the reader and its AI worker),
   cairo.dll, and a DLL-isolated Poppler `pdftotext` — no runtime, no Python,
@@ -68,11 +69,14 @@ understood. simple_speed_reader is RSVP with both objections engineered out:
 
 **The stage** — video-faithful ORP pivot with tick marks, settable font
 (Alt +/− live), WPM readout that shows the ramp's intent (`425 -> 900`),
-optional crossfade pacing that scales with the word's own display slot.
+optional crossfade pacing that scales with the word's own display slot, and a
+**1–9 reading window**: key 1 is the classic single word; higher keys flank
+the primary with its real neighbors, fisheye-small and dimmer with distance,
+inked by word-cloud significance — the red pivot stays pinned throughout.
 
-**Governance** — ramp to a persisted comfy-max, hold (H), back-offs (1/2/3),
-speed tiers on +/− (Shift ×2, Ctrl+Shift ×4), the analog brake (mouse-hold or
-B toggle).
+**Governance** — ramp to a persisted comfy-max, hold (H), back-offs (Speed
+drawer), speed tiers on +/− (Shift ×2, Ctrl+Shift ×4), the analog brake
+(mouse-hold or B toggle).
 
 **Navigation** — an eleven-button drawn VCR deck: start-over with a fresh
 ramp, paragraph and section jumps (sections detected from markdown headings
@@ -99,15 +103,16 @@ continue-where-you-left-off.
 
 ## Install
 
-Run `SimpleSpeedReader-0.9.0-Setup.exe` (per-user, no UAC; ~12 MB). The
-uninstaller asks before touching your reading history — and never asks
-silently.
+Download `SimpleSpeedReader-0.9.0-Setup.exe` from the
+[latest Release](https://github.com/simple-eiffel/simple_speed_reader/releases/latest)
+and run it (per-user, no UAC; ~12 MB). The uninstaller asks before touching
+your reading history — and never asks silently.
 
 ## Build from source
 
 ```
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target simple_speed_reader_tests
-./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 50/50
+./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 51/51
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader_worker
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\simple_speed_reader.iss

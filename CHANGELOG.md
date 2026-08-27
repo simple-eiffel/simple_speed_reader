@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](
 ## [0.9.0] - 2026-08-26 (the night build)
 
 Feature-complete in one evening, on top of the same day's design + v0.1:
+- **Reading window (keys 1–9)** (added 2026-08-27 morning, pre-publish): the stage
+  presents 1 word (key 1, the classic default) up to 10 words (key 9). Level N ≥ 2
+  shows the primary plus N words — N // 2 behind, the rest ahead (odd levels lean
+  ahead: key 3 = 1 behind + 2 ahead). The primary keeps its size, red ORP letter,
+  and pin; neighbors trail off fisheye-style (0.66^d size taper), inked by
+  word-cloud significance tier and dimmed toward the stage black with distance
+  (0.72^d, floored), melting with fade mode. The split law lives once on the facade
+  (`window_left_span` / `window_right_span`, contract-tested — engine 51/51); the
+  choice persists in the profile like the font. Keys 1/2/3 stop meaning back-off —
+  back-offs live on in the Speed drawer's buttons.
 - **Persistence**: SR_SETTINGS profile (simple_config, UTF-8-safe paths) +
   SR_LOG SQLite ledger (every sealed run: speeds, rewinds, quiz score);
   crash-safe bookmark on every pause/seal; Continue-where-I-left-off.
