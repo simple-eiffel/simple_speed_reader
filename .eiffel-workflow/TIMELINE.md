@@ -36,6 +36,7 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | AI quiz pipeline LIVE-verified | 2026-08-26 ~19:33 | 3:33 | worker exe → Ollama 11435 Qwen3-8B → 5 real quote-anchored questions from the sample; quote gate + SQ3R preview + self-judged admin; 35/35 |
 | **Installer built** | 2026-08-26 19:38 | 3:38 | SimpleSpeedReader-0.9.0-Setup.exe, 7 MB — ISCC compile 7.8 s (rebuild 5.8 s with final guide) |
 | v0.9.0 feature-complete, docs refreshed | 2026-08-26 19:40 | 3:40 | README/CHANGELOG/USER_GUIDE tell tonight's truth; awaiting the row below |
+| Late round: drops + PDFs + the deck + factoring | 2026-08-26 20:02 | 4:02 | Explorer drag-drop everywhere; pdftotext intake (live on ECMA-367!); drawn VCR deck w/ brake pedal; SW_CANVAS + SW_PAINTER grew five donated features (198/198); installer rebuilt 5.9 s |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release

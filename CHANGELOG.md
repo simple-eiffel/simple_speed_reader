@@ -23,6 +23,14 @@ Feature-complete in one evening, on top of the same day's design + v0.1:
   per-user, both exes + cairo.dll + icon + demo + guide, ledger-preserving
   uninstall prompt (UninstallSilent-guarded per the ocr lesson).
 - Engine tests 35/35 F_code; widgets 198/198.
+- **Late-night round**: Explorer drag-and-drop onto any surface or the cockpit drop tray
+  (SW_DROPZONE + canvas file agents); **PDF intake** via simple_pdf's bundled pdftotext
+  (live-verified on the ECMA-367 Eiffel standard), honest refusals for scans/missing extractor;
+  file dialog filters .txt/.md/.pdf; **the deck** - drawn VCR transport (PLAY/HERE/STOP/BRAKE
+  pedal/SPEED dial) with the automotive brake-warning glyph; pedal-hold in paused resumes
+  braked. Factored back to simple_widgets as ecosystem courtesy: SW_CANVAS grew
+  key/char/release/file agents (SR_SURFACE dissolved), SW_PAINTER grew triangle_fill +
+  arc_stroke; suite 198/198.
 
 ## [Unreleased]
 

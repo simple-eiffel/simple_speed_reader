@@ -38,6 +38,7 @@ feature {NONE} -- Initialization
 			create context_view.make (reader)
 			create flow_map.make (reader)
 			create ribbon.make (reader)
+			create transport.make (reader)
 			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm,
 				settings.skip_foreign, settings.quiz_opt_in)
 			create speed_drawer.make_titled ("Speed")
@@ -55,7 +56,6 @@ feature {NONE} -- Initialization
 			speed_drawer.put (nudge_up_button)
 			create nudge_down_button.make ("Target -25  (Down)", Void)
 			speed_drawer.put (nudge_down_button)
-			create speed_chip_button.make ("Speed >", Void)
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
@@ -68,9 +68,6 @@ feature {NONE} -- Initialization
 			l_row.set_grow (1.0)
 			l_col.put (l_row)
 			braking_root := l_col
-			create paused_resume_button.make_primary ("Resume at sentence head  (Space)", Void)
-			create paused_here_button.make ("Resume exactly here  (Enter)", Void)
-			create paused_stop_button.make ("Stop and log the run  (Esc)", Void)
 			create l_col.make
 			l_col.put (ribbon.surface)
 			create l_row.make
@@ -78,20 +75,14 @@ feature {NONE} -- Initialization
 			l_row.put (context_view.surface)
 			l_row.set_grow (1.0)
 			l_col.put (l_row)
-			create l_row.make
-			l_row := l_row.with_gap (10.0)
-			l_row.put (paused_resume_button)
-			l_row.put (paused_here_button)
-			l_row.put (paused_stop_button)
-			l_row.put (speed_chip_button)
-			l_col.put (l_row)
+			l_col.put (transport.surface)
 			paused_root := l_col
 			cockpit_root := cockpit.root
 			posture := Posture_cockpit
 
 				-- Phase 2: wiring - Current may now escape into agents.
 			stage.surface.set_on_char (agent on_reading_char)
-			stage.surface.set_on_vk (agent on_reading_vk)
+			stage.surface.set_on_key (agent on_reading_vk)
 			stage.surface.set_on_press (agent on_stage_press)
 			stage.surface.set_on_sweep (agent on_stage_sweep)
 			stage.surface.set_on_release (agent on_stage_release)
@@ -103,11 +94,15 @@ feature {NONE} -- Initialization
 				agent on_start_wpm_changed, agent on_comfy_changed,
 				agent on_skip_toggled, agent on_quiz_toggled, agent on_quiz_preview,
 				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False))
-			paused_resume_button.set_on_click (agent on_paused_resume_clicked)
-			paused_here_button.set_on_click (agent on_paused_here_clicked)
-			paused_stop_button.set_on_click (agent do_stop)
+			transport.wire (agent on_paused_resume_clicked, agent on_paused_here_clicked,
+				agent do_stop, agent open_speed_drawer,
+				agent on_deck_brake_press, agent do_brake_release)
 			ribbon.set_on_word_click (agent on_word_marked)
-			speed_chip_button.set_on_click (agent open_speed_drawer)
+			stage.surface.set_on_files (agent on_files_dropped)
+			context_view.surface.set_on_files (agent on_files_dropped)
+			ribbon.surface.set_on_files (agent on_files_dropped)
+			flow_map.surface.set_on_files (agent on_files_dropped)
+			cockpit.drop_zone.set_on_drop (agent on_files_dropped)
 			speed_drawer.set_on_close (agent close_speed_drawer)
 			hold_button.set_on_click (agent on_hold_clicked)
 			backoff_100_button.set_on_click (agent on_backoff_clicked (100))
@@ -365,21 +360,48 @@ feature {NONE} -- Transport (D-014)
 			if is_press_live then
 				is_press_live := False
 				if brake_engaged then
-					brake_engaged := False
-					scrub_mode := False
-					if reader.is_braking then
-						reader.release_brake
-						logger.info ("brake released at word " + reader.position.out
-							+ " (" + reader.current_wpm.out + " wpm, easing home)")
-					end
-					if posture = Posture_running then
-						window.set_root (running_root)
-						window.give_focus (stage.surface)
-						window.request_render
-					end
+					do_brake_release
 				else
 					do_pause
 				end
+			end
+		end
+
+	do_brake_release
+			-- Shared by the stage pedal and the deck's BRAKE button.
+		do
+			brake_engaged := False
+			scrub_mode := False
+			if reader.is_braking then
+				reader.release_brake
+				logger.info ("brake released at word " + reader.position.out
+					+ " (" + reader.current_wpm.out + " wpm, easing home)")
+			end
+			if posture = Posture_running then
+				window.set_root (running_root)
+				window.give_focus (stage.surface)
+				window.request_render
+			end
+		end
+
+	on_deck_brake_press
+			-- The deck's pedal, pressed while PAUSED: resume braked -
+			-- back into the stream at the crawl, ribbon flowing; let go
+			-- and it eases up to cruise.
+		do
+			if reader.is_paused then
+				reader.resume_at_sentence_start (window.tick_ms)
+				posture := Posture_running
+				brake_engaged := True
+				scrub_mode := False
+				scrub_accumulator := 0.0
+				if not reader.is_brake_active then
+					reader.apply_brake
+				end
+				logger.info ("deck pedal: resumed braked at word " + reader.position.out)
+				window.set_root (braking_root)
+				window.give_focus (stage.surface)
+				window.request_render
 			end
 		end
 
@@ -807,6 +829,7 @@ feature {NONE} -- Cockpit actions
 		do
 			logger.info ("open-file dialog requested")
 			create fd.make_open ({STRING_32} "D:\")
+			fd.set_extension_filter (".txt;.md;.pdf")
 			fd.set_on_accept (agent on_file_picked)
 			window.show_sheet (fd, 680.0)
 			logger.info ("open-file dialog shown - " + fd.available_drives.count.out + " drives")
@@ -815,20 +838,97 @@ feature {NONE} -- Cockpit actions
 	on_file_picked (a_path: STRING_32)
 		do
 			window.close_sheet
+			load_any (a_path)
+		end
+
+	load_any (a_path: STRING_32)
+			-- One intake door: .pdf goes through the extractor,
+			-- everything else through the UTF-8 file path.
+		do
+			flush_pending_record
 			apply_speed_prefs
-			reader.load_file (a_path)
+			if a_path.as_lower.ends_with ({STRING_32} ".pdf") then
+				load_pdf (a_path)
+			else
+				reader.load_file (a_path)
+			end
 			if reader.last_intake_ok then
 				last_source := reader.loaded_source.twin -- already UTF-8-decoded
 				last_title := reader.title.twin
 				current_file_path := a_path.twin
-				logger.info ({STRING_32} "loaded file " + a_path
+				logger.info ({STRING_32} "loaded " + a_path
 					+ {STRING_32} " - " + reader.token_count.out + {STRING_32} " words")
 				start_quiz_generation
 			else
-				logger.error ({STRING_32} "file intake failed: " + reader.last_intake_error)
+				logger.error ({STRING_32} "intake failed: " + reader.last_intake_error)
 			end
 			cockpit.refresh (reader)
 			window.request_render
+		end
+
+	load_pdf (a_path: STRING_32)
+			-- Text layer out of a PDF via simple_pdf's pdftotext
+			-- (Poppler), UTF-8 decoded; honest refusals for missing
+			-- extractor, non-ASCII paths (pdftotext's 8-bit door),
+			-- and text-free scans.
+		local
+			l_ex: SIMPLE_PDF_READER
+			l_raw: STRING
+			l_enc: SIMPLE_ENCODING
+			l_decoded, l_title: STRING_32
+			i: INTEGER
+		do
+			if file_exists ("pdftotext.exe") then
+				create l_ex.make_with_path ("pdftotext.exe")
+			elseif file_exists ("D:\prod\simple_pdf\bin\pdftotext.exe") then
+				create l_ex.make_with_path ("D:\prod\simple_pdf\bin\pdftotext.exe")
+			else
+				create l_ex.make
+			end
+			if not l_ex.is_available then
+				force_refusal ({STRING_32} "PDF extractor (pdftotext.exe) not found")
+			elseif not a_path.is_valid_as_string_8 then
+				force_refusal ({STRING_32} "PDF path has non-ASCII characters - move or rename it")
+			else
+				l_raw := l_ex.extract_text (a_path.to_string_8)
+				create l_enc.make
+				l_decoded := l_enc.utf_8_to_utf_32 (l_raw)
+				if l_decoded.count < 20 then
+					force_refusal ({STRING_32} "PDF has no text layer (a scan?) - nothing to stream")
+				else
+					create l_title.make_from_string_general (a_path)
+					i := l_title.last_index_of ({CHARACTER_32} '\', l_title.count).max (
+						l_title.last_index_of ({CHARACTER_32} '/', l_title.count))
+					if i > 0 then
+						l_title.remove_head (i)
+					end
+					reader.load_text (l_title, l_decoded)
+				end
+			end
+		end
+
+	force_refusal (a_why: STRING_32)
+			-- Land the facade in an honest refused-intake state and
+			-- surface the reason (a blank load is the refusal door).
+		do
+			reader.load_text ({STRING_32} "refused", {STRING_32} "  ")
+			logger.error ({STRING_32} "pdf intake: " + a_why)
+			cockpit.set_quiz_status (a_why)
+		end
+
+	on_files_dropped (a_paths: ARRAYED_LIST [STRING_32])
+			-- Explorer drag-and-drop, any posture: the first path wins;
+			-- a live sitting is sealed honestly first.
+		do
+			if not a_paths.is_empty then
+				logger.info ({STRING_32} "dropped: " + a_paths.first)
+				if reader.is_running or reader.is_paused then
+					reader.stop_and_seal
+					record_seal
+				end
+				load_any (a_paths.first)
+				to_cockpit
+			end
 		end
 
 	on_continue_asked
@@ -839,11 +939,8 @@ feature {NONE} -- Cockpit actions
 			flush_pending_record
 			apply_speed_prefs
 			if not settings.last_file_path.is_empty and then settings.last_position > 0 then
-				reader.load_file (settings.last_file_path)
+				load_any (settings.last_file_path)
 				if reader.last_intake_ok and then reader.can_start then
-					current_file_path := settings.last_file_path.twin
-					last_source := reader.loaded_source.twin
-					last_title := reader.title.twin
 					l_at := settings.last_position.min (reader.token_count).max (1)
 					reader.preset_position (l_at)
 					reader.start_reading (window.tick_ms)
@@ -909,9 +1006,10 @@ feature {NONE} -- Implementation
 
 	speed_label: SW_LABEL
 
-	paused_resume_button, paused_here_button, paused_stop_button,
-	speed_chip_button, hold_button, backoff_100_button, backoff_50_button,
+	hold_button, backoff_100_button, backoff_50_button,
 	backoff_25_button, nudge_up_button, nudge_down_button: SW_BUTTON
+
+	transport: SR_TRANSPORT_VIEW
 
 	logger: SIMPLE_LOGGER
 

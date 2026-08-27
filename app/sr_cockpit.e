@@ -50,6 +50,9 @@ feature {NONE} -- Initialization
 			l_row.put (continue_button)
 			root.put (l_row)
 
+			create drop_zone.make ("Drop a .txt, .md or .pdf here from Explorer")
+			root.put (drop_zone)
+
 			create l_speeds.make
 			l_speeds := l_speeds.with_gap (10.0)
 			l_speeds.put (create {SW_LABEL}.make_mono ("start WPM"))
@@ -161,6 +164,9 @@ feature -- Access
 	text_box: SW_TEXT_BOX
 
 	start_box, comfy_box: SW_NUMBER_BOX
+
+	drop_zone: SW_DROPZONE
+			-- Public: the host wires its on_drop.
 
 	pasted_text: STRING_32
 		do

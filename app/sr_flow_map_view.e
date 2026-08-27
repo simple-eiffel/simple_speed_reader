@@ -27,7 +27,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	surface: SR_SURFACE
+	surface: SW_CANVAS
 
 	on_seek: detachable PROCEDURE [INTEGER]
 			-- Token index picked on the map.

@@ -232,3 +232,32 @@ before touching the reading ledger and never asks silently (the ocr lesson, hono
 time for the installer itself: under eight seconds. Engine 35/35; widgets 198/198; idea to
 feature-complete-with-installer: **3 hours 40 minutes of wall clock, one afternoon and one
 evening.** The clock now waits on one row.
+
+### 21. "THIS is really good! ... drag-n-drop ... and PDFs?"
+**The ask.** Drop .md/.txt files from Explorer onto the reader; and can PDFs be pulled apart to
+raw text — cairo bits, maybe?
+**What the design did.** Drag-and-drop was already sleeping in the toolkit (WM_DROPFILES through
+the widget spine): every reading surface now accepts drops, the cockpit grew a visible drop
+tray, and a drop mid-read seals the sitting honestly before loading. For PDFs, cairo was the
+wrong tree — it *writes* PDF surfaces — but the family had the answer: simple_pdf bundles
+Poppler's pdftotext, and the first live extraction the reader ever did was on the ECMA-367
+Eiffel standard itself. Scans without a text layer are refused with a straight sentence, and the
+hip-pocket fallback is recorded: Windows.Data.Pdf rasterization + the machine's own olmOCR model
+if Poppler ever disappoints.
+
+### 22. "Tape-player controls ... and I don't see a brake button (make a pedal symbol if you don't have one)"
+**The ask.** VCR-styled transport instead of text buttons, with a visible brake.
+**What the design did.** The deck: a drawn transport bar — PLAY, HERE, STOP, the BRAKE pedal,
+and a SPEED dial — every glyph painted, labeled like a deck, and the brake wearing the
+automotive brake-warning mark (circle, exclamation, flanking arcs: any driver knows it). The
+pedal is not decoration: press and HOLD it while paused and the stream resumes braked at the
+crawl with the ribbon flowing; release and it eases up to cruise. It reddens while braking.
+
+### 23. "Factor abstractions back to the parent libraries - a courtesy to the ecosystem"
+**The ask.** Reusable code discovered downstream belongs upstream.
+**What the design did.** Two donations the same hour they were identified. SW_CANVAS absorbed
+the whole idea of SR_SURFACE - key, char, release, and shell-drop agents with
+focus-follows-interest semantics - and the app's own surface class dissolved to nothing.
+SW_PAINTER gained triangle_fill and arc_stroke, so glyph-drawing apps stay out of the cairo
+context entirely. Widgets suite: 198/198 both times. The toolkit is five features richer than
+the morning found it, every one demanded by a real application.

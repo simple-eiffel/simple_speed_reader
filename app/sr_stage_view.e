@@ -29,7 +29,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	surface: SR_SURFACE
+	surface: SW_CANVAS
 
 	font_size: REAL_64
 

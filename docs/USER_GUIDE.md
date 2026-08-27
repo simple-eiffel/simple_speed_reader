@@ -85,6 +85,21 @@ Requires a local [Ollama](https://ollama.com) server (URL and model live in `spe
 defaults to `http://localhost:11435`). Without one, everything else works normally and the
 status line says exactly why the quiz didn't arrive.
 
+## Getting text in
+
+Three doors, all equal: **paste** into the cockpit box; **Load .txt / .md / .pdf** through the
+file dialog (drive chips included); or **drag a file from Explorer** and drop it anywhere on the
+window — the cockpit's drop tray, the stage, even mid-read (the current sitting is sealed
+honestly first). PDFs go through a bundled extractor (Poppler's pdftotext): the text layer
+streams like any text; a pure scan without one is refused with a straight answer.
+
+## The deck
+
+The paused posture's controls are a drawn tape deck: **PLAY** (resume at the sentence head),
+**HERE** (resume exactly where you stopped), **STOP**, the **BRAKE pedal** — press and *hold* it
+to re-enter the stream braked at the crawl with the ribbon flowing, release to ease up to
+cruise — and the **SPEED** dial, which opens the speed drawer.
+
 ## Continue where you left off
 
 Your position is bookmarked on every pause and stop (crash-safe). **Continue where I left off**

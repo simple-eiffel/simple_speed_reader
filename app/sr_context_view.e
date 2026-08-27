@@ -28,7 +28,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	surface: SR_SURFACE
+	surface: SW_CANVAS
 
 	on_word_click: detachable PROCEDURE [INTEGER]
 			-- Token index the reader marked as the comprehension point.
