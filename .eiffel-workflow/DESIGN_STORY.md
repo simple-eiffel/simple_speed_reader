@@ -318,3 +318,15 @@ SW_ROW's default cross-axis CENTERS children at their preferred height. All thre
 went to Cross_stretch (the toolkit had the cure on the shelf), so stage, context page and flow
 map now fill their posture top to bottom - and right beneath the stage, one shared SW_PROGRESS
 strip rides every reading posture above the deck, fed position-over-token-count every tick.
+
+### 29. "A mode where words fade out/in instead of flipping - keeping pace with the WPM?"
+**The ask.** Crossfade pacing, tied to the dial.
+**What the design did.** Built it as a curve, not an effect: each word fades IN over the first
+30% of its slot (capped 120 ms), holds crisp through the middle, and fades OUT only into
+breathers - so mid-sentence cuts stay sharp while sentence ends melt into the dark. The windows
+scale with the slot, which means the mode self-attenuates: at 900 wpm they shrink toward
+nothing, exactly as pace demands. The curve is a pure, tested function in the timing model; the
+pacer learned when each word took the stage; and the stage fakes alpha honestly - lerping its
+inks toward the stage black, since on a solid ground that IS alpha. Frames flow only during
+transitions (the render signature quantizes brightness to 24 steps). Opt-in, persisted,
+tooltipped. Engine 39/39.
