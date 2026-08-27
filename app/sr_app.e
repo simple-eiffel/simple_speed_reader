@@ -102,7 +102,10 @@ feature {NONE} -- Initialization
 				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False))
 			transport.wire (agent on_deck_play, agent on_deck_here,
 				agent do_stop, agent open_speed_drawer,
-				agent on_deck_brake_press, agent do_brake_release)
+				agent on_deck_brake_press, agent do_brake_release,
+				agent on_deck_start_over,
+				agent on_deck_paragraph (True), agent on_deck_paragraph (False),
+				agent on_deck_section (True), agent on_deck_section (False))
 			ribbon.set_on_word_click (agent on_word_marked)
 			stage.surface.set_on_files (agent on_files_dropped)
 			context_view.surface.set_on_files (agent on_files_dropped)
@@ -552,6 +555,43 @@ feature {NONE} -- Transport (D-014)
 				hold_button.set_label ("Hold at current")
 			end
 			speed_label.set_text (l_s)
+		end
+
+	on_deck_start_over
+			-- |<< : word one, fresh ramp. Running keeps flowing from
+			-- the top; paused just moves the marker there.
+		do
+			if reader.is_running or reader.is_paused then
+				reader.restart_from_beginning (window.tick_ms)
+				logger.info ("start over - fresh ramp from word 1")
+				window.request_render
+			end
+		end
+
+	on_deck_paragraph (a_back: BOOLEAN)
+		do
+			if reader.is_running or reader.is_paused then
+				reader.jump_paragraph (a_back, window.tick_ms)
+				if reader.is_sealed then
+					record_seal
+					to_cockpit
+				else
+					window.request_render
+				end
+			end
+		end
+
+	on_deck_section (a_back: BOOLEAN)
+		do
+			if (reader.is_running or reader.is_paused) and then reader.has_sections then
+				reader.jump_section (a_back, window.tick_ms)
+				if reader.is_sealed then
+					record_seal
+					to_cockpit
+				else
+					window.request_render
+				end
+			end
 		end
 
 	on_deck_play

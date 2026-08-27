@@ -192,6 +192,17 @@ feature -- Commands
 			lowered_floored: target_wpm = (old target_wpm - Nudge_step).max (Min_wpm)
 		end
 
+	reset_to_start
+			-- Start-over (the deck's |<<): the ramp begins again from
+			-- the profile's start speed.
+		do
+			current_wpm := start_wpm.min (target_wpm)
+			words_since_ramp := 0
+		ensure
+			at_start: current_wpm = start_wpm.min (target_wpm)
+			target_frame: target_wpm = old target_wpm
+		end
+
 	reset_for_recovery
 			-- Comprehension recovered from a rewind: re-ramp gently.
 		do

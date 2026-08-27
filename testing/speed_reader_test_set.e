@@ -16,17 +16,17 @@ feature -- Test: ORP law
 		local
 			t: SR_TOKEN
 		do
-			create t.make ({STRING_32} "a", 1, 1, 1, True, True, False)
+			create t.make ({STRING_32} "a", 1, 1, 1, 1, True, True, False)
 			assert_integers_equal ("len 1", 1, t.pivot_index)
-			create t.make ({STRING_32} "But", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "But", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("len 3", 2, t.pivot_index)
-			create t.make ({STRING_32} "words", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "words", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("len 5", 2, t.pivot_index)
-			create t.make ({STRING_32} "reading", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "reading", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("len 7", 3, t.pivot_index)
-			create t.make ({STRING_32} "narrowing.", 1, 1, 1, True, False, False)
+			create t.make ({STRING_32} "narrowing.", 1, 1, 1, 1, True, False, False)
 			assert_integers_equal ("len 10", 4, t.pivot_index)
-			create t.make ({STRING_32} "extraordinarily", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "extraordinarily", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("len 15", 5, t.pivot_index)
 		end
 
@@ -43,7 +43,7 @@ feature -- Test: ORP law
 			l_w.append_code (0x05BC)
 			l_w.append_code (0x05B0)
 			l_w.append_code (0x05E8)
-			create t.make (l_w, 1, 1, 1, False, False, False)
+			create t.make (l_w, 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("stepped to base letter", 1, t.pivot_index)
 		end
 
@@ -57,7 +57,7 @@ feature -- Test: classification
 			create l_w.make (4)
 			l_w.append_code (0x05D1) -- bet
 			l_w.append_code (0x05E8) -- resh
-			create t.make (l_w, 1, 1, 1, False, False, False)
+			create t.make (l_w, 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("hebrew", t.Script_hebrew, t.script)
 			assert_true ("foreign", t.is_foreign_script)
 			assert_false ("filtered out", t.streams_under_filter (True))
@@ -73,7 +73,7 @@ feature -- Test: classification
 			l_w.append_code (0x1F00) -- alpha with psili
 			l_w.append_code (0x03B3) -- gamma
 			l_w.append_code (0x03AC) -- alpha tonos
-			create t.make (l_w, 1, 1, 1, False, False, False)
+			create t.make (l_w, 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("greek", t.Script_greek, t.script)
 		end
 
@@ -86,7 +86,7 @@ feature -- Test: classification
 			create l_w.make (5)
 			l_w.append_string_general ("agap")
 			l_w.append_code (0x0113) -- e with macron
-			create t.make (l_w, 1, 1, 1, False, False, False)
+			create t.make (l_w, 1, 1, 1, 1, False, False, False)
 			assert_true ("latin", t.is_latin)
 			assert_true ("diacritics", t.has_diacritics)
 			assert_true ("still streams under filter", t.streams_under_filter (True))
@@ -96,12 +96,12 @@ feature -- Test: classification
 		local
 			t: SR_TOKEN
 		do
-			create t.make ({STRING_32} "H7225", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "H7225", 1, 1, 1, 1, False, False, False)
 			assert_true ("strongs numeric", t.is_numeric)
-			create t.make ({STRING_32} "LXX", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "LXX", 1, 1, 1, 1, False, False, False)
 			assert_true ("acronym", t.is_acronym)
 			assert_false ("not numeric", t.is_numeric)
-			create t.make ({STRING_32} "God", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "God", 1, 1, 1, 1, False, False, False)
 			assert_false ("capitalized word is no acronym", t.is_acronym)
 		end
 
@@ -143,6 +143,52 @@ feature -- Test: tokenizer
 			create tk
 			assert_true ("whitespace only", tk.is_blank ({STRING_32} "  %T%N%N  "))
 			assert_false ("substance", tk.is_blank ({STRING_32} " x "))
+		end
+
+	test_tokenizer_sections_from_headings
+			-- Markdown '#' lines and short unpunctuated standalone
+			-- lines begin sections; plain prose stays one section.
+		local
+			tk: SR_TOKENIZER
+			l_toks: ARRAYED_LIST [SR_TOKEN]
+		do
+			create tk
+			l_toks := tk.tokenize ({STRING_32} "# Genesis%N%NIn the beginning was text.%N%N## The Fall%N%NMore words follow here.")
+			assert_integers_equal ("two md headings, leading one free", 2, l_toks.last.section_index)
+			assert_integers_equal ("body of first section", 1, l_toks.i_th (3).section_index)
+			l_toks := tk.tokenize ({STRING_32} "Just one plain paragraph. And another sentence here.")
+			assert_integers_equal ("prose is one section", 1, l_toks.last.section_index)
+			l_toks := tk.tokenize ({STRING_32} "Chapter One%N%NBody text goes on. More body.%N%NChapter Two%N%NFurther body text here.")
+			assert_integers_equal ("bare standalone titles sectionize", 2, l_toks.last.section_index)
+		end
+
+	test_session_structure_navigation
+			-- The deck's paragraph jumps and start-over.
+		local
+			r: SIMPLE_SPEED_READER
+			l_now: INTEGER
+		do
+			create r.make
+			r := r.with_speeds (600, 300, 900)
+			r.load_text ({STRING_32} "t",
+				{STRING_32} "# Head%N%NPara one words here.%N%NPara two words here.%N%NPara three here.")
+			assert_true ("one leading heading is not sections", not r.has_sections)
+			r.start_reading (0)
+			from l_now := 0 until r.position >= 7 or l_now > 10000 loop
+				l_now := l_now + 10
+				r.tick (l_now)
+			end
+			r.jump_paragraph (False, l_now)
+			assert_true ("moved to a later paragraph",
+				r.token (r.position).paragraph_index > 2)
+			r.jump_paragraph (True, l_now)
+			r.jump_paragraph (True, l_now)
+			assert_true ("walked back a paragraph",
+				r.token (r.position).paragraph_index < 3)
+			r.restart_from_beginning (l_now)
+			assert_integers_equal ("back at word one", 1, r.position)
+			assert_integers_equal ("ramp restarted", 600, r.current_wpm)
+			assert_true ("still running", r.is_running)
 		end
 
 feature -- Test: governor
@@ -256,10 +302,10 @@ feature -- Test: timing
 			t: SR_TOKEN
 		do
 			create tm
-			create t.make ({STRING_32} "word", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "word", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("600 at 100", 600, tm.display_ms (t, 100))
 			assert_integers_equal ("100 at 600", 100, tm.display_ms (t, 600))
-			create t.make ({STRING_32} "extraordinarily", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "extraordinarily", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("12+ chars linger x1.5", 150, tm.display_ms (t, 600))
 		end
 
@@ -273,7 +319,7 @@ feature -- Test: timing
 			create l_w.make (2)
 			l_w.append_code (0x05D1)
 			l_w.append_code (0x05E8)
-			create t.make (l_w, 1, 1, 1, False, False, False)
+			create t.make (l_w, 1, 1, 1, 1, False, False, False)
 				-- At 900 WPM base is 66; foreign floor is base_ms (350) = 171.
 			assert_greater_or_equal ("never faster than 350 effective",
 				tm.display_ms (t, 900), tm.base_ms (350))
@@ -285,13 +331,13 @@ feature -- Test: timing
 			t: SR_TOKEN
 		do
 			create tm
-			create t.make ({STRING_32} "flow", 1, 1, 1, False, False, False)
+			create t.make ({STRING_32} "flow", 1, 1, 1, 1, False, False, False)
 			assert_integers_equal ("plain flows", 0, tm.breather_ms (t, 300))
-			create t.make ({STRING_32} "clause,", 1, 1, 1, False, False, True)
+			create t.make ({STRING_32} "clause,", 1, 1, 1, 1, False, False, True)
 			assert_integers_equal ("clause one beat", 200, tm.breather_ms (t, 300))
-			create t.make ({STRING_32} "end.", 1, 1, 1, True, False, False)
+			create t.make ({STRING_32} "end.", 1, 1, 1, 1, True, False, False)
 			assert_integers_equal ("sentence two beats", 400, tm.breather_ms (t, 300))
-			create t.make ({STRING_32} "para.", 1, 1, 1, True, True, False)
+			create t.make ({STRING_32} "para.", 1, 1, 1, 1, True, True, False)
 			assert_integers_equal ("paragraph three beats", 600, tm.breather_ms (t, 300))
 		end
 

@@ -261,6 +261,40 @@ feature -- Status
 			end
 		end
 
+	has_sections: BOOLEAN
+			-- Section navigation enables on this (>= 2 detected).
+		do
+			Result := attached text as al_t and then al_t.has_sections
+		end
+
+	restart_from_beginning (a_now_ms: INTEGER)
+		require
+			live: is_running or is_paused
+		do
+			check attached session as al_s then
+				al_s.restart_from_beginning (a_now_ms)
+			end
+		end
+
+	jump_paragraph (a_back: BOOLEAN; a_now_ms: INTEGER)
+		require
+			live: is_running or is_paused
+		do
+			check attached session as al_s then
+				al_s.jump_paragraph (a_back, a_now_ms)
+			end
+		end
+
+	jump_section (a_back: BOOLEAN; a_now_ms: INTEGER)
+		require
+			live: is_running or is_paused
+			structured: has_sections
+		do
+			check attached session as al_s then
+				al_s.jump_section (a_back, a_now_ms)
+			end
+		end
+
 	sentence_start_of_position: INTEGER
 		require
 			placed: has_text and position >= 1

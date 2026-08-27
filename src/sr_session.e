@@ -224,6 +224,49 @@ feature -- Transport commands (D-014)
 			speed_untouched: governor.current_wpm = old governor.current_wpm
 		end
 
+	restart_from_beginning (a_now_ms: INTEGER)
+			-- The deck's |<< : back to the first word with a FRESH ramp
+			-- (start speed, climb again). Running stays running; paused
+			-- moves the marker and stays paused.
+		require
+			live: is_running or is_paused
+		local
+			l_first: INTEGER
+		do
+			l_first := next_streamable (1).max (1)
+			governor.reset_to_start
+			if is_running then
+				rewind_spans.extend (position - l_first)
+				position := l_first
+				stamp_and_arm (a_now_ms)
+			else
+				position := l_first
+			end
+		ensure
+			at_start: position <= old position or old position = 0
+			fresh_ramp: governor.current_wpm = governor.start_wpm.min (governor.target_wpm)
+		end
+
+	jump_paragraph (a_back: BOOLEAN; a_now_ms: INTEGER)
+			-- |< / >| by paragraph: back goes to this paragraph's head
+			-- (or the previous one's when already there); forward to the
+			-- next paragraph's first streamable word.
+		require
+			live: is_running or is_paused
+			placed: position >= 1
+		do
+			jump_structure (a_back, a_now_ms, agent paragraph_of, agent paragraph_start)
+		end
+
+	jump_section (a_back: BOOLEAN; a_now_ms: INTEGER)
+			-- << / >> by section - meaningful when the text has_sections.
+		require
+			live: is_running or is_paused
+			placed: position >= 1
+		do
+			jump_structure (a_back, a_now_ms, agent section_of, agent section_start)
+		end
+
 	scrub_back_word (a_now_ms: INTEGER)
 			-- D-016 brake-drag: one word back while STILL RUNNING (the
 			-- brake has us stopped or crawling); no posture change.
@@ -352,6 +395,107 @@ feature {NONE} -- Implementation
 			streamed_count := streamed_count + 1
 			pacer.arm (a_now_ms, timing.display_ms (text.token (position), governor.current_wpm),
 				timing.breather_ms (text.token (position), governor.current_wpm))
+		end
+
+	paragraph_of (a_index: INTEGER): INTEGER
+		require
+			in_text: a_index >= 1 and a_index <= text.token_count
+		do
+			Result := text.token (a_index).paragraph_index
+		end
+
+	section_of (a_index: INTEGER): INTEGER
+		require
+			in_text: a_index >= 1 and a_index <= text.token_count
+		do
+			Result := text.token (a_index).section_index
+		end
+
+	paragraph_start (a_index: INTEGER): INTEGER
+			-- First token of the paragraph containing `a_index'.
+		require
+			in_text: a_index >= 1 and a_index <= text.token_count
+		do
+			from
+				Result := a_index
+			until
+				Result = 1 or else
+					text.token (Result - 1).paragraph_index /= text.token (a_index).paragraph_index
+			loop
+				Result := Result - 1
+			end
+		ensure
+			at_or_before: Result >= 1 and Result <= a_index
+		end
+
+	section_start (a_index: INTEGER): INTEGER
+			-- First token of the section containing `a_index'.
+		require
+			in_text: a_index >= 1 and a_index <= text.token_count
+		do
+			from
+				Result := a_index
+			until
+				Result = 1 or else
+					text.token (Result - 1).section_index /= text.token (a_index).section_index
+			loop
+				Result := Result - 1
+			end
+		ensure
+			at_or_before: Result >= 1 and Result <= a_index
+		end
+
+	jump_structure (a_back: BOOLEAN; a_now_ms: INTEGER;
+			a_unit_of: FUNCTION [INTEGER, INTEGER]; a_start_of: FUNCTION [INTEGER, INTEGER])
+			-- The shared VCR jump: back to this unit's head (previous
+			-- unit's when already there), forward to the next unit's
+			-- first streamable word. Running keeps flowing; paused
+			-- moves the marker. Forward past the end seals.
+		local
+			l_target, i: INTEGER
+		do
+			if a_back then
+				l_target := a_start_of.item ([position])
+				if l_target = position and position > 1 then
+					l_target := a_start_of.item ([position - 1])
+				end
+				if is_running then
+					rewind_spans.extend (position - l_target)
+					position := l_target
+					stamp_and_arm (a_now_ms)
+				else
+					position := l_target
+				end
+			else
+				from
+					i := position + 1
+				until
+					i > text.token_count or else
+						a_unit_of.item ([i]) > a_unit_of.item ([position])
+				loop
+					i := i + 1
+				end
+				if i > text.token_count then
+					if is_running then
+						skipped_count := skipped_count + (text.token_count - position)
+						seal (Seal_finished)
+					end
+				else
+					l_target := next_streamable (i)
+					if l_target = 0 then
+						if is_running then
+							skipped_count := skipped_count + (text.token_count - position)
+							seal (Seal_finished)
+						end
+					elseif is_running then
+						skipped_count := skipped_count + (l_target - position - 1)
+						position := l_target
+						stamp_and_arm (a_now_ms)
+					else
+						position := l_target
+					end
+				end
+			end
 		end
 
 	next_streamable (a_from: INTEGER): INTEGER

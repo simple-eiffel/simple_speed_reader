@@ -39,7 +39,8 @@ feature -- Operations
 		local
 			l_words: ARRAYED_LIST [TUPLE [w: STRING_32; start: INTEGER; par_after: BOOLEAN]]
 			l_buf: STRING_32
-			i, l_code, l_start, l_newlines, l_sent, l_par: INTEGER
+			i, l_code, l_start, l_newlines, l_sent, l_par, l_sec: INTEGER
+			l_par_start, l_par_end: INTEGER
 			l_last: TUPLE [w: STRING_32; start: INTEGER; par_after: BOOLEAN]
 			l_ends_s, l_ends_p, l_clause: BOOLEAN
 		do
@@ -77,26 +78,43 @@ feature -- Operations
 			if not l_buf.is_empty then
 				l_words.extend ([l_buf.twin, l_start, False])
 			end
-				-- Pass 2: flags and structural indexes.
+				-- Pass 2: paragraph spans first (headings make sections),
+				-- then flags and structural indexes per word.
 			create Result.make (l_words.count)
 			l_sent := 1
 			l_par := 1
+			l_sec := 1
+			l_par_start := 1
 			from
 				i := 1
 			until
 				i > l_words.count
 			loop
+				if i = l_par_start then
+						-- A paragraph begins: does it read as a heading?
+					l_par_end := i
+					from
+					until
+						l_par_end >= l_words.count or else l_words.i_th (l_par_end).par_after
+					loop
+						l_par_end := l_par_end + 1
+					end
+					if is_heading_span (l_words, l_par_start, l_par_end) and l_par_start > 1 then
+						l_sec := l_sec + 1
+					end
+				end
 				l_ends_p := l_words.i_th (i).par_after or i = l_words.count
 				l_ends_s := l_ends_p or ends_sentence_word (l_words.i_th (i).w)
 				l_clause := (not l_ends_s) and has_clause_tail (l_words.i_th (i).w)
 				Result.extend (create {SR_TOKEN}.make (
-					l_words.i_th (i).w, l_sent, l_par, l_words.i_th (i).start,
+					l_words.i_th (i).w, l_sent, l_par, l_sec, l_words.i_th (i).start,
 					l_ends_s, l_ends_p, l_clause))
 				if l_ends_s then
 					l_sent := l_sent + 1
 				end
 				if l_ends_p then
 					l_par := l_par + 1
+					l_par_start := i + 1
 				end
 				i := i + 1
 			end
@@ -129,6 +147,26 @@ feature {NONE} -- Implementation
 			l_code := last_marking_code (a_w)
 			Result := l_code = 44 or l_code = 59 or l_code = 58
 				or l_code = 0x2014 or l_code = 0x2013 -- em, en dash
+		end
+
+	is_heading_span (a_words: ARRAYED_LIST [TUPLE [w: STRING_32; start: INTEGER; par_after: BOOLEAN]];
+			a_from, a_to: INTEGER): BOOLEAN
+			-- Does this paragraph read as a section heading? Markdown
+			-- '#' lines always; otherwise a short standalone line (<= 8
+			-- words) with no sentence-ending punctuation - which is how
+			-- pdftotext renders headings too.
+		require
+			ordered: a_from >= 1 and a_from <= a_to and a_to <= a_words.count
+		local
+			l_count: INTEGER
+		do
+			l_count := a_to - a_from + 1
+			if a_words.i_th (a_from).w.starts_with ({STRING_32} "#") then
+				Result := True
+			elseif l_count <= 8 then
+				Result := not ends_sentence_word (a_words.i_th (a_to).w)
+					and not has_clause_tail (a_words.i_th (a_to).w)
+			end
 		end
 
 	last_marking_code (a_w: STRING_32): INTEGER

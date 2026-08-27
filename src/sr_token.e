@@ -14,19 +14,21 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_word: READABLE_STRING_GENERAL; a_sentence, a_paragraph, a_source_start: INTEGER;
+	make (a_word: READABLE_STRING_GENERAL; a_sentence, a_paragraph, a_section, a_source_start: INTEGER;
 			a_ends_sentence, a_ends_paragraph, a_has_clause_break: BOOLEAN)
 			-- One tokenized word with its place in the text's structure.
 		require
 			word_not_empty: not a_word.is_empty
 			positive_sentence: a_sentence >= 1
 			positive_paragraph: a_paragraph >= 1
+			positive_section: a_section >= 1
 			positive_source: a_source_start >= 1
 			paragraph_closes_sentence: a_ends_paragraph implies a_ends_sentence
 		do
 			create word.make_from_string_general (a_word)
 			sentence_index := a_sentence
 			paragraph_index := a_paragraph
+			section_index := a_section
 			source_start := a_source_start
 			ends_sentence := a_ends_sentence
 			ends_paragraph := a_ends_paragraph
@@ -47,7 +49,7 @@ feature -- Access
 			-- ORP: the letter pinned (red) at the stage's fixed X.
 			-- Meaningful for Latin script only; combining-mark-avoiding.
 
-	sentence_index, paragraph_index, source_start: INTEGER
+	sentence_index, paragraph_index, section_index, source_start: INTEGER
 
 	ends_sentence, ends_paragraph, has_clause_break: BOOLEAN
 

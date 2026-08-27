@@ -35,6 +35,21 @@ feature -- Access
 			positive: Result >= 1
 		end
 
+	section_count: INTEGER
+			-- How many heading-bounded sections the tokenizer found.
+		do
+			Result := tokens.last.section_index
+		ensure
+			positive: Result >= 1
+		end
+
+	has_sections: BOOLEAN
+			-- Real internal structure (>= 2 sections) - the section
+			-- navigation buttons enable on this.
+		do
+			Result := section_count >= 2
+		end
+
 	token (a_index: INTEGER): SR_TOKEN
 		require
 			in_text: a_index >= 1 and a_index <= token_count

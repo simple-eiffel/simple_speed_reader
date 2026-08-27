@@ -1,10 +1,10 @@
 note
 	description: "[
-		The deck: tape-transport controls drawn like they mean it -
-		PLAY (resume at the sentence head), HERE (resume exactly),
-		STOP, the BRAKE pedal (press and HOLD: resumes braked at the
-		floor; release eases up to cruise), and the SPEED dial chip.
-		Labels under every glyph, VCR-honest. Paused posture's bar.
+		The deck, full VCR order: START (|<<), section and paragraph
+		jumps both ways, PLAY/PAUSE, REPLAY/HERE, STOP, the BRAKE
+		pedal, and the SPEED dial. Section buttons light up only when
+		the text has detected sections. Labels under every glyph,
+		per-button tooltips naming the key-combos, state-aware faces.
 	]"
 	author: "Larry Rix"
 
@@ -36,9 +36,12 @@ feature -- Access
 
 	on_brake_press, on_brake_release: detachable PROCEDURE
 
+	on_start_over, on_par_back, on_par_fwd, on_sect_back, on_sect_fwd: detachable PROCEDURE
+
 feature -- Element change
 
-	wire (a_play, a_here, a_stop, a_speed, a_brake_press, a_brake_release: PROCEDURE)
+	wire (a_play, a_here, a_stop, a_speed, a_brake_press, a_brake_release,
+			a_start_over, a_par_back, a_par_fwd, a_sect_back, a_sect_fwd: PROCEDURE)
 		do
 			on_play := a_play
 			on_here := a_here
@@ -46,19 +49,29 @@ feature -- Element change
 			on_speed := a_speed
 			on_brake_press := a_brake_press
 			on_brake_release := a_brake_release
+			on_start_over := a_start_over
+			on_par_back := a_par_back
+			on_par_fwd := a_par_fwd
+			on_sect_back := a_sect_back
+			on_sect_fwd := a_sect_fwd
 		end
 
-feature {NONE} -- Geometry
+feature {NONE} -- Geometry (VCR order)
 
 	Deck_height: REAL_64 = 72.0
-	Zone_w: REAL_64 = 92.0
-	Button_count: INTEGER = 5
+	Zone_w: REAL_64 = 84.0
+	Button_count: INTEGER = 10
 
-	Btn_play: INTEGER = 1
-	Btn_here: INTEGER = 2
-	Btn_stop: INTEGER = 3
-	Btn_brake: INTEGER = 4
-	Btn_speed: INTEGER = 5
+	Btn_start: INTEGER = 1
+	Btn_sect_back: INTEGER = 2
+	Btn_par_back: INTEGER = 3
+	Btn_play: INTEGER = 4
+	Btn_here: INTEGER = 5
+	Btn_par_fwd: INTEGER = 6
+	Btn_sect_fwd: INTEGER = 7
+	Btn_stop: INTEGER = 8
+	Btn_brake: INTEGER = 9
+	Btn_speed: INTEGER = 10
 
 	deck_left (a_w: REAL_64): REAL_64
 		do
@@ -97,7 +110,23 @@ feature {NONE} -- Painting
 			loop
 				gx := a_x + deck_left (a_w) + Zone_w * (i - 1) + Zone_w / 2.0
 				inspect i
-				when 1 then
+				when Btn_start then
+					p.set_color (Ink)
+					p.fill_rect (gx - 13.0, gy - 10.0, 3.0, 20.0)
+					triangle_left (p, gx - 3.0, gy, 8.0)
+					triangle_left (p, gx + 9.0, gy, 8.0)
+					glyph_label (p, gx, a_y, "START")
+				when Btn_sect_back then
+					p.set_color (sections_ink)
+					triangle_left (p, gx - 5.0, gy, 9.0)
+					triangle_left (p, gx + 7.0, gy, 9.0)
+					glyph_label (p, gx, a_y, "SECT")
+				when Btn_par_back then
+					p.set_color (Ink)
+					p.fill_rect (gx - 10.0, gy - 10.0, 3.0, 20.0)
+					triangle_left (p, gx + 4.0, gy, 9.0)
+					glyph_label (p, gx, a_y, "PARA")
+				when Btn_play then
 					p.set_color (Ink)
 					if reader.is_running then
 						p.fill_rect (gx - 8.0, gy - 10.0, 5.0, 20.0)
@@ -107,7 +136,7 @@ feature {NONE} -- Painting
 						triangle_right (p, gx - 2.0, gy, 11.0)
 						glyph_label (p, gx, a_y, "PLAY")
 					end
-				when 2 then
+				when Btn_here then
 					p.set_color (Ink)
 					p.fill_rect (gx - 11.0, gy - 10.0, 3.0, 20.0)
 					triangle_right (p, gx + 2.0, gy, 9.0)
@@ -116,11 +145,21 @@ feature {NONE} -- Painting
 					else
 						glyph_label (p, gx, a_y, "HERE")
 					end
-				when 3 then
+				when Btn_par_fwd then
+					p.set_color (Ink)
+					triangle_right (p, gx - 4.0, gy, 9.0)
+					p.fill_rect (gx + 7.0, gy - 10.0, 3.0, 20.0)
+					glyph_label (p, gx, a_y, "PARA")
+				when Btn_sect_fwd then
+					p.set_color (sections_ink)
+					triangle_right (p, gx - 7.0, gy, 9.0)
+					triangle_right (p, gx + 5.0, gy, 9.0)
+					glyph_label (p, gx, a_y, "SECT")
+				when Btn_stop then
 					p.set_color (Ink)
 					p.fill_rect (gx - 9.0, gy - 9.0, 18.0, 18.0)
 					glyph_label (p, gx, a_y, "STOP")
-				when 4 then
+				when Btn_brake then
 					if is_brake_pressed or reader.is_braking then
 						p.set_color (Accent_red)
 					else
@@ -128,7 +167,7 @@ feature {NONE} -- Painting
 					end
 					brake_glyph (p, gx, gy)
 					glyph_label (p, gx, a_y, "BRAKE - hold")
-				when 5 then
+				when Btn_speed then
 					p.set_color (Ink)
 					speed_glyph (p, gx, gy)
 					glyph_label (p, gx, a_y, "SPEED")
@@ -138,11 +177,26 @@ feature {NONE} -- Painting
 			end
 		end
 
+	sections_ink: NATURAL_32
+			-- Lit when the text has sections; ghosted when it does not.
+		do
+			if reader.has_sections then
+				Result := Ink
+			else
+				Result := Ghost
+			end
+		end
+
 	triangle_right (p: SW_PAINTER; a_cx, a_cy, a_r: REAL_64)
-			-- A filled play-style triangle pointing right.
 		do
 			p.triangle_fill (a_cx - a_r * 0.7, a_cy - a_r,
 				a_cx - a_r * 0.7, a_cy + a_r, a_cx + a_r, a_cy)
+		end
+
+	triangle_left (p: SW_PAINTER; a_cx, a_cy, a_r: REAL_64)
+		do
+			p.triangle_fill (a_cx + a_r * 0.7, a_cy - a_r,
+				a_cx + a_r * 0.7, a_cy + a_r, a_cx - a_r, a_cy)
 		end
 
 	brake_glyph (p: SW_PAINTER; a_cx, a_cy: REAL_64)
@@ -158,7 +212,6 @@ feature {NONE} -- Painting
 		end
 
 	speed_glyph (p: SW_PAINTER; a_cx, a_cy: REAL_64)
-			-- A little dial: half-gauge with a needle.
 		do
 			p.set_line_width (2.0)
 			p.arc_stroke (a_cx, a_cy + 4.0, 10.0, 3.4, 6.02)
@@ -174,33 +227,42 @@ feature {NONE} -- Painting
 
 feature {NONE} -- Input
 
-	last_width: REAL_64
-
 	press (a_px, a_py: REAL_64)
 		do
 			inspect button_at (a_px, surface.width)
 			when 1 then
-				if attached on_play as al_h then
-					al_h.call
-				end
+				call_if (on_start_over)
 			when 2 then
-				if attached on_here as al_h then
-					al_h.call
+				if reader.has_sections then
+					call_if (on_sect_back)
 				end
 			when 3 then
-				if attached on_stop as al_h then
-					al_h.call
-				end
+				call_if (on_par_back)
 			when 4 then
-				is_brake_pressed := True
-				if attached on_brake_press as al_h then
-					al_h.call
-				end
+				call_if (on_play)
 			when 5 then
-				if attached on_speed as al_h then
-					al_h.call
+				call_if (on_here)
+			when 6 then
+				call_if (on_par_fwd)
+			when 7 then
+				if reader.has_sections then
+					call_if (on_sect_fwd)
 				end
+			when 8 then
+				call_if (on_stop)
+			when 9 then
+				is_brake_pressed := True
+				call_if (on_brake_press)
+			when 10 then
+				call_if (on_speed)
 			else
+			end
+		end
+
+	call_if (a_agent: detachable PROCEDURE)
+		do
+			if attached a_agent as al_a then
+				al_a.call
 			end
 		end
 
@@ -208,9 +270,7 @@ feature {NONE} -- Input
 		do
 			if is_brake_pressed then
 				is_brake_pressed := False
-				if attached on_brake_release as al_h then
-					al_h.call
-				end
+				call_if (on_brake_release)
 			end
 		end
 
@@ -220,22 +280,40 @@ feature {NONE} -- Input
 		do
 			inspect button_at (a_px, surface.width)
 			when 1 then
+				surface.set_tooltip ("START OVER - back to word one, the ramp begins again from your start speed")
+			when 2 then
+				if reader.has_sections then
+					surface.set_tooltip ("Previous SECTION (headings found in this text)")
+				else
+					surface.set_tooltip ("Sections: none detected in this text - it lights up when headings are found")
+				end
+			when 3 then
+				surface.set_tooltip ("Previous PARAGRAPH - to its head first, then back one each press")
+			when 4 then
 				if reader.is_running then
 					surface.set_tooltip ("PAUSE - Space, or click the stage")
 				else
 					surface.set_tooltip ("PLAY - resume at the sentence head - Space")
 				end
-			when 2 then
+			when 5 then
 				if reader.is_running then
 					surface.set_tooltip ("REPLAY this sentence at pace - Left arrow")
 				else
 					surface.set_tooltip ("Resume exactly HERE - Enter, or click a word above")
 				end
-			when 3 then
+			when 6 then
+				surface.set_tooltip ("Next PARAGRAPH (skipped words are logged honestly)")
+			when 7 then
+				if reader.has_sections then
+					surface.set_tooltip ("Next SECTION (headings found in this text)")
+				else
+					surface.set_tooltip ("Sections: none detected in this text - it lights up when headings are found")
+				end
+			when 8 then
 				surface.set_tooltip ("STOP and log the run - Esc")
-			when 4 then
+			when 9 then
 				surface.set_tooltip ("BRAKE - hold with the mouse - key B toggles - drag left to scrub back")
-			when 5 then
+			when 10 then
 				surface.set_tooltip ("SPEED drawer - keys: +/- 25 wpm, Shift 50, Ctrl+Shift 100 - Alt +/- font size")
 			else
 				surface.set_tooltip ("")
@@ -246,6 +324,7 @@ feature {NONE} -- Palette
 
 	Band_black: NATURAL_32 = 0x0F0F12
 	Ink: NATURAL_32 = 0xC8C8CC
+	Ghost: NATURAL_32 = 0x3C3C42
 	Accent_red: NATURAL_32 = 0xE5484D
 	Dim: NATURAL_32 = 0x8A8A90
 

@@ -47,6 +47,8 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_tokenizer_structure, "test_tokenizer_structure")
 			run_test (agent l_set.test_tokenizer_quoted_sentence_end, "test_tokenizer_quoted_sentence_end")
 			run_test (agent l_set.test_tokenizer_blank_query, "test_tokenizer_blank_query")
+			run_test (agent l_set.test_tokenizer_sections_from_headings, "test_tokenizer_sections_from_headings")
+			run_test (agent l_set.test_session_structure_navigation, "test_session_structure_navigation")
 			print ("=== GOVERNOR ===%N")
 			run_test (agent l_set.test_governor_ramp, "test_governor_ramp")
 			run_test (agent l_set.test_governor_hold_and_release, "test_governor_hold_and_release")
