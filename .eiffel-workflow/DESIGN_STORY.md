@@ -372,3 +372,19 @@ Cloud are right-edge tabs now (hover peeks, click pins - D-012 exactly as drawn)
 an eleventh zone with a cumulus glyph, and W remains for the keyboard. The dig also caught a
 latent key-killer: present() clears keyboard focus, so any drawer visit left the paused keys
 dead - the tick self-heals focus now. Engine 41/41.
+
+## Night close — 2026-08-26, 23:40
+
+### 34. "Call it a night, eval where we've landed, write the narrative - and do the hardening, the README, the docs, the installer, a silent install"
+**The ask.** The full closing sweep, plus the real end-to-end proof: install it like a user.
+**What the design did.** The Phase-6 adversarial docket went first and went green on its first
+build - nine attacks (single words, all-foreign refusal, 500-character monsters, punctuation
+noise, rapid pause/resume, a floor-pinned governor through a full brake cycle, boundary jumps,
+a 201-question garbage quiz with 200 dropped and counted, a 20,000-word stress) for 50/50
+total. The README was rebuilt to the ecosystem's full standard; docs/index.html became a real
+product page with the stage demo, the intervention ladder, the keys, and the numbers; and the
+narrative landed twice - THE_NIGHT_BUILD.md in the repo and a designed page published for
+sharing with the Eiffel community, its hero a working ORP stage reading its own story. Then
+the proof: /VERYSILENT install, exit 0, both exes and the 25-file Poppler family landed in the
+user's programs folder, and the INSTALLED binary - not the build tree's - launched clean for
+the owner's screenshots. Seven hours thirty-eight minutes on the honest clock. One row open.
