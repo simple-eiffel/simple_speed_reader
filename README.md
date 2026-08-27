@@ -8,6 +8,7 @@
   <a href="https://simple-eiffel.github.io/simple_speed_reader/">Documentation</a> •
   <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a> •
   <a href="docs/USER_GUIDE.md">User Guide</a> •
+  <a href="#watch-it-run">Demos</a> •
   <a href="docs/THE_NIGHT_BUILD.md">The Night Build</a> •
   <a href=".eiffel-workflow/DESIGN_STORY.md">Design Story</a>
 </p>
@@ -28,6 +29,34 @@ reading science says comprehension needs), and a **local-AI comprehension
 quiz** written from your text *before* you read it, every question verified
 verbatim against the source. Part of the
 [Simple Eiffel](https://github.com/simple-eiffel) ecosystem.
+
+## Watch it run
+
+Two unscripted one-take recordings of the installed application — no narration,
+no edits, nothing staged.
+
+<table>
+<tr>
+<td width="50%" align="center" valign="top">
+  <a href="https://youtu.be/MTSQbIyAej0"><img src="https://img.youtube.com/vi/MTSQbIyAej0/hqdefault.jpg" width="400" alt="One word - or ten: speed-reading a 99,547-word book"></a>
+  <br><br><b>One word — or ten</b><br>
+  <sub><i>The reading window, on 99,547 words of academic PDF.</i><br>
+  Five words on the stage, then three, then four — the red pivot pinned
+  through all of it. A pause into the readable page, the book's own word
+  cloud, a resume at recovery speed, and the honest ledger to close:
+  <b>900 WPM dialled, 232 achieved</b>.</sub>
+</td>
+<td width="50%" align="center" valign="top">
+  <a href="https://youtu.be/KKIEJ3J0yhQ"><img src="https://img.youtube.com/vi/KKIEJ3J0yhQ/hqdefault.jpg" width="400" alt="A speed reader reads its own build story"></a>
+  <br><br><b>It reads its own build story</b><br>
+  <sub><i>The first film — before the reading window shipped.</i><br>
+  The whole intervention ladder in one take: the ramp to 725, a back-off,
+  Space into the context page, the recovery click, the brake gliding down
+  to a 300 crawl and easing home, then the seal —
+  <b>725 dialled, 255 achieved</b>.</sub>
+</td>
+</tr>
+</table>
 
 ## Status
 

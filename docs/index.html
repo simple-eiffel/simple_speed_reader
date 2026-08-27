@@ -67,6 +67,17 @@
     text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
   td:first-child { font-family: Consolas, monospace; color: var(--amber); white-space: nowrap; }
 
+  .films { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 14px; margin: 18px 0; }
+  .film { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px; display: block; color: var(--ink); text-decoration: none; }
+  .film:hover { border-color: var(--amber); text-decoration: none; }
+  .film img { width: 100%; border-radius: 5px; display: block; }
+  .film b { display: block; font-family: Consolas, monospace; color: var(--amber);
+    margin: 11px 0 5px; font-size: .95rem; }
+  .film i { color: var(--faint); font-size: .84rem; display: block; margin-bottom: 5px; }
+  .film span { color: var(--dim); font-size: .88rem; }
+
   .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
   .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
     padding: 12px 18px; }
@@ -87,6 +98,7 @@
     <div class="tag">Read fast without lying to yourself.</div>
     <nav>
       <a href="USER_GUIDE.md">User guide</a>
+      <a href="#films">Demos</a>
       <a href="THE_NIGHT_BUILD.md">The Night Build</a>
       <a href="https://github.com/simple-eiffel/simple_speed_reader">GitHub</a>
       <a href="https://github.com/simple-eiffel">Simple Eiffel</a>
@@ -107,6 +119,31 @@
   verifies comprehension with a local-AI quiz whose every question must prove
   itself with a verbatim quote from your text. Dark-only, contract-first,
   every pixel its own.</p>
+
+  <h2 id="films">watch it run</h2>
+  <p class="muted">Two unscripted one-take recordings of the installed
+  application — no narration, no edits.</p>
+  <div class="films">
+    <a class="film" href="https://youtu.be/MTSQbIyAej0">
+      <img src="https://img.youtube.com/vi/MTSQbIyAej0/hqdefault.jpg"
+        alt="One word or ten: speed-reading a 99,547-word book">
+      <b>One word &mdash; or ten</b>
+      <i>The reading window, on 99,547 words of academic PDF</i>
+      <span>Five words on the stage, then three, then four &mdash; the red pivot
+      pinned through all of it. A pause into the readable page, the book&rsquo;s own
+      word cloud, a resume at recovery speed, and the honest ledger to close:
+      900 WPM dialled, 232 achieved.</span>
+    </a>
+    <a class="film" href="https://youtu.be/KKIEJ3J0yhQ">
+      <img src="https://img.youtube.com/vi/KKIEJ3J0yhQ/hqdefault.jpg"
+        alt="A speed reader reads its own build story">
+      <b>It reads its own build story</b>
+      <i>The first film &mdash; before the reading window shipped</i>
+      <span>The whole intervention ladder in one take: the ramp to 725, a back-off,
+      Space into the context page, the recovery click, the brake gliding down to a
+      300 crawl and easing home, then the seal &mdash; 725 dialled, 255 achieved.</span>
+    </a>
+  </div>
 
   <h2>the intervention ladder</h2>
   <div class="grid">
