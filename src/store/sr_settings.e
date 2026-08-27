@@ -61,6 +61,22 @@ feature -- Access (defaults per D-004/D-011)
 			Result := config.boolean_value ("quiz_opt_in")
 		end
 
+	cloud_scope: INTEGER
+			-- 1 document (default), 2 section, 3 paragraph.
+		do
+			Result := bounded (config.integer_value ("cloud_scope"), 1, 1, 3)
+		end
+
+	set_cloud_scope (a_scope: INTEGER)
+		require
+			known: a_scope >= 1 and a_scope <= 3
+		do
+			config.set_integer ("cloud_scope", a_scope)
+			config.save
+		ensure
+			kept: cloud_scope = a_scope
+		end
+
 	fade_words: BOOLEAN
 			-- Words fade in (and melt into breathers) instead of cutting.
 		do

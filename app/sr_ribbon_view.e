@@ -48,10 +48,10 @@ feature {NONE} -- Painting
 
 	word_rects: ARRAYED_LIST [TUPLE [ix: INTEGER; rx, rw: REAL_64]]
 
-	Ribbon_height: REAL_64 = 64.0
-	Center_size: REAL_64 = 26.0
-	Decay: REAL_64 = 0.72
-	Floor_scale: REAL_64 = 0.24
+	Ribbon_height: REAL_64 = 92.0
+	Center_size: REAL_64 = 40.0
+	Decay: REAL_64 = 0.80
+	Floor_scale: REAL_64 = 0.30
 	Gap: REAL_64 = 9.0
 
 	scale_at (a_distance: INTEGER): REAL_64
@@ -93,7 +93,7 @@ feature {NONE} -- Painting
 				cx := a_x + a_w / 2.0 - l_adv / 2.0
 				p.set_color (Accent_red)
 				p.fill_rect (a_x + a_w / 2.0 - 1.5, a_y + a_h - 8.0, 3.0, 5.0)
-				p.set_color (Ink_center)
+				p.set_color (center_color (l_pos))
 				p.text (cx, l_base, reader.token (l_pos).word)
 				word_rects.extend ([l_pos, cx - a_x, l_adv])
 				l_left_edge := cx - Gap
@@ -109,7 +109,7 @@ feature {NONE} -- Painting
 					p.font (p.Role_mono, l_size, False)
 					l_adv := p.advance (reader.token (i).word)
 					if l_left_edge - l_adv >= a_x + 4.0 then
-						p.set_color (Ink_read)
+						p.set_color (tier_color (i, Ink_read))
 						p.text (l_left_edge - l_adv, l_base, reader.token (i).word)
 						word_rects.extend ([i, l_left_edge - l_adv - a_x, l_adv])
 					end
@@ -128,7 +128,7 @@ feature {NONE} -- Painting
 					p.font (p.Role_mono, l_size, False)
 					l_adv := p.advance (reader.token (i).word)
 					if l_right_edge + l_adv <= a_x + a_w - 4.0 then
-						p.set_color (Ink_ahead)
+						p.set_color (tier_color (i, Ink_ahead))
 						p.text (l_right_edge, l_base, reader.token (i).word)
 						word_rects.extend ([i, l_right_edge - a_x, l_adv])
 					end
@@ -152,12 +152,42 @@ feature {NONE} -- Painting
 			end
 		end
 
+	tier_color (a_index: INTEGER; a_plain: NATURAL_32): NATURAL_32
+			-- Word-cloud coloring: significance tiers warm up; the
+			-- unranked keep the side's plain ink (position sense stays).
+		do
+			inspect reader.cloud_tier (a_index)
+			when 5 then
+				Result := Accent_red
+			when 4 then
+				Result := Amber
+			when 3 then
+				Result := Ink_bright
+			when 2 then
+				Result := Ink_mid
+			else
+				Result := a_plain
+			end
+		end
+
+	center_color (a_index: INTEGER): NATURAL_32
+			-- The center word is never dimmer than bright ink.
+		do
+			Result := tier_color (a_index, Ink_center)
+			if Result = Ink_mid then
+				Result := Ink_center
+			end
+		end
+
 feature {NONE} -- Palette
 
 	Band_black: NATURAL_32 = 0x0F0F12
 	Ink_center: NATURAL_32 = 0xF0F0F2
+	Ink_bright: NATURAL_32 = 0xD8D8DC
+	Ink_mid: NATURAL_32 = 0xB0B0B6
 	Ink_read: NATURAL_32 = 0x9A9AA0
 	Ink_ahead: NATURAL_32 = 0x55555C
+	Amber: NATURAL_32 = 0xE8A33D
 	Accent_red: NATURAL_32 = 0xE5484D
 
 end

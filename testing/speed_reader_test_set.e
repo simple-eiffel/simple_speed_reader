@@ -591,6 +591,37 @@ feature -- Test: session
 			assert_false ("no text", r.has_text)
 		end
 
+feature -- Test: word cloud
+
+	test_wordcloud_ranks_and_scopes
+		local
+			r: SIMPLE_SPEED_READER
+			l_top: ARRAYED_LIST [TUPLE [word: STRING_32; tally: INTEGER]]
+		do
+			create r.make
+			r.load_text ({STRING_32} "t",
+				{STRING_32} "# Head%N%NGlory glory glory speaketh truth. The truth and the glory.%N%NAnother paragraph entirely, mercy mercy here.")
+			assert_true ("loaded", r.last_intake_ok)
+			r.preset_position (3)
+			l_top := r.top_words_scoped ({SIMPLE_SPEED_READER}.Scope_document, 10)
+			assert_true ("glory tops the document",
+				l_top.first.word.same_string_general ("glory"))
+			assert_integers_equal ("glory counted through punctuation", 4, l_top.first.tally)
+			across
+				l_top as w
+			loop
+				assert_false ("stopwords never rank", w.word.same_string_general ("the"))
+			end
+			l_top := r.top_words_scoped ({SIMPLE_SPEED_READER}.Scope_paragraph, 10)
+			across
+				l_top as w
+			loop
+				assert_false ("mercy is another paragraph's word",
+					w.word.same_string_general ("mercy"))
+			end
+			assert_true ("ribbon tier hot for glory", r.cloud_tier (3) >= 4)
+		end
+
 feature -- Test: quiz (D-007)
 
 	test_validator_normalizes_whitespace

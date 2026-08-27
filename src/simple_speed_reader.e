@@ -73,6 +73,9 @@ feature -- Intake
 				create source_text.make_from_string_general (a_source)
 				quiz := Void
 				create text.make (a_title, tokenizer.tokenize (a_source))
+				check attached text as al_t2 then
+					create cloud.make (al_t2.tokens)
+				end
 				create l_gov.make (pref_start_wpm, pref_recovery_wpm, pref_comfy_max_wpm)
 				check attached text as al_t then
 					create al_s.make_with_text (al_t, l_gov, timing)
@@ -270,6 +273,69 @@ feature -- Status
 			if attached session as al_s then
 				Result := al_s.last_record
 			end
+		end
+
+	cloud: detachable SR_WORDCLOUD
+			-- Word-significance ranks for the loaded text.
+
+	cloud_tier (a_index: INTEGER): INTEGER
+			-- Ribbon color tier (0..5) of the token at `a_index'.
+		require
+			has_text: has_text
+			in_text: a_index >= 1 and a_index <= token_count
+		do
+			if attached cloud as al_c then
+				Result := al_c.tier_of (token (a_index).word)
+			end
+		ensure
+			tiered: Result >= 0 and Result <= 5
+		end
+
+	Scope_document: INTEGER = 1
+	Scope_section: INTEGER = 2
+	Scope_paragraph: INTEGER = 3
+
+	top_words_scoped (a_scope, a_limit: INTEGER): ARRAYED_LIST [TUPLE [word: STRING_32; tally: INTEGER]]
+			-- The cloud around the current position: whole document,
+			-- this section, or this paragraph.
+		require
+			has_text: has_text
+			placed: position >= 1
+			scope_known: a_scope >= Scope_document and a_scope <= Scope_paragraph
+			positive: a_limit >= 1
+		local
+			l_from, l_to, l_unit: INTEGER
+		do
+			check attached cloud as al_c and then attached text as al_t then
+				inspect a_scope
+				when Scope_document then
+					l_from := 1
+					l_to := al_t.token_count
+				when Scope_section then
+					l_unit := al_t.token (position).section_index
+					from l_from := position until l_from = 1
+						or else al_t.token (l_from - 1).section_index /= l_unit loop
+						l_from := l_from - 1
+					end
+					from l_to := position until l_to = al_t.token_count
+						or else al_t.token (l_to + 1).section_index /= l_unit loop
+						l_to := l_to + 1
+					end
+				else
+					l_unit := al_t.token (position).paragraph_index
+					from l_from := position until l_from = 1
+						or else al_t.token (l_from - 1).paragraph_index /= l_unit loop
+						l_from := l_from - 1
+					end
+					from l_to := position until l_to = al_t.token_count
+						or else al_t.token (l_to + 1).paragraph_index /= l_unit loop
+						l_to := l_to + 1
+					end
+				end
+				Result := al_c.top_words (l_from, l_to, a_limit)
+			end
+		ensure
+			bounded: Result.count <= a_limit
 		end
 
 	has_sections: BOOLEAN

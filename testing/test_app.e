@@ -76,6 +76,8 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_settings_roundtrip, "test_settings_roundtrip")
 			run_test (agent l_set.test_log_records_and_reads, "test_log_records_and_reads")
 			run_test (agent l_set.test_preset_position_continue, "test_preset_position_continue")
+			print ("=== WORD CLOUD ===%N")
+			run_test (agent l_set.test_wordcloud_ranks_and_scopes, "test_wordcloud_ranks_and_scopes")
 			print ("=== QUIZ ===%N")
 			run_test (agent l_set.test_validator_normalizes_whitespace, "test_validator_normalizes_whitespace")
 			run_test (agent l_set.test_quiz_parse_validate_score, "test_quiz_parse_validate_score")

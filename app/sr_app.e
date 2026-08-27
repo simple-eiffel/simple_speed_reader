@@ -60,6 +60,18 @@ feature {NONE} -- Initialization
 			speed_drawer.put (nudge_down_button)
 			create fade_button.make ("Fade words: OFF  (F)", Void)
 			speed_drawer.put (fade_button)
+			create cloud_view.make
+			create cloud_drawer.make_titled ("Word cloud")
+			create l_row.make
+			l_row := l_row.with_gap (8.0)
+			create cloud_doc_button.make ("Document", Void)
+			l_row.put (cloud_doc_button)
+			create cloud_sect_button.make ("Section", Void)
+			l_row.put (cloud_sect_button)
+			create cloud_par_button.make ("Paragraph", Void)
+			l_row.put (cloud_par_button)
+			cloud_drawer.put (l_row)
+			cloud_drawer.put (cloud_view.surface)
 			create l_col.make
 			create l_row.make
 			l_row.put (flow_map.surface)
@@ -125,7 +137,7 @@ feature {NONE} -- Initialization
 			cockpit.drop_zone.set_on_drop (agent on_files_dropped)
 			stage.surface.set_tooltip ("Click = pause - hold = brake (B) - Left = replay - +/- speed - Alt +/- font - F fades")
 			context_view.surface.set_tooltip ("Click the word you last truly read - Space resumes at the sentence head")
-			ribbon.surface.set_tooltip ("Where you are in the flow - click a word to resume there")
+			ribbon.surface.set_tooltip ("Where you are - click a word to resume there - colors = word significance - W opens the cloud")
 			flow_map.surface.set_tooltip ("The whole text - click while paused to jump back")
 			hold_button.set_tooltip ("H while reading")
 			backoff_100_button.set_tooltip ("key 1 - or Ctrl+Shift+minus")
@@ -142,6 +154,13 @@ feature {NONE} -- Initialization
 			nudge_down_button.set_on_click (agent on_drawer_nudge (False))
 			fade_button.set_on_click (agent on_fade_key)
 			fade_button.set_tooltip ("Key F, anywhere - words breathe in and melt into pauses, scaled to your WPM")
+			cloud_drawer.set_on_close (agent close_speed_drawer)
+			cloud_doc_button.set_on_click (agent on_cloud_scope ({SIMPLE_SPEED_READER}.Scope_document))
+			cloud_sect_button.set_on_click (agent on_cloud_scope ({SIMPLE_SPEED_READER}.Scope_section))
+			cloud_par_button.set_on_click (agent on_cloud_scope ({SIMPLE_SPEED_READER}.Scope_paragraph))
+			cloud_doc_button.set_tooltip ("Themes of the whole text")
+			cloud_sect_button.set_tooltip ("Themes of the section you are in")
+			cloud_par_button.set_tooltip ("Themes of this paragraph")
 			cockpit.show_history (ledger.recent_lines (6))
 			apply_fade_mode
 
@@ -312,6 +331,8 @@ feature {NONE} -- Transport (D-014)
 				do_toggle_hold
 			when 102, 70 then -- f, F: fade mode toggle
 				on_fade_key
+			when 119, 87 then -- w, W: the word cloud (pauses first)
+				on_cloud_key
 			when 98, 66 then -- b, B: the keyboard brake TOGGLE (the
 					-- shell forwards no key-up, so a hold-key cannot
 					-- exist; press engages, press again releases)
@@ -429,6 +450,8 @@ feature {NONE} -- Transport (D-014)
 				do_stop
 			when 102, 70 then -- f, F: fade mode toggle
 				on_fade_key
+			when 119, 87 then -- w, W: the word cloud
+				on_cloud_key
 			when 98, 66 then -- b, B: brake toggle from paused = resume braked
 				if brake_engaged then
 					do_brake_release
@@ -1147,6 +1170,55 @@ feature {NONE} -- Cockpit actions
 			apply_fade_mode
 		end
 
+	on_cloud_key
+			-- W: the word cloud, at pause (a running stream pauses first).
+		do
+			if reader.is_running then
+				do_pause
+			end
+			if reader.is_paused and then reader.position >= 1 then
+				open_cloud_drawer
+			end
+		end
+
+	on_cloud_scope (a_scope: INTEGER)
+		do
+			settings.set_cloud_scope (a_scope)
+			if reader.is_paused and then reader.position >= 1 then
+				refresh_cloud
+				window.request_render
+			end
+		end
+
+	open_cloud_drawer
+		do
+			refresh_cloud
+			window.show_drawer (cloud_drawer, 560.0, False)
+			window.request_render
+		end
+
+	refresh_cloud
+		require
+			placed: reader.has_text and then reader.position >= 1
+		local
+			l_scope: INTEGER
+		do
+			l_scope := settings.cloud_scope
+			cloud_view.set_words (reader.top_words_scoped (l_scope, 40))
+			cloud_doc_button.set_label (scope_label ("Document", l_scope = {SIMPLE_SPEED_READER}.Scope_document))
+			cloud_sect_button.set_label (scope_label ("Section", l_scope = {SIMPLE_SPEED_READER}.Scope_section))
+			cloud_par_button.set_label (scope_label ("Paragraph", l_scope = {SIMPLE_SPEED_READER}.Scope_paragraph))
+		end
+
+	scope_label (a_name: STRING; a_active: BOOLEAN): STRING
+		do
+			if a_active then
+				Result := "[ " + a_name + " ]"
+			else
+				Result := a_name
+			end
+		end
+
 	on_fade_key
 			-- F (anywhere) and the Speed drawer's toggle.
 		do
@@ -1197,6 +1269,12 @@ feature {NONE} -- Implementation
 	cockpit: SR_COCKPIT
 
 	ribbon: SR_RIBBON_VIEW
+
+	cloud_view: SR_CLOUD_VIEW
+
+	cloud_drawer: SW_DRAWER
+
+	cloud_doc_button, cloud_sect_button, cloud_par_button: SW_BUTTON
 
 	speed_drawer: SW_DRAWER
 
