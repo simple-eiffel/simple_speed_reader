@@ -58,6 +58,8 @@ feature {NONE} -- Initialization
 			speed_drawer.put (nudge_up_button)
 			create nudge_down_button.make ("Target -25  (Down)", Void)
 			speed_drawer.put (nudge_down_button)
+			create fade_button.make ("Fade words: OFF  (F)", Void)
+			speed_drawer.put (fade_button)
 			create l_col.make
 			create l_row.make
 			l_row.put (flow_map.surface)
@@ -121,7 +123,7 @@ feature {NONE} -- Initialization
 			ribbon.surface.set_on_files (agent on_files_dropped)
 			flow_map.surface.set_on_files (agent on_files_dropped)
 			cockpit.drop_zone.set_on_drop (agent on_files_dropped)
-			stage.surface.set_tooltip ("Click = pause - hold = brake (B toggles) - Left = replay - +/- speed - Alt +/- font")
+			stage.surface.set_tooltip ("Click = pause - hold = brake (B) - Left = replay - +/- speed - Alt +/- font - F fades")
 			context_view.surface.set_tooltip ("Click the word you last truly read - Space resumes at the sentence head")
 			ribbon.surface.set_tooltip ("Where you are in the flow - click a word to resume there")
 			flow_map.surface.set_tooltip ("The whole text - click while paused to jump back")
@@ -138,7 +140,10 @@ feature {NONE} -- Initialization
 			backoff_25_button.set_on_click (agent on_backoff_clicked (25))
 			nudge_up_button.set_on_click (agent on_drawer_nudge (True))
 			nudge_down_button.set_on_click (agent on_drawer_nudge (False))
+			fade_button.set_on_click (agent on_fade_key)
+			fade_button.set_tooltip ("Key F, anywhere - words breathe in and melt into pauses, scaled to your WPM")
 			cockpit.show_history (ledger.recent_lines (6))
+			apply_fade_mode
 
 			window.set_root (cockpit_root)
 			window.set_on_shell_event (agent on_shell_event)
@@ -304,6 +309,8 @@ feature {NONE} -- Transport (D-014)
 				do_stop
 			when 104, 72 then -- h, H
 				do_toggle_hold
+			when 102, 70 then -- f, F: fade mode toggle
+				on_fade_key
 			when 98, 66 then -- b, B: the keyboard brake TOGGLE (the
 					-- shell forwards no key-up, so a hold-key cannot
 					-- exist; press engages, press again releases)
@@ -419,6 +426,8 @@ feature {NONE} -- Transport (D-014)
 				end
 			when 27, 115, 83 then -- Esc
 				do_stop
+			when 102, 70 then -- f, F: fade mode toggle
+				on_fade_key
 			when 98, 66 then -- b, B: brake toggle from paused = resume braked
 				if brake_engaged then
 					do_brake_release
@@ -1134,8 +1143,29 @@ feature {NONE} -- Cockpit actions
 		do
 			fade_mode := cockpit.fade_on
 			settings.set_fade_words (fade_mode)
+			apply_fade_mode
+		end
+
+	on_fade_key
+			-- F (anywhere) and the Speed drawer's toggle.
+		do
+			fade_mode := not fade_mode
+			settings.set_fade_words (fade_mode)
+			cockpit.sync_fade (fade_mode)
+			apply_fade_mode
+			logger.info ("fade mode " + (if fade_mode then "ON" else "OFF" end))
+			window.request_render
+		end
+
+	apply_fade_mode
+		do
 			if not fade_mode then
 				stage.set_word_alpha (1.0)
+			end
+			if fade_mode then
+				fade_button.set_label ("Fade words: ON  (F)")
+			else
+				fade_button.set_label ("Fade words: OFF  (F)")
 			end
 		end
 
@@ -1172,7 +1202,7 @@ feature {NONE} -- Implementation
 	speed_label: SW_LABEL
 
 	hold_button, backoff_100_button, backoff_50_button,
-	backoff_25_button, nudge_up_button, nudge_down_button: SW_BUTTON
+	backoff_25_button, nudge_up_button, nudge_down_button, fade_button: SW_BUTTON
 
 	transport: SR_TRANSPORT_VIEW
 

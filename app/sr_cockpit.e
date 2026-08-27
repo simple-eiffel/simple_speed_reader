@@ -207,6 +207,12 @@ feature -- Access
 			Result := fade_check.is_checked
 		end
 
+	sync_fade (a_on: BOOLEAN)
+			-- The F key or the drawer toggled it: keep the box honest.
+		do
+			fade_check.set_checked (a_on)
+		end
+
 feature -- Operations
 
 	refresh (a_reader: SIMPLE_SPEED_READER)
