@@ -52,7 +52,7 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Reading window (keys 1–9) | 2026-08-27 00:43 | 8:43 | 1 = the classic solo word … 9 = 10 words (4 behind / 5 ahead — odd levels lean ahead); fisheye 0.66^d size taper + 0.72^d distance dim over word-cloud tier inks, red pivot stays pinned; persisted like the font; span law lives once on the facade, contract-tested — engine 51/51; digit back-offs retire to the Speed drawer's buttons |
 | Installer rebuilt + SILENT-INSTALLED with the window | 2026-08-27 00:54 | 8:54 | worker re-finalized; cairo restaged into wiped F_code; ISCC 8.0 s → 12.4 MB; /VERYSILENT exit 0; profile + ledger survived the reinstall; installed exe boot-verified, no trace |
 | **SHIPPED: repo + v0.9.0 Release + Pages** | 2026-08-27 00:56 | 8:56 | github.com/simple-eiffel/simple_speed_reader live with the full night history; Release v0.9.0 carries the setup exe; Pages serving /docs; widgets +7 and shell +3 donation commits pushed; cairo and all ten other deps already current |
-| **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
+| **LARRY APPROVES deliverable** | 2026-08-27 01:00 | **9:00** | "it worked as I thought it would. we're good." — installed app with the reading window, verified by the owner. THE CLOCK STOPS: video to approved, shipped, publicly released product in nine hours flat |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release
 (ship phase) — after the approval row fills.
