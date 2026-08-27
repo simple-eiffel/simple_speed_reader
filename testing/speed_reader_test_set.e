@@ -341,6 +341,21 @@ feature -- Test: timing
 			assert_integers_equal ("paragraph three beats", 600, tm.breather_ms (t, 300))
 		end
 
+	test_timing_fade_alpha
+			-- The fade curve: rise over the first 30%, crisp middle,
+			-- melt only into breathers, unit-bounded always.
+		local
+			tm: SR_TIMING_MODEL
+		do
+			create tm
+			assert_true ("dark at onset", tm.fade_alpha (0, 200, True) < 0.05)
+			assert_true ("half-risen mid-fade-in", (tm.fade_alpha (30, 200, True) - 0.5).abs < 0.05)
+			assert_true ("crisp mid-word", tm.fade_alpha (100, 200, True) = 1.0)
+			assert_true ("melting into the breather", tm.fade_alpha (185, 200, True) < 0.5)
+			assert_true ("no melt without a breather", tm.fade_alpha (185, 200, False) = 1.0)
+			assert_true ("self-attenuates at speed", tm.fade_alpha (30, 66, True) = 1.0)
+		end
+
 feature -- Test: pacer
 
 	test_pacer_anchoring_no_drift

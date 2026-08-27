@@ -76,6 +76,33 @@ feature -- Queries (pure)
 			paragraph_longest: a_token.ends_paragraph implies Result = 3 * base_ms (a_wpm)
 		end
 
+	fade_alpha (a_elapsed_ms, a_display_ms: INTEGER; a_breather_follows: BOOLEAN): REAL_64
+			-- Fade-mode brightness for a word `a_elapsed_ms' into its
+			-- `a_display_ms' slot: rise over the first 30% (capped
+			-- 120 ms), hold crisp, and melt over the last 20% (capped
+			-- 100 ms) ONLY into a breather - mid-sentence cuts stay
+			-- sharp. Self-attenuates at speed: tiny slots, tiny fades.
+		require
+			display_positive: a_display_ms > 0
+			elapsed_sane: a_elapsed_ms >= 0
+		local
+			l_in, l_out, l_remaining: INTEGER
+		do
+			Result := 1.0
+			l_in := (a_display_ms * 3 // 10).min (120)
+			if l_in > 0 and a_elapsed_ms < l_in then
+				Result := a_elapsed_ms / l_in
+			elseif a_breather_follows then
+				l_out := (a_display_ms * 2 // 10).min (100)
+				l_remaining := a_display_ms - a_elapsed_ms
+				if l_out > 0 and l_remaining < l_out then
+					Result := l_remaining.max (0) / l_out
+				end
+			end
+		ensure
+			unit: Result >= 0.0 and Result <= 1.0
+		end
+
 feature -- Constants
 
 	Foreign_ceiling_wpm: INTEGER = 350

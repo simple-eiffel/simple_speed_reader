@@ -13,7 +13,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make (a_start_wpm, a_comfy_wpm: INTEGER; a_skip, a_quiz_opt: BOOLEAN)
+	make (a_start_wpm, a_comfy_wpm: INTEGER; a_skip, a_quiz_opt, a_fade: BOOLEAN)
 			-- Build the surface seeded from the profile; `wire' hooks
 			-- the host's agents after.
 		require
@@ -69,6 +69,8 @@ feature {NONE} -- Initialization
 			l_row := l_row.with_gap (10.0)
 			create quiz_check.make ("Comprehension quiz (local AI, before reading - SQ3R)", a_quiz_opt, Void)
 			l_row.put (quiz_check)
+			create fade_check.make ("Fade words", a_fade, Void)
+			l_row.put (fade_check)
 			create preview_button.make ("Preview questions", Void)
 			l_row.put (preview_button)
 			create quiz_status_label.make_mono ("")
@@ -106,6 +108,7 @@ feature {NONE} -- Initialization
 			got_button.set_tooltip ("Honest self-scoring - the score joins this run's ledger row")
 			missed_button.set_tooltip ("No shame - the gap is information")
 			drop_zone.set_tooltip ("Drag from Explorer - works on any part of the reader, any time")
+			fade_check.set_tooltip ("Words fade in, and melt into sentence pauses - scales with your WPM, vanishing at speed")
 
 			create history_labels.make (History_rows)
 			from
@@ -124,7 +127,7 @@ feature -- Wiring
 	wire (a_on_load_file, a_on_start, a_on_continue: PROCEDURE;
 			a_on_start_wpm, a_on_comfy_wpm: PROCEDURE [INTEGER];
 			a_on_skip, a_on_quiz_toggle, a_on_preview,
-			a_on_reveal, a_on_got, a_on_missed: PROCEDURE)
+			a_on_reveal, a_on_got, a_on_missed, a_on_fade: PROCEDURE)
 			-- Hook the host's actions (two-phase: after the host's own
 			-- attributes are all set, so its agents may capture it).
 		do
@@ -139,6 +142,7 @@ feature -- Wiring
 			reveal_button.set_on_click (a_on_reveal)
 			got_button.set_on_click (a_on_got)
 			missed_button.set_on_click (a_on_missed)
+			fade_check.set_on_change (a_on_fade)
 		end
 
 	set_quiz_status (a_text: READABLE_STRING_GENERAL)
@@ -198,6 +202,11 @@ feature -- Access
 			Result := quiz_check.is_checked
 		end
 
+	fade_on: BOOLEAN
+		do
+			Result := fade_check.is_checked
+		end
+
 feature -- Operations
 
 	refresh (a_reader: SIMPLE_SPEED_READER)
@@ -247,6 +256,6 @@ feature {NONE} -- Implementation
 
 	question_label, answer_label: SW_LABEL
 
-	skip_check, quiz_check: SW_CHECK_BOX
+	skip_check, quiz_check, fade_check: SW_CHECK_BOX
 
 end

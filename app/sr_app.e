@@ -41,7 +41,8 @@ feature {NONE} -- Initialization
 			create transport.make (reader)
 			create progress_bar.make (0.0)
 			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm,
-				settings.skip_foreign, settings.quiz_opt_in)
+				settings.skip_foreign, settings.quiz_opt_in, settings.fade_words)
+			fade_mode := settings.fade_words
 			create speed_drawer.make_titled ("Speed")
 			create speed_label.make_mono ("")
 			speed_drawer.put (speed_label)
@@ -106,7 +107,8 @@ feature {NONE} -- Initialization
 				agent on_load_file_asked, agent on_start_asked, agent on_continue_asked,
 				agent on_start_wpm_changed, agent on_comfy_changed,
 				agent on_skip_toggled, agent on_quiz_toggled, agent on_quiz_preview,
-				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False))
+				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False),
+				agent on_fade_toggled)
 			transport.wire (agent on_deck_play, agent on_deck_here,
 				agent do_stop, agent open_speed_drawer,
 				agent on_deck_brake_press, agent do_brake_release,
@@ -208,9 +210,13 @@ feature {NONE} -- The clock
 						to_cockpit
 					else
 						stage.set_breather (reader.in_breather (l_now))
+						if fade_mode then
+							stage.set_word_alpha (reader.word_fade_alpha (l_now))
+						end
 						l_sig := reader.position * 16
 							+ reader.current_wpm + reader.target_wpm * 3
 							+ (if stage.is_in_breather then 8 else 0 end)
+							+ (stage.word_alpha * 24.0).truncated_to_integer * 131072
 						if l_sig /= last_render_sig then
 							last_render_sig := l_sig
 							window.request_render
@@ -234,7 +240,7 @@ feature {NONE} -- Postures (D-012)
 
 	is_press_live, brake_engaged, scrub_mode: BOOLEAN
 
-	quiz_generating, quiz_admin_active: BOOLEAN
+	quiz_generating, quiz_admin_active, fade_mode: BOOLEAN
 
 	pending_record: detachable SR_RUN_RECORD
 
@@ -1122,6 +1128,15 @@ feature {NONE} -- Cockpit actions
 		do
 			reader := reader.with_foreign_skip (cockpit.skip_on)
 			settings.set_skip_foreign (cockpit.skip_on)
+		end
+
+	on_fade_toggled
+		do
+			fade_mode := cockpit.fade_on
+			settings.set_fade_words (fade_mode)
+			if not fade_mode then
+				stage.set_word_alpha (1.0)
+			end
 		end
 
 	apply_speed_prefs

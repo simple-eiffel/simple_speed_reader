@@ -240,6 +240,17 @@ feature -- Status
 			Result := attached session as al_s and then al_s.in_breather (a_now_ms)
 		end
 
+	word_fade_alpha (a_now_ms: INTEGER): REAL_64
+			-- Fade-mode brightness of the current word (1.0 outside fades).
+		do
+			Result := 1.0
+			if attached session as al_s then
+				Result := al_s.word_fade_alpha (a_now_ms)
+			end
+		ensure
+			unit: Result >= 0.0 and Result <= 1.0
+		end
+
 	skipped_count: INTEGER
 		do
 			if attached session as al_s then

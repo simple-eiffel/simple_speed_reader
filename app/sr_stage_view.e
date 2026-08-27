@@ -23,6 +23,7 @@ feature {NONE} -- Initialization
 			surface.set_grow (1.0)
 			surface.set_on_paint (agent paint)
 			is_in_breather := False
+			word_alpha := 1.0
 		ensure
 			reader_kept: reader = a_reader
 		end
@@ -54,6 +55,18 @@ feature -- Element change
 			set: font_size = a_size
 		end
 
+	word_alpha: REAL_64
+			-- Fade-mode brightness of the word (1.0 = crisp).
+
+	set_word_alpha (a_alpha: REAL_64)
+		require
+			unit: a_alpha >= 0.0 and a_alpha <= 1.0
+		do
+			word_alpha := a_alpha
+		ensure
+			set: word_alpha = a_alpha
+		end
+
 feature {NONE} -- Painting
 
 	reader: SIMPLE_SPEED_READER
@@ -77,18 +90,18 @@ feature {NONE} -- Painting
 					if l_tok.is_latin then
 						l_pre_w := p.advance (l_word.substring (1, l_tok.pivot_index - 1))
 						l_piv_w := p.advance (l_word.substring (l_tok.pivot_index, l_tok.pivot_index))
-						p.set_color (Ink)
+						p.set_color (faded (Ink))
 						p.text (l_pin - l_pre_w - l_piv_w / 2, l_base,
 							l_word.substring (1, l_tok.pivot_index - 1))
-						p.set_color (Accent_red)
+						p.set_color (faded (Accent_red))
 						p.text (l_pin - l_piv_w / 2, l_base,
 							l_word.substring (l_tok.pivot_index, l_tok.pivot_index))
-						p.set_color (Ink)
+						p.set_color (faded (Ink))
 						p.text (l_pin + l_piv_w / 2, l_base,
 							l_word.substring (l_tok.pivot_index + 1, l_word.count))
 					else
 						l_all_w := p.advance (l_word)
-						p.set_color (Ink)
+						p.set_color (faded (Ink))
 						p.text (l_pin - l_all_w / 2, l_base, l_word)
 					end
 				end
@@ -119,6 +132,28 @@ feature {NONE} -- Painting
 				l_s := {STRING_32} "no text - Esc to the cockpit"
 				p.text (a_x + (a_w - p.advance (l_s)) / 2, l_base, l_s)
 			end
+		end
+
+	faded (a_color: NATURAL_32): NATURAL_32
+			-- `a_color' lerped toward the stage black by `word_alpha' -
+			-- alpha on a solid ground, without touching cairo alpha.
+		local
+			l_r, l_g, l_b: INTEGER
+		do
+			l_r := lerp_channel ((Stage_black |>> 16).bit_and (0xFF).to_integer_32,
+				(a_color |>> 16).bit_and (0xFF).to_integer_32)
+			l_g := lerp_channel ((Stage_black |>> 8).bit_and (0xFF).to_integer_32,
+				(a_color |>> 8).bit_and (0xFF).to_integer_32)
+			l_b := lerp_channel (Stage_black.bit_and (0xFF).to_integer_32,
+				a_color.bit_and (0xFF).to_integer_32)
+			Result := (l_r.to_natural_32 |<< 16) + (l_g.to_natural_32 |<< 8) + l_b.to_natural_32
+		end
+
+	lerp_channel (a_bg, a_fg: INTEGER): INTEGER
+		do
+			Result := a_bg + ((a_fg - a_bg) * (word_alpha * 100.0).truncated_to_integer) // 100
+		ensure
+			byte: Result >= 0 and Result <= 255
 		end
 
 feature {NONE} -- Palette (the video's)

@@ -19,6 +19,12 @@ feature -- Access
 	display_end_ms: INTEGER
 			-- When the word blanks into its breather.
 
+	word_started_ms: INTEGER
+			-- When the current word took the stage (fade-in anchors here).
+
+	display_duration_ms: INTEGER
+			-- The current word's visible share (fade windows scale on it).
+
 feature -- Status
 
 	should_advance (a_now_ms: INTEGER): BOOLEAN
@@ -49,6 +55,8 @@ feature -- Commands
 			display_positive: a_display_ms > 0
 			breather_non_negative: a_breather_ms >= 0
 		do
+			word_started_ms := a_now_ms
+			display_duration_ms := a_display_ms
 			display_end_ms := a_now_ms + a_display_ms
 			next_deadline_ms := display_end_ms + a_breather_ms
 			is_armed := True
@@ -64,6 +72,8 @@ feature -- Commands
 			display_positive: a_display_ms > 0
 			breather_non_negative: a_breather_ms >= 0
 		do
+			word_started_ms := next_deadline_ms
+			display_duration_ms := a_display_ms
 			display_end_ms := next_deadline_ms + a_display_ms
 			next_deadline_ms := display_end_ms + a_breather_ms
 		ensure

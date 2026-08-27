@@ -88,6 +88,22 @@ feature -- Access
 			Result := is_running and then pacer.in_breather (a_now_ms)
 		end
 
+	word_fade_alpha (a_now_ms: INTEGER): REAL_64
+			-- Fade-mode brightness of the word on stage right now.
+		do
+			Result := 1.0
+			if is_running and then position >= 1 and then pacer.is_armed
+				and then pacer.display_duration_ms > 0
+			then
+				Result := timing.fade_alpha (
+					(a_now_ms - pacer.word_started_ms).max (0).min (pacer.display_duration_ms),
+					pacer.display_duration_ms,
+					timing.breather_ms (text.token (position), governor.current_wpm) > 0)
+			end
+		ensure
+			unit: Result >= 0.0 and Result <= 1.0
+		end
+
 	has_streamable: BOOLEAN
 			-- Any token at all passes the filter?
 		do

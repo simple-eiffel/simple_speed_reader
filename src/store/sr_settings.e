@@ -61,6 +61,12 @@ feature -- Access (defaults per D-004/D-011)
 			Result := config.boolean_value ("quiz_opt_in")
 		end
 
+	fade_words: BOOLEAN
+			-- Words fade in (and melt into breathers) instead of cutting.
+		do
+			Result := config.boolean_value ("fade_words")
+		end
+
 	ollama_url: STRING_32
 		do
 			if attached config.string_value ("ollama_url") as al_s and then not al_s.is_empty then
@@ -145,6 +151,14 @@ feature -- Element change (each saves immediately - crash-honest)
 		do
 			config.set_boolean ("quiz_opt_in", a_on)
 			config.save
+		end
+
+	set_fade_words (a_on: BOOLEAN)
+		do
+			config.set_boolean ("fade_words", a_on)
+			config.save
+		ensure
+			kept: fade_words = a_on
 		end
 
 	set_resume_point (a_file: READABLE_STRING_GENERAL; a_title: READABLE_STRING_GENERAL; a_position: INTEGER)

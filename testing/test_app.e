@@ -60,6 +60,7 @@ feature {NONE} -- Test Runners
 			run_test (agent l_set.test_timing_base_and_length, "test_timing_base_and_length")
 			run_test (agent l_set.test_timing_foreign_floor, "test_timing_foreign_floor")
 			run_test (agent l_set.test_timing_breathers, "test_timing_breathers")
+			run_test (agent l_set.test_timing_fade_alpha, "test_timing_fade_alpha")
 			print ("=== PACER ===%N")
 			run_test (agent l_set.test_pacer_anchoring_no_drift, "test_pacer_anchoring_no_drift")
 			run_test (agent l_set.test_pacer_far_behind, "test_pacer_far_behind")
