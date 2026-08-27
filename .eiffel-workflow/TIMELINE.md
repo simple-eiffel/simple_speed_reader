@@ -44,6 +44,7 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Fade mode (WPM-scaled crossfade) | 2026-08-26 21:49 | 5:49 | fade_alpha curve in the timing model (39/39); fade-in 30%, melt into breathers only, self-attenuates at speed |
 | Fade toggle everywhere + window icon | 2026-08-26 ~22:00 | 6:00 | F key + drawer toggle + synced checkbox; shell_set_window_icon donation (13/13) - the r-e-ad mark in the title bar |
 | Colorized fisheye + scoped word cloud | 2026-08-26 22:15 | 6:15 | SR_WORDCLOUD (stopworded incl. KJV register) tiers the ribbon's colors; 40px center, 92px band; W opens the Document/Section/Paragraph cloud drawer; engine 40/40 |
+| Greek crash fixed + edge tabs wired | 2026-08-26 22:27 | 6:27 | third to_string_8 bite (named regression test; oracle gotcha); Speed/Cloud as right-edge peek-and-pin tabs; deck CLOUD button; focus self-heal after drawers; 41/41 |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release

@@ -360,3 +360,15 @@ reads both WHERE you are and WHAT matters near you. And the fun ask landed whole
 (a running stream politely pauses first) opens the Word cloud drawer - the scope's top forty
 words sized and colored by rank, counts on the leaders, with the three scope buttons right in
 the drawer and the choice persisted. The ToC-before-the-book instinct, computed. Engine 40/40.
+
+### 33. The crash, then: "I was looking for the drawer icon at one of the GUI window edges"
+**The ask.** First a PDF-drop crash; then, cloud fixed, the real UX note: where is the edge tab?
+**What the design did.** The crash was the night's third to_string_8 bite - the cloud's stopword
+gate met δόξα and died on the precondition; the guard is one line, the crash text is a named
+regression test asserting the RIGHT behavior (Greek terms rank in the cloud), and the lesson is
+now an oracle gotcha with teeth. Then the discoverability truth: Larry reached for edge tabs -
+and SW_WINDOW had carried a full peek-and-pin drawer-tab machinery all along, unwired. Speed and
+Cloud are right-edge tabs now (hover peeks, click pins - D-012 exactly as drawn), the deck grew
+an eleventh zone with a cumulus glyph, and W remains for the keyboard. The dig also caught a
+latent key-killer: present() clears keyboard focus, so any drawer visit left the paused keys
+dead - the tick self-heals focus now. Engine 41/41.
