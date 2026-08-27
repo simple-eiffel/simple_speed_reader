@@ -261,3 +261,21 @@ focus-follows-interest semantics - and the app's own surface class dissolved to 
 SW_PAINTER gained triangle_fill and arc_stroke, so glyph-drawing apps stay out of the cairo
 context entirely. Widgets suite: 198/198 both times. The toolkit is five features richer than
 the morning found it, every one demanded by a real application.
+
+### 24. The PDF drop that died — "poppler.dll was not found"
+**The ask.** A screenshot of Windows' own error dialog.
+**What the design did.** The copied exe had left its family behind: pdftotext needs poppler.dll
+and twenty-three companions, resolved from the exe's OWN directory. The set was found by
+isolation-directory bisection (never by guessing imports), and it ships DLL-isolated in a
+`pdf\` subfolder — non-negotiable, because poppler carries its own cairo.dll, and the one time
+it nearly shadowed the app's, only the running instance's file lock stopped it. Gotcha recorded;
+proven from the app's own working directory; installer 12 MB with the family aboard.
+
+### 25. "I need these visible to click and use while the reader is reading"
+**The ask.** The deck, full-time.
+**What the design did.** The product owner amended his own zero-chrome doctrine, and the deck
+learned state: PAUSE bars while the stream flows, PLAY when it doesn't; REPLAY mid-read (this
+sentence again, at pace), HERE when paused; the pedal engages the brake live exactly as the
+stage hold does; the speed drawer opens over the moving stream for live tuning. And thanks to
+focus-follows-interest — donated to SW_CANVAS an hour earlier — deck clicks never steal the
+keyboard from the stage.

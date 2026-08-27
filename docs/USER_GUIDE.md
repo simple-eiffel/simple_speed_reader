@@ -95,10 +95,12 @@ streams like any text; a pure scan without one is refused with a straight answer
 
 ## The deck
 
-The paused posture's controls are a drawn tape deck: **PLAY** (resume at the sentence head),
-**HERE** (resume exactly where you stopped), **STOP**, the **BRAKE pedal** — press and *hold* it
-to re-enter the stream braked at the crawl with the ribbon flowing, release to ease up to
-cruise — and the **SPEED** dial, which opens the speed drawer.
+A drawn tape deck rides the bottom of **every posture** — clickable while the stream flows:
+**PAUSE/PLAY** (state-aware: bars while running, triangle while paused), **REPLAY/HERE**
+(running: this sentence again at pace; paused: resume exactly where you stopped), **STOP**,
+the **BRAKE pedal** — press and *hold* it mid-read to glide down to the crawl with the ribbon
+flowing (it turns red), release to ease back to cruise; from paused it re-enters the stream
+braked — and the **SPEED** dial, which opens the speed drawer even over the running stream.
 
 ## Continue where you left off
 
