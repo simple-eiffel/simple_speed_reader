@@ -346,3 +346,17 @@ simple_shell gained `shell_set_window_icon` - the r-e-ad mark loads from the .ic
 beside the exe (the multi-size file the icon script built hours ago; Windows picks 16px for
 the title bar, larger for the taskbar) and lands via WM_SETICON on the first heartbeat. Shell
 suite 13/13. The reader now wears its own face.
+
+### 32. "The fisheye more pronounced, colorized like a word-cloud - and the FUN ask: a real scoped word cloud at pause"
+**The ask.** Bigger center word with readable neighbors; ribbon words colored by significance;
+and a pause-time cloud of the text's themes with a Document / Section / Paragraph scope,
+switchable on the spot.
+**What the design did.** One engine serves both faces: SR_WORDCLOUD makes a single frequency
+pass over the text - content words only, stopworded for modern English AND the KJV register
+(unto, thee, hath and their kin; verse-ref numerics excluded) - and tiers them against the
+observed peak. The ribbon grew (40px center, gentler 0.80 falloff, a 92px band) and its words
+now warm from plain ink through bright to amber to red by significance, so the paused glance
+reads both WHERE you are and WHAT matters near you. And the fun ask landed whole: W at pause
+(a running stream politely pauses first) opens the Word cloud drawer - the scope's top forty
+words sized and colored by rank, counts on the leaders, with the three scope buttons right in
+the drawer and the choice persisted. The ToC-before-the-book instinct, computed. Engine 40/40.
