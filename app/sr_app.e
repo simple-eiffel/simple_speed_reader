@@ -878,8 +878,10 @@ feature {NONE} -- Cockpit actions
 			l_decoded, l_title: STRING_32
 			i: INTEGER
 		do
-			if file_exists ("pdftotext.exe") then
-				create l_ex.make_with_path ("pdftotext.exe")
+			if file_exists ("pdf\pdftotext.exe") then
+					-- The shipped, DLL-isolated extractor (its own cairo
+					-- and friends live in pdf\, never shadowing ours).
+				create l_ex.make_with_path ("pdf\pdftotext.exe")
 			elseif file_exists ("D:\prod\simple_pdf\bin\pdftotext.exe") then
 				create l_ex.make_with_path ("D:\prod\simple_pdf\bin\pdftotext.exe")
 			else

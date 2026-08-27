@@ -57,8 +57,12 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 Source: "..\EIFGENs\speed_reader\F_code\simple_speed_reader.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\EIFGENs\speed_reader_worker\F_code\simple_speed_reader.exe"; DestDir: "{app}"; DestName: "speed_reader_worker.exe"; Flags: ignoreversion
 Source: "..\EIFGENs\speed_reader\F_code\cairo.dll"; DestDir: "{app}"; Flags: ignoreversion
-; Poppler's pdftotext (GPL, bundled by simple_pdf) - the PDF text layer's door.
-Source: "D:\prod\simple_pdf\bin\pdftotext.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Poppler's pdftotext + its companion DLLs (GPL, bundled by simple_pdf),
+; ISOLATED in {app}\pdf so poppler's own cairo.dll never shadows the app's.
+; Set determined empirically 2026-08-26 (wkhtmltox and the cpp/glib
+; bindings are not needed by the CLI and stay home).
+Source: "D:\prod\simple_pdf\bin\pdftotext.exe"; DestDir: "{app}\pdf"; Flags: ignoreversion
+Source: "D:\prod\simple_pdf\bin\*.dll"; DestDir: "{app}\pdf"; Excludes: "wkhtmltox.dll,poppler-cpp.dll,poppler-glib.dll"; Flags: ignoreversion
 Source: "..\app\resources\speed_reader.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\demo\sample_text.md"; DestDir: "{app}\demo"; Flags: ignoreversion
 Source: "..\docs\USER_GUIDE.md"; DestDir: "{app}"; Flags: ignoreversion isreadme

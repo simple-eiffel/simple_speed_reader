@@ -42,7 +42,7 @@ feature {NONE} -- Initialization
 
 			create l_row.make
 			l_row := l_row.with_gap (10.0)
-			create load_button.make ("Load .txt / .md file", Void)
+			create load_button.make ("Load .txt / .md / .pdf", Void)
 			l_row.put (load_button)
 			create start_button.make_primary ("Start reading  (Space pauses - Esc stops)", Void)
 			l_row.put (start_button)
