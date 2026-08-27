@@ -432,3 +432,25 @@ the whole digit row now belongs to the window. The choice persists beside the fo
 51/51 first build; GUI melted, finalized, and smoke-launched clean. The installer was NOT
 rebuilt: the 0.9.0 setup exe is the artifact under Larry's open approval, and its version
 stamp is his call.
+
+## The ship — 2026-08-27, 00:56
+
+### 37. "make the installer, update the repo README and /docs and then push it all out to repo — silent install it on this PC"
+**The ask.** The ship phase, compressed to one sentence, with the owner's own machine as the
+first customer.
+**What the design did.** The reading window was folded into 0.9.0's changelog entry before
+anything went public — nothing had shipped yet, so the release that ships is the release that
+has it. The docs went first per the standing rule: README badges and counts to 51/51 with a
+Release download link; the product page's hero now demonstrates the very feature (fisheye
+neighbors hung absolutely off the primary so the pivot stays mathematically centered under its
+ticks — the page must not lie about the law it advertises), a reading-window card, the keys
+table split honestly, back-offs relabeled to the drawer. The worker was re-finalized against
+the current engine so both packed exes match the tag; the first ISCC run failed honestly —
+finalize wipes F_code, taking the staged cairo.dll with it — restaged, 8.0 seconds, 12.4 MB.
+/VERYSILENT landed it over the owner's 23:38 install with exit 0, and the reinstall kept his
+profile and ledger untouched, which is the uninstall-prompt design working in reverse. The
+installed exe booted clean, no trace. Then the public birth: simple-eiffel/simple_speed_reader
+created with the whole night history, v0.9.0 tagged, the Release carrying the installer, Pages
+serving /docs, and the toolkit's side of the story — seven widget commits, three shell commits
+— pushed so a cloner builds. Ten other dependency repos checked: all current. 8:56 on the
+clock. One row open.
