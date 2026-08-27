@@ -39,6 +39,7 @@ feature {NONE} -- Initialization
 			create flow_map.make (reader)
 			create ribbon.make (reader)
 			create transport.make (reader)
+			create progress_bar.make (0.0)
 			create cockpit.make (settings.start_wpm, settings.comfy_max_wpm,
 				settings.skip_foreign, settings.quiz_opt_in)
 			create speed_drawer.make_titled ("Speed")
@@ -61,7 +62,9 @@ feature {NONE} -- Initialization
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
 			l_row.set_grow (1.0)
+			l_row.set_cross_axis ({SW_ROW}.Cross_stretch)
 			l_col.put (l_row)
+			l_col.put (progress_bar)
 			l_col.put (transport.surface)
 			running_root := l_col
 			create l_col.make
@@ -70,7 +73,9 @@ feature {NONE} -- Initialization
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
 			l_row.set_grow (1.0)
+			l_row.set_cross_axis ({SW_ROW}.Cross_stretch)
 			l_col.put (l_row)
+			l_col.put (progress_bar)
 			l_col.put (transport.surface)
 			braking_root := l_col
 			create l_col.make
@@ -79,7 +84,9 @@ feature {NONE} -- Initialization
 			l_row.put (flow_map.surface)
 			l_row.put (context_view.surface)
 			l_row.set_grow (1.0)
+			l_row.set_cross_axis ({SW_ROW}.Cross_stretch)
 			l_col.put (l_row)
+			l_col.put (progress_bar)
 			l_col.put (transport.surface)
 			paused_root := l_col
 			cockpit_root := cockpit.root
@@ -163,6 +170,9 @@ feature {NONE} -- The clock
 		do
 			if a_type = 25 then
 				l_now := window.tick_ms
+				if reader.has_text and then reader.token_count > 0 then
+					progress_bar.set_fraction (reader.position / reader.token_count)
+				end
 					-- The brake pedal (D-016): engage after a held press,
 					-- glide every tick, scrub while dragged left.
 				if is_press_live and then not brake_engaged and then reader.is_running
@@ -1150,6 +1160,9 @@ feature {NONE} -- Implementation
 	backoff_25_button, nudge_up_button, nudge_down_button: SW_BUTTON
 
 	transport: SR_TRANSPORT_VIEW
+
+	progress_bar: SW_PROGRESS
+			-- Position in the text, right under the stage (Larry #28).
 
 	logger: SIMPLE_LOGGER
 
