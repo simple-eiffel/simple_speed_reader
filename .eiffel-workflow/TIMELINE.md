@@ -45,6 +45,9 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | Fade toggle everywhere + window icon | 2026-08-26 ~22:00 | 6:00 | F key + drawer toggle + synced checkbox; shell_set_window_icon donation (13/13) - the r-e-ad mark in the title bar |
 | Colorized fisheye + scoped word cloud | 2026-08-26 22:15 | 6:15 | SR_WORDCLOUD (stopworded incl. KJV register) tiers the ribbon's colors; 40px center, 92px band; W opens the Document/Section/Paragraph cloud drawer; engine 40/40 |
 | Greek crash fixed + edge tabs wired | 2026-08-26 22:27 | 6:27 | third to_string_8 bite (named regression test; oracle gotcha); Speed/Cloud as right-edge peek-and-pin tabs; deck CLOUD button; focus self-heal after drawers; 41/41 |
+| Hardening pass (Phase 6) GREEN | 2026-08-26 ~23:10 | 7:10 | 9 adversarial tests first-build green - 50/50 total (monster words, all-foreign refusal, garbage quizzes, 20k stress) |
+| Ship materials complete | 2026-08-26 ~23:30 | 7:30 | ecosystem-standard README; docs/index.html product page; THE_NIGHT_BUILD.md narrative + published artifact page; installer rebuilt (8.5 s) |
+| **Silent install + installed exe verified** | 2026-08-26 23:38 | 7:38 | /VERYSILENT exit 0 to %LOCALAPPDATA%\Programs; both exes + cairo + icon + pdf family (25 files) + demo + guide; INSTALLED app launched clean for screenshots |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release
