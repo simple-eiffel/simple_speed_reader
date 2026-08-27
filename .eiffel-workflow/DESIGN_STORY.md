@@ -296,3 +296,16 @@ shell forwards no key-up; a key cannot hear its own release), working from runni
 both. And discovery: donation #8, SW_CANVAS.on_hover, lets the one-canvas deck retarget its
 tooltip per button - so every control in the reader now names its own key-combo when the mouse
 rests on it. Everything persists; everything reloads at boot. Engine 36/36.
+
+### 27. "A start-over button - and back/fwd by paragraph? Sections, if they're detectable?"
+**The ask.** VCR navigation by structure, with the section buttons appearing only when the text
+actually has sections.
+**What the design did.** Paragraphs were already first-class (blank-line breaks - the same in
+markdown, plain text, and pdftotext output), so |< and >| were pure navigation over a shared
+jump engine. Sections got an honest detector: markdown '#' lines always, plus the short
+unpunctuated standalone line that is how pdftotext renders a heading - with a leading title
+free, so "sections exist" means at least two. Exactly as asked, the SECT buttons ghost out on
+unstructured prose and their tooltip says why; on a real book they light up. START (|<<) does
+what a tape deck means by it: word one, and the RAMP starts over too - back to your start
+speed, climbing fresh. The deck is ten zones now, VCR-ordered, every button still naming its
+behavior on hover. Engine 38/38.

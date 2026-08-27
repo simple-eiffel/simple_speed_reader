@@ -37,6 +37,9 @@ on the idea; timestamps below from file system / oracle log, local time UTC-4)
 | **Installer built** | 2026-08-26 19:38 | 3:38 | SimpleSpeedReader-0.9.0-Setup.exe, 7 MB — ISCC compile 7.8 s (rebuild 5.8 s with final guide) |
 | v0.9.0 feature-complete, docs refreshed | 2026-08-26 19:40 | 3:40 | README/CHANGELOG/USER_GUIDE tell tonight's truth; awaiting the row below |
 | Late round: drops + PDFs + the deck + factoring | 2026-08-26 20:02 | 4:02 | Explorer drag-drop everywhere; pdftotext intake (live on ECMA-367!); drawn VCR deck w/ brake pedal; SW_CANVAS + SW_PAINTER grew five donated features (198/198); installer rebuilt 5.9 s |
+| Poppler family fix + full-time deck | 2026-08-26 20:15 | 4:15 | DLL-isolated pdf\ (24 DLLs, bisected); deck rides every posture, state-aware PAUSE/REPLAY, live pedal |
+| Keys volley: tiers, Alt-font, B, tooltips | 2026-08-26 20:29 | 4:29 | shell keymap donation (13/13); +/- 25/50/100; Alt±4pt persisted; 21px honest readout; B brake toggle; hover combos everywhere (SW_CANVAS.on_hover donation); engine 36/36 |
+| Structure navigation: START/PARA/SECT | 2026-08-26 20:43 | 4:43 | 10-zone VCR deck; section detection (md # + standalone headings), SECT ghosts without structure; fresh-ramp start-over; engine 38/38 |
 | **LARRY APPROVES deliverable** | — | — | THE finish line for this clock |
 
 Still ahead of a 1.0 tag: hardening pass (Phase 6 adversarial tests), GitHub repo + Release
