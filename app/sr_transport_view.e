@@ -38,10 +38,13 @@ feature -- Access
 
 	on_start_over, on_par_back, on_par_fwd, on_sect_back, on_sect_fwd: detachable PROCEDURE
 
+	on_cloud: detachable PROCEDURE
+
 feature -- Element change
 
 	wire (a_play, a_here, a_stop, a_speed, a_brake_press, a_brake_release,
-			a_start_over, a_par_back, a_par_fwd, a_sect_back, a_sect_fwd: PROCEDURE)
+			a_start_over, a_par_back, a_par_fwd, a_sect_back, a_sect_fwd,
+			a_cloud: PROCEDURE)
 		do
 			on_play := a_play
 			on_here := a_here
@@ -54,13 +57,14 @@ feature -- Element change
 			on_par_fwd := a_par_fwd
 			on_sect_back := a_sect_back
 			on_sect_fwd := a_sect_fwd
+			on_cloud := a_cloud
 		end
 
 feature {NONE} -- Geometry (VCR order)
 
 	Deck_height: REAL_64 = 72.0
 	Zone_w: REAL_64 = 84.0
-	Button_count: INTEGER = 10
+	Button_count: INTEGER = 11
 
 	Btn_start: INTEGER = 1
 	Btn_sect_back: INTEGER = 2
@@ -72,6 +76,7 @@ feature {NONE} -- Geometry (VCR order)
 	Btn_stop: INTEGER = 8
 	Btn_brake: INTEGER = 9
 	Btn_speed: INTEGER = 10
+	Btn_cloud: INTEGER = 11
 
 	deck_left (a_w: REAL_64): REAL_64
 		do
@@ -171,6 +176,10 @@ feature {NONE} -- Painting
 					p.set_color (Ink)
 					speed_glyph (p, gx, gy)
 					glyph_label (p, gx, a_y, "SPEED")
+				when Btn_cloud then
+					p.set_color (Ink)
+					cloud_glyph (p, gx, gy)
+					glyph_label (p, gx, a_y, "CLOUD")
 				else
 				end
 				i := i + 1
@@ -209,6 +218,16 @@ feature {NONE} -- Painting
 			p.fill_rect (a_cx - 1.2, a_cy + 2.6, 2.4, 2.4)
 			p.arc_stroke (a_cx, a_cy, 12.5, 2.4, 3.9)
 			p.arc_stroke (a_cx, a_cy, 12.5, -0.75, 0.75)
+		end
+
+	cloud_glyph (p: SW_PAINTER; a_cx, a_cy: REAL_64)
+			-- A little cumulus: three arcs on a baseline.
+		do
+			p.set_line_width (2.0)
+			p.arc_stroke (a_cx - 6.0, a_cy + 2.0, 5.0, 1.57, 4.71)
+			p.arc_stroke (a_cx, a_cy - 3.0, 6.5, 2.6, 6.1)
+			p.arc_stroke (a_cx + 7.0, a_cy + 2.0, 5.0, 4.71, 7.85)
+			p.line (a_cx - 6.0, a_cy + 7.0, a_cx + 7.0, a_cy + 7.0, 2.0)
 		end
 
 	speed_glyph (p: SW_PAINTER; a_cx, a_cy: REAL_64)
@@ -255,6 +274,8 @@ feature {NONE} -- Input
 				call_if (on_brake_press)
 			when 10 then
 				call_if (on_speed)
+			when 11 then
+				call_if (on_cloud)
 			else
 			end
 		end
@@ -315,6 +336,8 @@ feature {NONE} -- Input
 				surface.set_tooltip ("BRAKE - hold with the mouse - key B toggles - drag left to scrub back")
 			when 10 then
 				surface.set_tooltip ("SPEED drawer - keys: +/- 25 wpm, Shift 50, Ctrl+Shift 100 - Alt +/- font size")
+			when 11 then
+				surface.set_tooltip ("WORD CLOUD - key W - the themes of the document, section or paragraph")
 			else
 				surface.set_tooltip ("")
 			end

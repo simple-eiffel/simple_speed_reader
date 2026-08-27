@@ -128,7 +128,8 @@ feature {NONE} -- Initialization
 				agent on_deck_brake_press, agent do_brake_release,
 				agent on_deck_start_over,
 				agent on_deck_paragraph (True), agent on_deck_paragraph (False),
-				agent on_deck_section (True), agent on_deck_section (False))
+				agent on_deck_section (True), agent on_deck_section (False),
+				agent on_cloud_key)
 			ribbon.set_on_word_click (agent on_word_marked)
 			stage.surface.set_on_files (agent on_files_dropped)
 			context_view.surface.set_on_files (agent on_files_dropped)
@@ -163,6 +164,9 @@ feature {NONE} -- Initialization
 			cloud_par_button.set_tooltip ("Themes of this paragraph")
 			cockpit.show_history (ledger.recent_lines (6))
 			apply_fade_mode
+				-- Edge tabs (D-012 as promised): hover peeks, click pins.
+			window.add_drawer_tab ("Speed", agent built_speed_drawer, {SW_WINDOW}.Edge_right)
+			window.add_drawer_tab ("Cloud", agent built_cloud_drawer, {SW_WINDOW}.Edge_right)
 
 			window.set_root (cockpit_root)
 			window.set_on_shell_event (agent on_shell_event)
@@ -199,6 +203,15 @@ feature {NONE} -- The clock
 				l_now := window.tick_ms
 				if reader.has_text and then reader.token_count > 0 then
 					progress_bar.set_fraction (reader.position / reader.token_count)
+				end
+					-- A closed drawer leaves focus Void (present clears
+					-- it): self-heal so the keys never die.
+				if window.sheet_content = Void and then window.focused = Void then
+					if posture = Posture_paused then
+						window.give_focus (context_view.surface)
+					elseif posture = Posture_running then
+						window.give_focus (stage.surface)
+					end
 				end
 					-- The brake pedal (D-016): engage after a held press,
 					-- glide every tick, scrub while dragged left.
@@ -1193,8 +1206,25 @@ feature {NONE} -- Cockpit actions
 	open_cloud_drawer
 		do
 			refresh_cloud
+			logger.info ("cloud drawer opened (scope " + settings.cloud_scope.out + ")")
 			window.show_drawer (cloud_drawer, 560.0, False)
 			window.request_render
+		end
+
+	built_speed_drawer: SW_WIDGET
+			-- The Speed edge tab's content, labels fresh.
+		do
+			refresh_speed_labels
+			Result := speed_drawer
+		end
+
+	built_cloud_drawer: SW_WIDGET
+			-- The Cloud edge tab's content, recomputed for the position.
+		do
+			if reader.has_text and then reader.position >= 1 then
+				refresh_cloud
+			end
+			Result := cloud_drawer
 		end
 
 	refresh_cloud
