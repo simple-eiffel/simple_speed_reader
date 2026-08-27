@@ -56,10 +56,14 @@ feature {NONE} -- Initialization
 			speed_drawer.put (nudge_up_button)
 			create nudge_down_button.make ("Target -25  (Down)", Void)
 			speed_drawer.put (nudge_down_button)
+			create l_col.make
 			create l_row.make
 			l_row.put (flow_map.surface)
 			l_row.put (stage.surface)
-			running_root := l_row
+			l_row.set_grow (1.0)
+			l_col.put (l_row)
+			l_col.put (transport.surface)
+			running_root := l_col
 			create l_col.make
 			l_col.put (ribbon.surface)
 			create l_row.make
@@ -67,6 +71,7 @@ feature {NONE} -- Initialization
 			l_row.put (stage.surface)
 			l_row.set_grow (1.0)
 			l_col.put (l_row)
+			l_col.put (transport.surface)
 			braking_root := l_col
 			create l_col.make
 			l_col.put (ribbon.surface)
@@ -94,7 +99,7 @@ feature {NONE} -- Initialization
 				agent on_start_wpm_changed, agent on_comfy_changed,
 				agent on_skip_toggled, agent on_quiz_toggled, agent on_quiz_preview,
 				agent on_quiz_reveal, agent on_quiz_judged (True), agent on_quiz_judged (False))
-			transport.wire (agent on_paused_resume_clicked, agent on_paused_here_clicked,
+			transport.wire (agent on_deck_play, agent on_deck_here,
 				agent do_stop, agent open_speed_drawer,
 				agent on_deck_brake_press, agent do_brake_release)
 			ribbon.set_on_word_click (agent on_word_marked)
@@ -385,11 +390,23 @@ feature {NONE} -- Transport (D-014)
 		end
 
 	on_deck_brake_press
-			-- The deck's pedal, pressed while PAUSED: resume braked -
-			-- back into the stream at the crawl, ribbon flowing; let go
-			-- and it eases up to cruise.
+			-- The deck's pedal. While RUNNING: engage the brake, as the
+			-- stage hold does. While PAUSED: resume braked - back into
+			-- the stream at the crawl, ribbon flowing. Release eases
+			-- up to cruise either way.
 		do
-			if reader.is_paused then
+			if reader.is_running and then not brake_engaged then
+				brake_engaged := True
+				scrub_mode := False
+				scrub_accumulator := 0.0
+				if not reader.is_brake_active then
+					reader.apply_brake
+				end
+				logger.info ("deck pedal: brake engaged at word " + reader.position.out)
+				window.set_root (braking_root)
+				window.give_focus (stage.surface)
+				window.request_render
+			elseif reader.is_paused then
 				reader.resume_at_sentence_start (window.tick_ms)
 				posture := Posture_running
 				brake_engaged := True
@@ -464,17 +481,25 @@ feature {NONE} -- Transport (D-014)
 			speed_label.set_text (l_s)
 		end
 
-	on_paused_resume_clicked
+	on_deck_play
+			-- The deck's first button: PAUSE while running, PLAY while paused.
 		do
-			if reader.is_paused then
+			if reader.is_running then
+				do_pause
+			elseif reader.is_paused then
 				reader.resume_at_sentence_start (window.tick_ms)
 				to_running
 			end
 		end
 
-	on_paused_here_clicked
+	on_deck_here
+			-- REPLAY (this sentence again, at pace) while running;
+			-- resume-exactly-here while paused.
 		do
-			if reader.is_paused and then reader.position >= 1 then
+			if reader.is_running then
+				reader.replay_sentence (window.tick_ms)
+				window.request_render
+			elseif reader.is_paused and then reader.position >= 1 then
 				reader.resume_at (reader.position, window.tick_ms)
 				to_running
 			end

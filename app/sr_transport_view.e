@@ -98,13 +98,23 @@ feature {NONE} -- Painting
 				inspect i
 				when 1 then
 					p.set_color (Ink)
-					triangle_right (p, gx - 2.0, gy, 11.0)
-					glyph_label (p, gx, a_y, "PLAY")
+					if reader.is_running then
+						p.fill_rect (gx - 8.0, gy - 10.0, 5.0, 20.0)
+						p.fill_rect (gx + 3.0, gy - 10.0, 5.0, 20.0)
+						glyph_label (p, gx, a_y, "PAUSE")
+					else
+						triangle_right (p, gx - 2.0, gy, 11.0)
+						glyph_label (p, gx, a_y, "PLAY")
+					end
 				when 2 then
 					p.set_color (Ink)
 					p.fill_rect (gx - 11.0, gy - 10.0, 3.0, 20.0)
 					triangle_right (p, gx + 2.0, gy, 9.0)
-					glyph_label (p, gx, a_y, "HERE")
+					if reader.is_running then
+						glyph_label (p, gx, a_y, "REPLAY")
+					else
+						glyph_label (p, gx, a_y, "HERE")
+					end
 				when 3 then
 					p.set_color (Ink)
 					p.fill_rect (gx - 9.0, gy - 9.0, 18.0, 18.0)
