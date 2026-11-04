@@ -1,7 +1,7 @@
 # SCOPE: simple_speed_reader
 
 **Date:** 2026-08-26
-**Idea source:** Larry's video `C:\Users\LJR19\Videos\read-speed-drill.mp4` (55s screen capture of a
+**Idea source:** Larry's video `C:\Users\user\Videos\read-speed-drill.mp4` (55s screen capture of a
 Spritz-style RSVP reader: one word at a time, red pivot letter fixed at screen center with tick
 marks, dark screen, `SPEED: NNN WPM` readout ramping 300 → 803 WPM, blank breathers at sentence ends).
 

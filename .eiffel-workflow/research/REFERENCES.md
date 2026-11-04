@@ -42,5 +42,5 @@
   ("event 25 every a_ms")
 - D:\prod\simple_ai_client\src\providers\ollama\ollama_client.e:263 — Default_base_url
   http://localhost:11434 (Larry's native GPU instance: 11435 — must stay configurable)
-- Source video: C:\Users\LJR19\Videos\read-speed-drill.mp4 (55 s, 1048×1312, 30 fps; frames
+- Source video: C:\Users\user\Videos\read-speed-drill.mp4 (55 s, 1048×1312, 30 fps; frames
   sampled at 4 s intervals; observed WPM 300/442/456/595/697/717/803; blank sentence breathers)
