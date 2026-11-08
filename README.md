@@ -17,8 +17,10 @@
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
   <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
-  <img src="https://img.shields.io/badge/Platform-Windows%20x64-lightgrey.svg" alt="Windows x64">
   <img src="https://img.shields.io/badge/tests-51%2F51-brightgreen.svg" alt="Tests 51/51">
+  <img src="https://img.shields.io/badge/Windows-tests%20pass-0078D6?logo=windows&logoColor=white" alt="Windows: tests pass">
+  <img src="https://img.shields.io/badge/Linux-tests%20pass-FCC624?logo=linux&logoColor=black" alt="Linux: tests pass">
+  <img src="https://img.shields.io/badge/macOS-tests%20pass-000000?logo=apple&logoColor=white" alt="macOS: tests pass">
 </p>
 
 **Read fast without lying to yourself.** An RSVP speed reader — one word at a
