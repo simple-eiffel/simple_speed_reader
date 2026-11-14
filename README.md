@@ -77,6 +77,9 @@ features this application factored back into them. Awaiting the 1.0 tag.
 - Local-only by design: the quiz talks to your own Ollama; nothing leaves the machine
 - The reading ledger (SQLite), profile, and bookmarks live beside the exe
 
+The engine and its tests run on Windows, macOS and Linux. The app and
+installer are Windows only for now.
+
 ## The idea
 
 Reading science has two standing objections to RSVP speed reading: it
@@ -134,16 +137,23 @@ continue-where-you-left-off.
 
 ## Install
 
-Download `SimpleSpeedReader-0.9.0-Setup.exe` from the
+On Windows, download `SimpleSpeedReader-0.9.0-Setup.exe` from the
 [latest Release](https://github.com/simple-eiffel/simple_speed_reader/releases/latest)
 and run it (per-user, no UAC; ~12 MB). The uninstaller asks before touching
 your reading history — and never asks silently.
 
 ## Build from source
 
+Engine tests (Windows, macOS and Linux; no `.exe` on macOS/Linux):
+
 ```
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target simple_speed_reader_tests
 ./EIFGENs/simple_speed_reader_tests/F_code/simple_speed_reader.exe    # 51/51
+```
+
+The app, its worker and the installer (Windows only for now):
+
+```
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader
 /d/prod/ec.sh test -config simple_speed_reader.ecf -target speed_reader_worker
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\simple_speed_reader.iss
@@ -168,7 +178,7 @@ never meets a blocking call, by construction.
 
 | Library | Purpose |
 |---------|---------|
-| simple_widgets / simple_shell / simple_cairo | the drawn Win32 face |
+| simple_widgets / simple_shell / simple_cairo | the drawn Win32 face (Windows only for now) |
 | simple_ai_client | Ollama (worker process only) |
 | simple_sql | the reading ledger |
 | simple_config | the profile |
