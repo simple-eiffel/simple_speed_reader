@@ -21,6 +21,7 @@
 #define AppVersion     "0.9.0"
 #define AppPublisher   "Larry Rix"
 #define AppExeName     "simple_speed_reader.exe"
+#define CairoDir       "..\..\simple_cairo\runtime\windows"
 
 [Setup]
 AppId={{C226CF56-B82C-4593-A61F-A6EAAFB320C3}
@@ -56,7 +57,10 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 [Files]
 Source: "..\EIFGENs\speed_reader\F_code\simple_speed_reader.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\EIFGENs\speed_reader_worker\F_code\simple_speed_reader.exe"; DestDir: "{app}"; DestName: "speed_reader_worker.exe"; Flags: ignoreversion
-Source: "..\EIFGENs\speed_reader\F_code\cairo.dll"; DestDir: "{app}"; Flags: ignoreversion
+; cairo 1.18.0 and the six libraries it loads: the fleet's one set, owned by simple_cairo
+; (BUILD_STANDARDS section 9), with their licenses. Never a copy from F_code or elsewhere.
+Source: "{#CairoDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#CairoDir}\licenses\*"; DestDir: "{app}\licenses\cairo"; Flags: ignoreversion
 ; Poppler's pdftotext + its companion DLLs (GPL, bundled by simple_pdf),
 ; ISOLATED in {app}\pdf so poppler's own cairo.dll never shadows the app's.
 ; Set determined empirically 2026-08-26 (wkhtmltox and the cpp/glib
