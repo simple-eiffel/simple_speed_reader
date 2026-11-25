@@ -67,6 +67,7 @@ Source: "{#CairoDir}\licenses\*"; DestDir: "{app}\licenses\cairo"; Flags: ignore
 ; bindings are not needed by the CLI and stay home).
 Source: "D:\prod\simple_pdf\bin\pdftotext.exe"; DestDir: "{app}\pdf"; Flags: ignoreversion
 Source: "D:\prod\simple_pdf\bin\*.dll"; DestDir: "{app}\pdf"; Excludes: "wkhtmltox.dll,poppler-cpp.dll,poppler-glib.dll"; Flags: ignoreversion
+Source: "D:\prod\simple_pdf\bin\licenses\*"; DestDir: "{app}\pdf\licenses"; Flags: ignoreversion recursesubdirs
 Source: "..\app\resources\speed_reader.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\demo\sample_text.md"; DestDir: "{app}\demo"; Flags: ignoreversion
 Source: "..\docs\USER_GUIDE.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
